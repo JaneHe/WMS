@@ -1,0 +1,150 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{DA44DA61-A53C-4F13-ABCF-4C024A7CF18F}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Tops.FRM</RootNamespace>
+    <AssemblyName>Tops.FRM</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EncryptCode, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>bin\Debug\EncryptCode.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=14.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\TopsERP\bin\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI">
+      <HintPath>..\..\..\TopsHNAH\Tops.FRM\bin\Debug\NPOI.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OOXML">
+      <HintPath>..\..\..\TopsHNAH\Tops.FRM\bin\Debug\NPOI.OOXML.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXml4Net">
+      <HintPath>..\..\..\TopsHNAH\Tops.FRM\bin\Debug\NPOI.OpenXml4Net.dll</HintPath>
+    </Reference>
+    <Reference Include="NPOI.OpenXmlFormats">
+      <HintPath>..\..\..\TopsHNAH\Tops.FRM\bin\Debug\NPOI.OpenXmlFormats.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.configuration" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Web.Mvc, Version=3.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="AttachsHelp.cs" />
+    <Compile Include="Barcode.cs" />
+    <Compile Include="Biz.cs" />
+    <Compile Include="BizResult.cs" />
+    <Compile Include="DbHelperSQL.cs" />
+    <Compile Include="DecalerEmail.cs" />
+    <Compile Include="EmailErrorLog.cs" />
+    <Compile Include="EmailHelp.cs" />
+    <Compile Include="Encryption.cs" />
+    <Compile Include="ExcelHelp.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Log.cs" />
+    <Compile Include="Lookup.cs" />
+    <Compile Include="Module.cs" />
+    <Compile Include="ModuleConfig.cs" />
+    <Compile Include="Mvc\AccountController.cs" />
+    <Compile Include="Mvc\ExcelHelpController.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Mvc\Global.cs" />
+    <Compile Include="Mvc\SharedController.cs" />
+    <Compile Include="Mvc\ToolsController.cs" />
+    <Compile Include="Mvc\TopsViewEngine.cs" />
+    <Compile Include="Mvc\ZyUploadController.cs" />
+    <Compile Include="ObjExtensions.cs" />
+    <Compile Include="MD5Common.cs" />
+    <Compile Include="Field.cs" />
+    <Compile Include="Mvc\CommonController.cs" />
+    <Compile Include="Mvc\Filters.cs" />
+    <Compile Include="Mvc\TopsMvcHttpHandler.cs" />
+    <Compile Include="Mvc\TopsMvcRouteHandler.cs" />
+    <Compile Include="PostResult.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SendingEmail.cs" />
+    <Compile Include="TopsCommon.cs" />
+    <Compile Include="TopsException.cs" />
+    <Compile Include="TopsMeta.cs" />
+    <Compile Include="TopsModel.cs" />
+    <Compile Include="TopsTools.cs" />
+    <Compile Include="TopsUser.cs" />
+    <Compile Include="Upload.cs" />
+    <Compile Include="UploadExecl.cs" />
+    <Compile Include="UploadFile.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+    <None Include="obj\Debug\ResolveAssemblyReference.cache" />
+    <None Include="Properties\.svn\all-wcprops" />
+    <None Include="Properties\.svn\entries" />
+    <None Include="Properties\.svn\text-base\AssemblyInfo.cs.svn-base" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="bin\Release\" />
+    <Folder Include="obj\Debug\TempPE\" />
+    <Folder Include="Properties\.svn\prop-base\" />
+    <Folder Include="Properties\.svn\props\" />
+    <Folder Include="Properties\.svn\tmp\prop-base\" />
+    <Folder Include="Properties\.svn\tmp\props\" />
+    <Folder Include="Properties\.svn\tmp\text-base\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="bin\Debug\Tops.FRM.dll" />
+    <Content Include="bin\Debug\Tops.FRM.pdb" />
+    <Content Include="obj\Debug\Tiger.FRM.dll" />
+    <Content Include="obj\Debug\Tiger.FRM.pdb" />
+    <Content Include="obj\Debug\Tops.FRM.csproj.FileListAbsolute.txt" />
+    <Content Include="obj\Debug\Tops.FRM.dll" />
+    <Content Include="obj\Debug\Tops.FRM.pdb" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
