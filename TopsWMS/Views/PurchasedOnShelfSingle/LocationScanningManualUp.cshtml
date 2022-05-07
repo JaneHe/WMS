@@ -1,0 +1,492 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("ParentIds"))
+    {
+        ParentIds = Request.QueryString["ParentIds"];
+    }
+    //货物编码
+    string GoodsCode = Request.QueryString["GoodsCode"];
+    if (Request.QueryString.AllKeys.Contains("GoodsCode"))
+    {
+        GoodsCode = Request.QueryString["GoodsCode"];
+    }
+    
+    //货物标识编码
+    string GoodsBarCode = Request.QueryString["GoodsBarCode"];
+    if (Request.QueryString.AllKeys.Contains("GoodsBarCode"))
+    {
+        GoodsBarCode = Request.QueryString["GoodsBarCode"];
+    }
+     
+    
+    //数量
+    string GoodsWorkQuantity = Request.QueryString["GoodsWorkQuantity"];
+    if (Request.QueryString.AllKeys.Contains("GoodsWorkQuantity"))
+    {
+        GoodsWorkQuantity = Request.QueryString["GoodsWorkQuantity"];
+    }
+    
+    //仓库外键ID
+    string n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+    if (Request.QueryString.AllKeys.Contains("n_Warehouse_Id"))
+    {
+        n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+    } 
+
+    //下架单据外键ID
+    string n_BillStockInOut_Id = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("n_BillStockInOut_Id"))
+    {
+        n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"];
+    }
+
+    //单据的录入方式 批量录入[2]，单个录入[1];
+    string s_Warehouse_ShelfForm = "2";
+    if (Request.QueryString.AllKeys.Contains("s_Warehouse_ShelfForm"))
+    {
+        s_Warehouse_ShelfForm = Request.QueryString["s_Warehouse_ShelfForm"];
+    }
+}
+@section Body{
+    <input type="hidden" name="GoodsCode" value="@(GoodsCode)" />
+    <input type="hidden" name="GoodsBarCode" value="@(GoodsBarCode)" /> 
+    <div class="body">
+        <div v-bind:class="RadioTab_Showed">
+            <input type="radio" id="radio1" name="radio" value="系统分配" v-on:click="f_radio" /><label for="radio1">系统分配</label> 
+            <input type="radio" id="radio2" checked="true" name="radio" value="手工指定" v-on:click="f_radio" /><label for="radio2">手工指定</label> 
+        </div>
+        <div v-bind:class="TitleTab_Showed">
+            <table cellspacing="0">
+                <tr>
+                    <th>
+                        库位
+                    </th>
+                    <th>
+                        下架数
+                    </th>
+                    <th>
+                        剩余数
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table cellspacing="0">
+                <tr v-for="(item,i) in DataList" :index="i" :s_ReportInventoryCurrent_Code="item.s_ReportInventoryCurrent_Code" :s_ReportInventoryCurrent_SurplusNumber="item.s_ReportInventoryCurrent_SurplusNumber" :class="{ 'morechecked':item.s_ReportInventoryCurrent_isCheck }" v-on:click="f_checkontr" >
+                   <td>{{ item.s_ReportInventoryCurrent_Code }}</td>
+                   <td>{{ item.s_ReportInventoryCurrent_DownNumber }}</td>
+                   <td>{{ item.n_ReportInventoryCurrent_SurplusNumber > 100000000 ? "---" : item.n_ReportInventoryCurrent_SurplusNumber }}</td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <input type="text" v-bind:class="GoodsWorkQuantity_Showed" name="GoodsWorkQuantity" value="@(GoodsWorkQuantity)" placeholder="下架总数" disabled="disabled" readonly="true" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="SpaceBarCode_Showed" name="SpaceBarCode" placeholder="请输入库位码" v-on:keyup.enter="f_reSureSpaceCode" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="SpaceAmount_Showed" name="Amount" placeholder="请输入下架数量" v-on:keyup.enter="f_reSureSpaceAmount" />
+        </div>
+        
+        <div v-bind:class="button_Div_Showed">
+            <div v-on:click="f_DelBillStockInOut">
+                删除</div>
+            <div v-on:click="f_SaveBillStockInOut">
+                确认下架</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .TitleTab
+        {
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+            line-height: 22px;
+        }
+        .TitleTab table
+        {
+            width: 100%;
+            height: 100%;
+        }
+        .TitleTab th
+        {
+            width: 33%;
+            border: 1px solid #a5e0a5;
+            line-height: 22px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+            background: rgb(200 220 232);
+        }
+        
+        .InfoTab
+        {
+            width: calc(90%);
+            max-height: 132px;
+            min-height: 132px;
+            margin: calc(0%) calc(5%);
+            text-align: center;
+            line-height: 22px;
+            overflow-y: scroll;
+        }
+        .InfoTab table
+        {
+            width: 100%;
+            height: 100%;
+        }
+        .InfoTab td
+        {
+            width: 33%;
+            border: 1px solid #a5e0a5;
+            height: 22px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        
+        .GoodsWorkQuantity
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .SpaceBarCode
+        {
+            width: calc(90%);
+            margin: calc(0%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .SpaceAmount
+        { 
+            width: calc(90%);
+            margin: calc(0%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center; 
+        }
+        
+        
+        .button_Div div
+        {
+            width: calc(43%);
+            margin: calc(2%) calc(2%) calc(2%) calc(4%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        .RadioTab
+        { 
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Post请求
+        var ajaxFirst = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    RadioTab_Showed: "RadioTab", //单选框样式
+                    TitleTab_Showed: "TitleTab", //结果标题表格样式
+                    InfoTab_Showed: "InfoTab",   //结果表格样式
+                    GoodsWorkQuantity_Showed: "GoodsWorkQuantity",   //数量样式
+                    SpaceBarCode_Showed: "SpaceBarCode",   //库位码样式
+                    button_Div_Showed: "button_Div", //按钮样式
+                    SpaceAmount_Showed: "SpaceAmount",
+                    DataList: new Array(), //结果表格数据
+                    GoodsWorkQuantity: "@(GoodsWorkQuantity)"
+                },
+                methods: {
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("条码扫描");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../PurchasedOnShelfSingle/AddBillStockInOutDetail?ParentIds=" + "@ParentIds" + "&GoodsCode="  + "@(GoodsCode)"
+                            + "&GoodsWorkQuantity=" + "@GoodsWorkQuantity" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&GoodsBarCode=" + "@(GoodsBarCode)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../PurchasedOnShelfSingle/AddBillStockInOutDetail?ParentIds=" + "@ParentIds" + "&GoodsCode="  + "@(GoodsCode)"
+                            + "&GoodsWorkQuantity=" + "@GoodsWorkQuantity" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&GoodsBarCode=" + "@(GoodsBarCode)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)";
+                            })
+                        }
+
+                        //库位码焦点
+                        $(".SpaceBarCode").focus().select();
+
+
+                    },
+                    //根据货物编码判定是否可以匹配对应进行出库
+                    f_SelPutOnOffSingleReportInventoryCurrentIsExists: function (SpaceBarCode) {
+
+                        //对象名 根据货物编码判定是否可以匹配对应进行出库
+                        var objectName = "SelPurchasedOnShelfSingleInventoryCurrentExists";
+                        //传递参数
+                        var param = { s_ReportInventoryCurrent_GoodsProductCode: "@(GoodsCode)",
+                            s_ReportInventoryCurrent_Code: SpaceBarCode,
+                            s_ReportInventoryCurrent_QualityStatus: 1, 
+                            n_BillStockInOut_Id: "@(n_BillStockInOut_Id)"
+                        };
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            if (result.IsSuccess) {
+                                if (result.Data[0].length > 0) {
+
+                                    vue.DataList.forEach(function (value, index) {
+                                        value.s_ReportInventoryCurrent_isCheck = false;
+                                    })
+
+                                    $.each(result.Data[0], function (index, value) {
+                                        vue.DataList.push({
+                                            s_ReportInventoryCurrent_Code: value.s_ReportInventoryCurrent_Code,
+                                            n_ReportInventoryCurrent_Number: value.n_ReportInventoryCurrent_LotsizeNumber,
+                                            n_ReportInventoryCurrent_SurplusNumber: value.n_ReportInventoryCurrent_LotsizeNumber,
+                                            s_ReportInventoryCurrent_DownNumber: 0,
+                                            s_ReportInventoryCurrent_isCheck: true,
+                                            s_ReportInventoryCurrent_GoodsProductCode: "@(GoodsCode)",
+                                            s_ListStockInOut_QualityStatus: 1,
+                                            s_Warehouse_ShelfForm:"@(s_Warehouse_ShelfForm)",
+                                            n_ReportInventoryCurrent_Id:value.n_ReportInventoryCurrent_Id,
+                                            s_ReportInventoryCurrent_GoodsBarCode: "@(GoodsBarCode)",
+                                            n_BillStockInOut_Id: "@(n_BillStockInOut_Id)"
+                                        })
+                                    })
+
+
+                                    //清空 并焦点到数量文本框
+                                    $(".SpaceBarCode").val("");
+                                    $(".SpaceAmount").val("").focus();
+                                } else {
+                                
+                                    f_commonShowMsg("该储位已经没有对应产品的库存,请重新确认!");
+                                    //焦点到数量文本框
+                                    $(".SpaceBarCode").val("").focus();
+                                }
+                            }
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+
+                            //焦点到数量文本框
+                            $(".SpaceBarCode").val("").focus();
+                        })
+                    },
+                    //进行下架确认
+                    f_SaveBillStockInOut: function () {
+
+                        var obj = event.target;
+
+                        if ($(obj).is("[disabled]")) {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxFirst != null) {
+                            ajaxFirst.abort();
+                            ajaxFirst = null;
+                            return;
+                        }
+                        $(obj).attr("disabled", "disabled");
+
+                        //需要库位数据才能保存
+                        if (vue.DataList.length == 0) {
+
+                            f_commonShowMsg("请扫下架的储位二维码,填写数量再进行下架操作!");
+                            //焦点到条码文本框
+                            $(".SpaceBarCode").val("").focus();
+
+                            $(obj).removeAttr("disabled");
+                            return;
+                        }
+
+                        //计算下架数量之和，看是否超过前面所定义的数量，超过则不允许保存
+                        var sum = 0;
+                        vue.DataList.forEach(function (value, index) {
+                            sum += parseInt(value.s_ReportInventoryCurrent_DownNumber);
+                        })
+                        var GoodsWorkQuantity = parseInt($("[name=GoodsWorkQuantity]").val());
+                        if (sum > GoodsWorkQuantity) {
+
+                            f_commonShowMsg("当前进行下架的记录数量之和已超过之前已输入的下架数量,请重新调整!");
+
+                            //焦点到数量文本框
+                            $(".SpaceAmount").val("").focus();
+                            $(obj).removeAttr("disabled");
+
+                            ajaxFirst = null;
+                            return;
+                        }
+                        
+
+
+                        //对象名 新增货物出库记录以及下架记录
+                        var objectName = "InsertPurchasedOnShelfSingleListStockInOut";
+
+                        var param = { Dictionary: vue.DataList };
+
+                        ajaxFirst = ajaxhelper.ajax_Post(objectName, param, function (result) {
+
+                            f_commonShowMsg("下架成功!");
+                             
+                            //根据单据的库区去判定该库区的录入方式【1 单件录入，2 批量录入】
+                            if(@(s_Warehouse_ShelfForm) == "1"){
+                               //跳转到批量录入条码扫描界面
+                               setTimeout('location.href = "/PurchasedOnShelfSingle/AddBillStockInOutDetailSingle?ParentIds=" + "@ParentIds" + "&GoodsCode=" + "&GoodsWorkQuantity=" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&GoodsBarCode=" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)"', 3000);
+                               
+                            }else{
+                               //跳转到批量录入条码扫描界面
+                               setTimeout('location.href = "/PurchasedOnShelfSingle/AddBillStockInOutDetail?ParentIds=" + "@ParentIds" + "&GoodsCode=" + "&GoodsWorkQuantity=" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&GoodsBarCode=" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)"', 3000);
+                            }
+
+                            ajaxFirst = null;
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxFirst = null;
+
+                            $(obj).removeAttr("disabled");
+                        })
+                    },
+                    //确认库位
+                    f_reSureSpaceCode: function () {
+                        //获取库位编码
+                        var SpaceBarCode = $("[name=SpaceBarCode]").val();
+
+                        var len = vue.DataList.filter(function (result) {
+                            return result.s_ReportInventoryCurrent_Code == SpaceBarCode
+                        }).length
+
+                        if (len == 0) {
+                            //根据货物编码判定是否可以匹配对应进行出库
+                            vue.f_SelPutOnOffSingleReportInventoryCurrentIsExists(SpaceBarCode);
+                        } else {
+                            $(".SpaceBarCode").val("").focus();
+                        }
+                    },
+                    //确认数量
+                    f_reSureSpaceAmount: function () {
+                        //获取下架数量
+                        var Amount = $(event.target).val();
+
+                        //获取剩余数量
+                        var n_ReportInventoryCurrent_Number = 0;
+                        var n_ReportInventoryCurrent_index = 0
+
+                        vue.DataList.forEach(function (value, index) {
+                            if (value.s_ReportInventoryCurrent_isCheck) {
+                                n_ReportInventoryCurrent_index = index;
+                                n_ReportInventoryCurrent_Number = value.n_ReportInventoryCurrent_Number;
+                            }
+                        })
+
+                        //判定剩余数量是否超过下架数量，超过则予以下架
+                        if (parseInt(n_ReportInventoryCurrent_Number) >= parseInt(Amount)) {
+                            vue.DataList[n_ReportInventoryCurrent_index].s_ReportInventoryCurrent_DownNumber = Amount;
+                            vue.DataList[n_ReportInventoryCurrent_index].n_ReportInventoryCurrent_SurplusNumber = n_ReportInventoryCurrent_Number - Amount;
+
+                            //重新焦点
+                            $(".SpaceAmount").val("");
+                            $(".SpaceBarCode").val("").focus();
+                        } else {
+
+                            f_commonShowMsg("该储位下架数量已经超过了该储位的可允许的下架数量，请重新输入!");
+                            //聚焦于数量文本框
+                            $(".SpaceAmount").val("").focus();
+                        }
+
+                    },
+                    //删除确认下架的记录
+                    f_DelBillStockInOut: function () {
+                        var arr = new Array();
+                        var bincode = "";
+
+                        vue.DataList.forEach(function (value, index) {
+                            if (!value.s_ReportInventoryCurrent_isCheck) {
+                                arr.push(value);
+                            } else {
+                                bincode = value.s_ReportInventoryCurrent_BinCode;
+                            }
+                        })
+
+                        vue.DataList = arr;
+
+                        $("[name=BinCode]").find("option[code=" + bincode + "]").show();
+
+                        //重新焦点
+                        $(".SpaceAmount").val("");
+                        $(".SpaceBarCode").val("").focus();
+                    },
+                    //选中储位行事件
+                    f_checkontr: function (event) {
+                        var i = $(event.target).parent().attr("index");
+
+                        vue.DataList.forEach(function (value, index) {
+                            if (index == i) {
+                                value.s_ReportInventoryCurrent_isCheck = true;
+                            } else {
+                                value.s_ReportInventoryCurrent_isCheck = false;
+                            }
+                        })
+                    },
+                    //选中库位匹配方式
+                    f_radio: function (event) {
+                        if ($(event.target).attr("value") == "系统分配") {
+
+                            //跳转至手工库位扫描界面
+                            location.href = "LocationScanningUp?ParentIds=" + "@ParentIds" + "&GoodsCode=" + "@(GoodsCode)"  + "&GoodsBarCode=" + "@(GoodsBarCode)" + "&GoodsWorkQuantity=" + "@(GoodsWorkQuantity)" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)"+ "&s_Warehouse_ShelfForm=" + "@(s_Warehouse_ShelfForm)";
+
+                        }
+                    },
+                    //验证所填是否是数字,不是则清空
+                    checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    }
+                }
+            })
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+    </script>
+}

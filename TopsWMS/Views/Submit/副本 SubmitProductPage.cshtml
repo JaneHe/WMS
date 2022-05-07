@@ -1,0 +1,237 @@
+﻿<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>质量部检具室可视化管控平台</title>
+    <script src="../../TopsLib/Scripts/jquery-1.5.1.min.js"></script>
+    <script src="../../TopsLib/Scripts/jquery.json-2.3.min.js"></script>
+    <script src="../../TopsLib/Scripts/highCharts/V8/highcharts.js"></script>
+    <script type="text/javascript">
+        $(function () {
+
+            var page = 0;
+            var heigth = $(window).height();
+            var width = $(window).width();
+            $("#Main").css("height", heigth);
+            $("#Main").css("width", width);
+            $("#time").css("height", heigth);
+            
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGet/SelSubmitPage",
+                dealError: false,
+                success: function (data) {
+                    var data = JSON.parse(data);
+                    if (data.IsSuccess) {
+                        var html = "";
+                        var yushu = 0;
+                        var count = 0;
+                        var s_ProjectName = "";
+                        for (var j = 0; j < data.Data[0].length; j++) {
+
+                            s_ProjectName = data.Data[0][j].s_ProjectName;
+                            if (yushu % 3 == 0) {
+                                page += 1;
+                                html += "<div class='displaypage_" + (j+1) + "' style='width:100%;height:100%'>"
+                                html += "  <div class='time' style='background: url(../../images/submit/左下角图片.png)no-repeat  0%; height: 15%; background-size: 100% 100%; height: 93%;width:25%;float:left;margin-left:6%;float:left;'>"
+                                html += " <div style='background: url(../../images/submit/时间框.png); height: 7%; width: 72.1%;font-size: 25px;color:white;line-height: 50px;margin-left:4%;'>"
+                                html += " <label style='margin-left:5%;'>" + data.Data[0][j].s_ProjectName + "</label>"
+                                html += "</div>"
+                                html += "  <div style='margin-left:25%;margin-top:5%;'>"
+                                html += "   <div class='titles' style='float: left'>"
+                                html += "  <div class='yuan' style='border: 1px solid white; border-radius: 50%; background:   radial-gradient(circle at 100px 100px, #5cabff, limegreen); width: 95%; height: 25%; text-align: center; line-height: 50px;'>" + data.Data[0][j].state1 + "</div>"
+                                html += " <div style='margin-top:20%;'>"
+                                html += "  <label style='color:white;font-size:15px;'>正常使用</label>"
+                                html += "</div>"
+                                html += " </div>"
+                                html += "  <div class='titles' style='float: left;margin-left:10%;'>"
+                                html += " <div class='yuan' style='border: 1px solid white; border-radius: 50%; background: radial-gradient(circle at 100px 100px, #5cabff, darkorange); width:105%; height: 25%; margin-left: 0.5%; float: left; text-align: center; line-height: 50px;'>" + data.Data[0][j].state2 + "</div>"
+                                html += "  <div style='margin-top:113%;'>"
+                                html += " <label style='color:white;font-size:15px;'>调 试 中</label>"
+                                html += "  </div>"
+                                html += "  </div>"
+                                html += "  <div class='titles' style='float: left;margin-left:10%;'>"
+                                html += "   <div class='yuan' style='border: 1px solid white; border-radius: 50%; background: radial-gradient(circle at 100px 100px, #5cabff, red); width:97%; height: 25%; margin-left: 0.5%; float: left; text-align: center; line-height: 50px;'>" + data.Data[0][j].state3 + "</div>"
+                                html += "  <div style='margin-top:103%;'>"
+                                html += " <label style='color:white;font-size:15px;'>无法使用</label>"
+                                html += " </div>"
+                                html += "  </div>"
+                                html += " </div>"
+                                @* --分割线*@
+                                html += " <div style='border-bottom:1px dashed skyblue; height:18%;width:99%'></div>"
+                                html += " <div class='submitstate' style='margin-top:0.5%;height:80%;width:100%;'>"
+                                yushu += 1;
+                            }
+                            else {
+                                html += "  <div class='time' style='background: url(../../images/submit/左下角图片.png)no-repeat  0%; height: 15%; background-size: 100% 100%; height: 93%;width:25%;float:left;margin-left:5%;float:left;'>"
+                                html += " <div style='background: url(../../images/submit/时间框.png); height: 7%; width: 72.1%;font-size: 25px;color:white;line-height: 50px;margin-left:4%;'>"
+                                html += " <label style='margin-left:5%;'>" + data.Data[0][j].s_ProjectName + "</label>"
+                                html += "</div>"
+                                html += "  <div style='margin-left:25%;margin-top:5%;'>"
+                                html += "   <div class='titles' style='float: left'>"
+                                html += "  <div class='yuan' style='border: 1px solid white; border-radius: 50%; background:   radial-gradient(circle at 100px 100px, #5cabff, limegreen); width: 95%; height: 25%; text-align: center; line-height: 50px;'>" + data.Data[0][j].state1 + "</div>"
+                                html += " <div style='margin-top:20%;'>"
+                                html += "  <label style='color:white;font-size:15px;'>正常使用</label>"
+                                html += "</div>"
+                                html += " </div>"
+                                html += "  <div class='titles' style='float: left;margin-left:10%;'>"
+                                html += " <div class='yuan' style='border: 1px solid white; border-radius: 50%; background: radial-gradient(circle at 100px 100px, #5cabff, darkorange); width:100%; height: 25%; margin-left: 0.5%; float: left; text-align: center; line-height: 50px;'>" + data.Data[0][j].state2 + "</div>"
+                                html += "  <div style='margin-top:113%;'>"
+                                html += " <label style='color:white;font-size:15px;'>调 试 中</label>"
+                                html += "  </div>"
+                                html += "  </div>"
+                                html += "  <div class='titles' style='float: left;margin-left:10%;'>"
+                                html += "   <div class='yuan' style='border: 1px solid white; border-radius: 50%; background: radial-gradient(circle at 100px 100px, #5cabff, red); width:95%; height: 25%; margin-left: 0.5%; float: left; text-align: center; line-height: 50px;'>" + data.Data[0][j].state3 + "</div>"
+                                html += "  <div style='margin-top:103%;'>"
+                                html += " <label style='color:white;font-size:15px;'>无法使用</label>"
+                                html += " </div>"
+                                html += "  </div>"
+                                html += " </div>"
+                                @* --分割线*@
+                                html += " <div style='border-bottom:1px dashed skyblue; height:18%;width:99%'></div>"
+                                html += " <div class='submitstate' style='margin-top:0.5%;height:80%;width:100%;'>"
+                                yushu += 1;
+                            }
+                            for (var i = count; i < data.Data[1].length; i++) {
+                                if (data.Data[1][i].s_ProjectName == s_ProjectName) {
+                                    html += "  <div style='float:left;width:24%;margin-left:7%;margin-top:5%;   '>"
+                                    html += "  <label style='font-size:15px;color:white;margin-left:0.5%;width:100%'>" + data.Data[1][i].s_SubmitName + "</label>"
+                                    html += " <br />"
+                                    if (data.Data[1][i].n_IsuseState == 1) {
+                                        html += " <div style='height: 0;padding-top: 30%;border: 1px solid #ccc;background: radial-gradient(circle at 100px 100px, #5cabff, limegreen);float:left;border-radius:20%;float:left;width:100%;'></div>"
+                                    }
+                                    else if (data.Data[1][i].n_IsuseState == 2) {
+                                        html += " <div style='height: 0;padding-top: 30%;border: 1px solid #ccc;background: radial-gradient(circle at 100px 100px, #5cabff, darkorange);float:left;border-radius:20%;float:left;width:100%;'></div>"
+                                    }
+                                    else {
+                                        html += " <div style='height: 0;padding-top: 30%;border: 1px solid #ccc;background: radial-gradient(circle at 100px 100px, #5cabff, red   );float:left;border-radius:20%;float:left;width:100%;'></div>"
+                                    }
+                                    html += " </div>"
+                                    count += 1;
+                                }
+                                else {
+                                    html += " </div>"
+                                    html += " </div>"
+                                    break;
+                                }
+
+                            }
+                            if (count >= data.Data[1].length) {
+                                html += " </div>"
+                                html += " </div>"
+                            }
+                            if (yushu > 1 && yushu % 3 == 0) {
+                                html += " </div>"
+                                
+                            }
+                        }
+                    //   $("#conter").append(html);
+
+                    }
+                }
+            });
+           // 定时执行
+            var id = setInterval(function () {
+                var val = $(".page").attr("value");
+                if (val < page)
+                {
+                    $(".displaypage_" + val + "").hide();
+                    val += 1;
+                    $(".displaypage_" + val + "").show();
+                    $(".page").val(val);
+                }
+                if (val = page)
+                {
+                    $(".displaypage_" + page + "").hide();
+                    val = 1;
+                    $(".displaypage_" + val + "").show();
+                    $(".page").val(val);
+                }
+                //console.log("");
+
+            }, 30000)
+        })
+    </script>
+    <style type="text/css">
+        /*#yuan {
+
+				
+
+			}*/
+    </style>
+</head>
+<body>
+    <div id="Main" style="background: url(../../Images/Submit/检具背景.png)no-repeat 12%;  background-size:100% 100%;">
+          <div id="title" style="width:100%;height:5%;background:url(../../Images/Submit/顶部.jpg)no-repeat 12%;background-size:100% " > 
+               <div style="background:url(../../Images/Submit/logo.png)no-repeat 12%;width:70%;height:98%;margin-left:30%">
+                   <label style="font-size:30px;color:white;margin-left:15%"> 质量部检具室可视化管控平台</label>
+               </div>
+               
+           </div>
+        <div id="conter" style="width: 100%;height:94%;margin-top:1%; ">
+            <span class="page" value="1" style="display:none;"></span>
+            <div class="displaypage_1" style="width:100%;height:100%">
+
+            <div class="time" style="background: url(../../images/submit/检具框.png)no-repeat  0%;   background-size: 100% 100%; height: 93%;width:25%;float:left;margin-left:5%;float:left;">
+                <div style=" height: 7%; width: 72.1%;font-size: 25px;color:white;line-height: 50px;margin-left:4%;">
+                    <label style="margin-left:5%;">g40检具状态</label>
+                </div>
+                <div style="margin-left:5%;margin-top:5%;width:99%;height:15%;text-align:center;margin:0 auto;">
+                     <div class="titles" style="float: left;margin-left:3%;">
+                         
+                        <div style="width: 85px;height: 85px;border: 1px solid white;border-radius: 50%;background-color:#58AD00; text-align: center; font-size:25px; vertical-align:middle;display:table-cell;">
+                           2 
+                        </div>
+                        <div style="margin-top:20%;">
+                            <label style="color:white;font-size:15px;margin-left:16%;">正常使用</label>
+                        </div>
+                    </div>
+                    <div class="titles" style="float: left;margin-left:15%;">
+                        <div style="width: 85px;height: 85px;border: 1px solid white;border-radius: 50%;background-color:#FCA400; text-align: center; font-size:25px; vertical-align:middle;display:table-cell;">
+                           2 
+                        </div>
+                         <div style="margin-top:20%;">
+                            <label style="color:white;font-size:15px;margin-left:16%;">调 试 中</label>
+                        </div>
+                    </div>
+                    <div class="titles" style="float: left;margin-left:15%;">
+                        <div style="width: 85px;height: 85px;border: 1px solid white;border-radius: 50%;background-color:#DC1D15; text-align: center; font-size:25px; vertical-align:middle;display:table-cell;">
+                           2 
+                        </div> 
+                     <div style="margin-top:20%;">
+                            <label style="color:white;font-size:15px;margin-left:16%;">无法使用</label>
+                        </div>
+                    </div>
+                </div>
+             @*   分割线*@
+                <div style="border-bottom:1px dashed skyblue; height:1%;width:99%"></div>
+
+                <div class="submitstate" style="margin-top:0.5%;height:70%;width:100%;">
+                    <div style="float:left;width:24%;margin-left:7%;margin-top:3%;">
+                            <label style="font-size:15px;color:white;margin-left:0.5%;width:100%">g40检具</label>
+                        <br />
+                           <div style="background:url(../../images/submit/绿色.png)no-repeat  12%;padding-top:45%;float:left;border-radius:15%;float:left;width:100%;background-size:100%;box-shadow:5px 4px 3px black;">
+                          
+                        </div>
+                    </div>
+                      <div style="float:left;width:24%;margin-left:7%;margin-top:3%;">
+                            <label style="font-size:15px;color:white;margin-left:0.5%;width:100%">g40检具</label>
+                        <br />
+                        <div style="background:url(../../images/submit/绿色.png)no-repeat  12%;padding-top:45%;float:left;border-radius:15%;float:left;width:100%;background-size:100%;box-shadow:5px 4px 3px black;"></div>
+                    </div>
+                    <div style="float:left;width:24%;margin-left:7%;margin-top:3%;">
+                            <label style="font-size:15px;color:white;margin-left:0.5%;width:100%">g40检具</label>
+                        <br />
+                        <div style="background:url(../../images/submit/黄色.png)no-repeat  12%;padding-top:45%;float:left;border-radius:15%;float:left;width:100%;background-size:100%;box-shadow:5px 4px 3px black;"></div>
+                    </div>
+                    <div style="float:left;width:24%;margin-left:7%;margin-top:3%;">
+                            <label style="font-size:15px;color:white;margin-left:0.5%;width:100%">g40检具</label>
+                        <br />
+                       <div style="background:url(../../images/submit/红色.png)no-repeat  12%;padding-top:45%;float:left;border-radius:15%;float:left;width:100%;background-size:100%;box-shadow:5px 4px 3px black;"></div>
+                    </div>
+                </div>
+        </div>
+           </div>
+    </div>
+    </div>
+</body>
+</html>

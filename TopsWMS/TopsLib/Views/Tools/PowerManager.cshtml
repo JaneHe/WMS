@@ -1,0 +1,257 @@
+﻿@{
+    ViewBag.Title = "权限管理";
+    Layout = "~/TopsLib/Views/Tools/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var module_biz_exportDialog = null;
+
+    var oldmoduleName = ""; 
+
+    $(function () {
+        LoadTree();
+        f_loadExportDictionaryDailog();
+        $("#save_field_bt").click(function () {
+            var data = {
+                ModuleID: $("#moduleID").text(),
+                Powers: GetPowers()
+            }
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/AjaxPOST/SaveModulePower",
+                data: data,
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功");
+                    } else {
+                        alert("保存失败，" + data.Msgs[0]);
+                    }
+                }
+            });
+        });
+
+        $("#add_field_bt").click(function () {
+            var $newPower = $("#powers_table tfoot").eq(0);
+            var $newTr = $($newPower.html());
+            $("#powers_table tbody").append($newTr);
+            $newTr.find("input").eq(0).select();
+            if ($("#moduleID").text() == "_Default_Role")
+                $newTr.find("select[name=PowerType]").remove();
+        });
+        $("input.del_field").live("click", function () {
+            var $tr1 = $(this).closest("tr");
+            $tr1.remove();
+        });
+        $("input").live("focus", function () {
+            $(this).select();
+        });
+
+        /* hwj 2015-12-04  批量导出一个模块的查询对象业务对象 */
+        $("#export_field_bt").live("click", function () {
+            var module = $("#moduleID").text();
+            $.ligerDialog.open({ title: '批量导出模块对象', width: '1000', height: '500', url: "/Tools/ExportModuleObject?Module=" + module });
+        })
+        /* hwj 2015-12-04  批量导出一个模块的查询对象业务对象 */
+
+
+        /* hwj 2016-07-20  批量导出一个模块的数据字典 */
+        $("#export_dictionary_bt").live("click", f_ExportDictionary);
+        /* hwj 2016-07-20  批量导出一个模块的数据字典 */
+    });
+    function LoadTree() {
+        var $loading = $("#tree_loading").show();
+        $.topsAjax({
+            type: "POST",
+            url: "/Tools/GetSysModules",
+            //data: {},
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    var treeData = data.Data;
+                    treeData.splice(0, 0, {
+                        IsLeaf: true,
+                        icon: "/TopsLib/Content/icon/01/254.gif",
+                        id: "_Default_Role",
+                        isexpand: true,
+                        text: "默认权限"
+                    })
+                    $("#treemenu").ligerTree({
+                        nodeWidth: 180,
+                        checkbox: false,
+                        data: treeData,
+                        onSelect: function (node) {
+                            if (node.data.children == undefined) {
+                                //f_addTab(node.data.id, node.data.text, node.data.url)
+                                $("#hide_back #msg").text("正在加载，请稍等...").show();
+                                $("#hide_back").show().find("img").show();
+                                $("#moduleID").text(node.data.id);
+                                $("#moduleName").text(node.data.text);
+
+                                oldmoduleName = $("#moduleName").text();
+
+                                $("#powers_table tbody").html('')
+                                //1.获取模块权限
+                                $.topsAjax({
+                                    type: "Get",
+                                    url: "/Tools/AjaxGet/SelPowersByModuleID",
+                                    data: { ModuleID: node.data.id },
+                                    dealError: false,
+                                    success: function (data) {
+                                        if (data.IsSuccess) {
+                                            SetPowers(data.Data[0])
+                                        }
+                                        if (node.data.id == "_Default_Role")
+                                            $("#powers_table tbody").find("select[name=PowerType]").remove(); //;
+                                        $("#hide_back #msg").hide(200);
+                                        $("#hide_back").hide(300)
+                                    }
+                                });
+
+                            }
+
+                        }
+                    });
+                    $loading.hide();
+                }
+            }
+        });
+
+    }
+    function GetPowers() {
+        var powers = new Array();
+        var $trs = $("#powers_table tbody tr");
+        $trs.each(function (index) {
+            var $tr1 = $(this);
+            powers.push({
+                PowerID: $tr1.find("input[name=PowerID]").val(),
+                PowerName: $tr1.find("input[name=PowerName]").val(),
+                PowerType: $tr1.find("select[name=PowerType]").val(),
+                IsPublic: !!$("input[name=IsPublic]", $tr1).attr("checked")
+            });
+        });
+        return powers;
+    }
+    function SetPowers(powers) {
+        var $newSql = $("#powers_table tfoot").eq(0);
+        if (powers == null) return;
+        $.each(powers, function (index) {
+            var $newTr = $($newSql.html());
+            $("#powers_table tbody").append($newTr);
+            $newTr.find("input[name=PowerID]").val(this.PowerID);
+            $newTr.find("input[name=PowerName]").val(this.PowerName);
+            $newTr.find("select[name=PowerType]").attr("value", this.PowerType);
+            $newTr.find("input[name=IsPublic]").attr("checked", this.IsPublic);
+        });
+         
+    }
+
+    //加载数据字典导出弹出框
+    function f_loadExportDictionaryDailog() {
+        //初始化弹出框
+        module_biz_exportDialog = $.ligerDialog({
+            show: false,
+            width: 550,
+            title: "数据字典导出",
+            content: $("#module_biz_export")
+        });
+        module_biz_exportDialog.hide();
+         
+
+        $("#exportBizName").live("blur",function () {
+            var moduleName = $(this).val();
+            $("#exportTextarea").text($("#exportTextarea").text().replace(new RegExp(oldmoduleName, 'g'), moduleName));
+            oldmoduleName = moduleName;
+        })
+    }
+
+    //数据字典数据导出
+    function f_ExportDictionary() {
+        $("#exportTextarea").hide();
+        $("#exportLoading").show();
+        $("#exportBizName").val($("#moduleName").text());
+        module_biz_exportDialog.show();
+        $.topsAjax({
+            type: "Get",
+            url: "/Tools/ExportDictionary",
+            data: { ModuleName: $("#moduleName").text() },
+            dataType: "text",
+            dealError: false,
+            success: function (data) {
+                $("#exportLoading").hide();
+                $("#exportTextarea").html(data).show();
+            }
+        });
+    }
+</script>
+<div style="width: 310px; float: left; margin-left:5px;">
+    <h2>模块：</h2>
+    <div style="width: 300px; height: 400px; overflow:auto; border: 1px solid #BED5F3;">
+        <div id="treemenu">
+            <img id="tree_loading" src=""/TopsLib/Content/loading.gif" />
+        </div>
+    </div>
+</div>
+<div style="width: 310px; float: left; ">
+    <h2>权限：</h2>
+    <div style="width: 470px; height: 400px; overflow: auto; border: 1px solid #BED5F3;position:relative;">
+        <p><input type="button" class="save_bt_min" id="save_field_bt" />
+            <input type="button" class="add_bt_min" id="add_field_bt" />
+            @* hwj 2015-12-04  批量导出一个模块的查询对象业务对象 *@
+            <input type="button" class="export_bt_min" id="export_field_bt" />
+            @* hwj 2015-12-04  批量导出一个模块的查询对象业务对象 *@
+
+            @* hwj 2016-07-20  批量导出一个模块的数据字典 *@
+            <input type="button" class="export_bt_min" id="export_dictionary_bt" />
+            @* hwj 2016-07-20  批量导出一个模块的数据字典 *@
+            <b><label id="moduleName"></label>-<label id="moduleID"></label></b>
+        </p>
+        <table id="powers_table" class="main_table"  border="0" cellpadding=0 cellspacing=0 width=100%>
+            <thead class="main_table_head">
+                <tr>
+                    
+                    <th  width="150px" class="main_table_td">权限编码</th>
+                    <th  width="200px" class="main_table_td">权限名称</th>
+                    <th  width="75px" class="main_table_td">权限类型</th>
+                    <th  width="30px" class="main_table_td">公开</th>
+                    <td width="20px" class="main_table_td">
+                        删
+                    </td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot style=" display:none;">
+                <tr>
+                    <td class="main_table_td"><input  class="input_bg" name="PowerID" style=" width:100%;height:25px; border-width:0" /></td>
+                    <td class="main_table_td"><input  class="input_bg" name="PowerName" style=" width:100%;height:25px; border-width:0" /></td>
+                    <td class="main_table_td">
+                        <select name="PowerType" >
+                            <option value="3">业务权限</option>
+                            <option value="4">查询权限</option>
+                            <option value="2">模块权限</option>
+                        </select>
+                    </td>
+                    <td  class="main_table_td" >
+                        <input name="IsPublic" type="checkbox" />
+                    </td>
+                    <td  class="main_table_td">
+                        <input  class="del_field del_bt_min" type="button" />
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    
+    <div id="hide_back" style="width: 100%; height: 100%; position:absolute;top:0;background-color: #e2e2e2; 
+                opacity: 0.7; /* Safari, Opera */
+                -moz-opacity:0.70; /* FireFox */
+                filter: alpha(opacity=70); /* IE */">
+        <p style="margin:100px 100px"><a id="msg">请点击左边模块...</a><img style="display:none;" src=""/TopsLib/Content/loading_min.gif" /></p>
+    </div>
+
+    <div id="module_biz_export">
+        <p >模块名称：<input id="exportBizName" name="ModuleID"  style="width:450px;"/></p>
+        <img id="exportLoading" src="/TopsLib/Content/loading.gif" />
+        <textarea id="exportTextarea" rows="20" style=" width:99%"></textarea>
+    </div>
+
+    </div>
+</div>

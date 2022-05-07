@@ -1,0 +1,263 @@
+﻿@using Tops.FRM;
+@{
+    string Serial = Request.QueryString["s_LoadingASN"];
+    var UserNo = Tops.FRM.TopsUser.UserNO;
+    
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>print</title>
+    <script src="../../Scripts/jquery-1.4.4.min.js"></script>
+    <script src="../../Scripts/js/jquery.jqprint-0.3.js"></script>
+    <script src="../../Scripts/js/qrcode.js"></script>
+    <script src="../../Scripts/js/JsBarcode.all.min.js"></script>
+    <script src="../../Scripts/QRCodeJs/barcode.js"></script>
+    <script src="../../Scripts/QRCodeJs/printPage.js"></script>
+    <script src="../../TopsLib/Scripts/Tops.js"></script>
+</head>
+<body>
+    <style>
+        *
+        {
+            margin: 0px;
+            padding: 0px;
+        }
+
+        #promt_DY
+        {
+            display: none;
+        }
+
+        .PrintingDame
+        {
+            display: flex;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .table1
+        {
+            width: 80%;
+            height: 200px;
+            /*border: 1px solid #000000;*/
+            font-weight: bold;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font-family: 黑体;
+            margin-top: 214px;
+            table-layout: fixed;
+        }
+
+        .table2
+        {
+            width: 80%;
+            /*border: 1px solid #000000;*/
+            font-weight: bold;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font-family: 黑体;
+            table-layout: fixed;
+        }
+
+        .table1 tr td
+        {
+            font-size: 22px;
+            /*border: 1px solid #000000;*/
+            word-break: keep-all;
+        }
+
+        .table2 tr td
+        {
+            font-size: 16px;
+            /*border: 1px solid #000000;*/
+            /*word-break: break-all;*/
+            word-break: keep-all;
+        }
+
+        .table3
+        {
+            margin-top: 430px;
+            width: 80%;
+            /*border: 1px solid #000000;*/
+            font-weight: bold;
+            border-collapse: collapse;
+            border-spacing: 0;
+            font-family: 黑体;
+            table-layout: fixed;
+        }
+
+            .table3 tr td
+            {
+                font-size: 16px;
+                word-break: keep-all;
+            }
+    </style>
+    <script>
+        $(function () {
+            $("#promt_DY").click(function () {
+                setTimeout(function () {
+                    window.print();
+                }, 1500);
+                setTimeout(function () {
+                    javascript: window.opener = null; window.open('', '_self');
+                    window.close();
+                }, 5000);
+            });
+        });
+    </script>
+    <input type="button" value="Print" id="promt_DY">
+    <div class="PrintingDame">
+        <table class="table1" cellpadding="0" cellspacing="0">
+            <tr style="height: 19.5%">
+                <td style="width: 16%;"></td>
+                <td style="width: 44%; font-weight: bold; text-align: center;">ASN&nbsp;&nbsp;<del>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</del></td>
+                <td style="width: 22%"></td>
+                <td style="width: 18%"></td>
+            </tr>
+            <tr style="height: 19.5%">
+                <td></td>
+                <td>大东名华</td>
+                <td></td>
+                <td style="font-size: 18px;" class="DayData"></td>
+            </tr>
+            <tr style="height: 19.5%">
+                <td></td>
+                <td>铁西名华</td>
+                <td></td>
+                <td style="font-size: 16px;">@Serial</td>
+            </tr>
+            <tr style="height: 19.5%">
+                <td colspan="4">&nbsp;</td>
+            </tr>
+        </table>
+        <table class="table2" cellpadding="0" cellspacing="0">
+            <tr style="height: 54px">
+                <td style="width: 13%;"></td>
+                <td style="width: 34%;"></td>
+                <td style="width: 13%;"></td>
+                <td style="width: 6%;"></td>
+                <td style="width: 15%;"></td>
+                <td style="width: 18%;">箱号</td>
+            </tr>
+        </table>
+        <table class="table3" cellpadding="0" cellspacing="0">
+            <tr style="height: 54px">
+                <td style="width: 13%;"></td>
+                <td id="span_Paiton" style="width: 34%;">合计:0</td>
+                <td style="width: 13%;"></td>
+                <td style="width: 6%;"></td>
+                <td style="width: 15%;"></td>
+                <td id="span_Paiton1" style="width: 18%;">合计箱数:0</td>
+            </tr>
+        </table>
+    </div>
+@*    <div class="PrintingDame">
+        <table class="table1" cellpadding="0" cellspacing="0">
+            <tr style="height: 19.5%">
+                <td style="width: 16%;"></td>
+                <td style="width: 44%; font-weight: bold; text-align: center;">ASN&nbsp;&nbsp;<del>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</del></td>
+                <td style="width: 22%"></td>
+                <td style="width: 18%"></td>
+            </tr>
+            <tr style="height: 19.5%">
+                <td></td>
+                <td>大东名华</td>
+                <td></td>
+                <td style="font-size: 18px;" class="DayData"></td>
+            </tr>
+            <tr style="height: 19.5%">
+                <td></td>
+                <td>铁西名华</td>
+                <td></td>
+                <td style="font-size: 16px;">@Serial</td>
+            </tr>
+            <tr style="height: 19.5%">
+                <td colspan="4">&nbsp;</td>
+            </tr>
+        </table>
+        <table class="table2" cellpadding="0" cellspacing="0">
+            <tr style="height: 54px">
+                <td style="width: 13%;"></td>
+                <td style="width: 34%;"></td>
+                <td style="width: 13%;"></td>
+                <td style="width: 6%;"></td>
+                <td style="width: 15%;"></td>
+                <td style="width: 18%;">箱号</td>
+            </tr>
+        </table>
+        <table class="table3" cellpadding="0" cellspacing="0">
+            <tr style="height: 54px">
+                <td style="width: 13%;"></td>
+                <td id="span_Paiton" style="width: 34%;">合计:0</td>
+                <td style="width: 13%;"></td>
+                <td style="width: 6%;"></td>
+                <td style="width: 15%;"></td>
+                <td id="span_Paiton1" style="width: 18%;">合计箱数:0</td>
+            </tr>
+        </table>
+    </div>*@
+    <script>
+        $(function () {
+            // 批次
+            LoadBacth();
+            LoadPackingPrint();
+        })
+
+
+        // 加载数据
+        function LoadPackingPrint() {
+            var SerialName = '@Serial';
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGET/SeltZCPackingPrint",
+                data: {
+                    Serial: SerialName
+                },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        var tr = "";
+                        data.Data[0].forEach(function (value, index) {
+                            tr += "<tr style='height: 25px;'>"
+                                   + "<td style='font-size: 14px;'>" + value.Code + "</td>"
+                                   + "<td>" + value.CarName + "</td>"
+                                   + "<td style='font-size: 18px; text-align: center;'>" + value.Number + "</td>"
+                                   + "<td style='font-size: 18px; text-align: center;'>EA</td>"
+                                   + "<td></td>"
+                                   + "<td>" + value.LogCode + "</td>"
+                                   + " </tr>"
+                        })
+
+                        $("#span_Paiton").html(data.Data[1][0].toNum)
+                        $("#span_Paiton1").html(data.Data[1][0].toNum1)
+
+                        $(".table2").append(tr);
+                        $("#promt_DY").click();
+                    }
+                }
+            })
+        }
+
+        // 批次
+        function LoadBacth() {
+            var time = new Date();
+            var year = time.getFullYear();
+            var month = time.getMonth() + 1;
+            var day = time.getDate();
+
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
+
+            $(".DayData").html(year.toString().substring(0, 4) + '/' + month + '/' + day);
+
+            setTimeout("LoadBacth()", 3000000);
+        }
+    </script>
+</body>
+</html>

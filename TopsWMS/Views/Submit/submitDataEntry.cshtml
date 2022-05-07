@@ -1,0 +1,139 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "模块名称";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName="SelsubmitDataEntry";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas=Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols =  ModuleConfig.GetColumns(metas[0], biz.Lookups,biz.Sqls[0], biz);
+    string NewDate = DateTime.Now.ToString("yyyy-MM-dd");
+    string NextDate = DateTime.Now.AddDays(1).ToString("yyyy-MM-dd");
+}
+
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad" > 
+    <div id="hiddenlist"> 
+    </div>
+    <div id="paramlist"> 
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+        string labelStr=string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+        var fieldName = biz.Fields[i].FieldName;
+        var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+        <div class="param_item">
+            @if (lookupField != null && lookupField.ToList().Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                        <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                        </script>
+                    }
+            else if (biz.Fields[i].DataList.Count > 0)
+            {
+                <label class="plugin_label">@(labelStr):</label>
+                <select name="@(fieldName)" fieldType="select" >
+                    @foreach(var item in biz.Fields[i].DataList){
+                    <option value="@(item.Key)">@(item.Value)</option>
+                    }
+            </select>
+            }else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+            {
+                <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+            }
+            else
+            {
+            <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+            }
+        </div>
+        }
+        <div style=" clear:both;"></div>
+    </div>
+    </form>
+    
+}
+@section Script{
+<script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#addBt,#searchBt").show();
+            $("#module_toolbar").append('<input id="CheckOldDate" type="button" value="产品数据导入" class="serch_bt" style="width:120px;">');
+        $("#module_toolbar").append($("#searchBt2")).append('<a href="../../Content/Excel/检具数据录入操作文档_20210227.docx">检具数据录入操作文档下载</a>');
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        $('input[name=startime]').val("@NewDate")
+        $('input[name=endtime]').val("@NextDate")
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelsubmitDataEntry',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+               @* var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+                f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/submit/submitDataEntryModify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&" + Math.random());*@
+               
+                f_addTab("edit",  "维护[" + rowdata.n_id+ "]", "/Submit/submitDataEntryModify?"+"ctrl=edit&id=" +rowdata.n_id+ "&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+        });
+        $("#searchBt").click();
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/submit/submitDataEntryModify?"+"ctrl=add&" + Math.random());
+        }); 
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        }) 
+
+            $('#CheckOldDate').click(function(){
+                var h= $(window).height()
+                var w= $(window).width()
+                //A线：5551；B线：5552；
+                var urlStr="";
+                    urlStr='../Submit/ExcelSubmit'
+             
+
+                $.ligerDialog.open({
+                    title: "检具数据导入",
+                    width: w,
+                    height: h,
+                    url:urlStr, 
+                    onClosed: function () { 
+                    }
+                });
+            })
+        
+    });
+        function f_flushGrid()
+        {
+            grid.loadData();
+        }
+</script>
+}
+<div id="datagrid"></div>
+
+

@@ -1,0 +1,76 @@
+﻿*
+{
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+}
+.item_title
+{
+    float: none;
+  /* margin: 15 2 2 2;*/
+    background-image: url('icon/01/010.gif');
+    background-position: 4px center;
+    background-repeat: no-repeat;
+    padding-left: 20px;
+    border-color: #f6f6f6;
+}
+.search_title
+{
+    float: none;
+    margin: 2px;
+    background-image: url('icon/01/016.gif');
+    background-position: 4px center;
+    background-repeat: no-repeat;
+    padding-left: 20px;
+    border-color: #f6f6f6;
+   
+}
+#paramlist
+{
+    display: inline-block;
+    margin: 2px;
+    border: 0px solid #BED5F3;
+   
+}
+#detaillist
+{
+    border: 1px solid #BED5F3;
+}
+#datagrid
+{
+    margin: 2px;
+}
+/* JaneHe 应黄总要求缩小间距及样式 20190612 */
+.param_item
+{
+    /*margin: 2px 5px;*/
+    margin: 2px 1px;
+    /*padding: 2px;*/
+    float: left;
+    /*min-width: 250px;*/
+    min-width: 220px;
+}
+.param_item label
+{
+    display: inline-block;
+}
+.l-text-wrapper
+{
+    float: left;
+}
+.l-text
+{
+    float: left;
+}
+.plugin_label
+{
+    display: block;
+    float: left;
+    /*width: 100px;*/
+    width: 80px;
+    text-align: right;
+}
+.l-dialog-content
+{
+    overflow: hidden;
+}

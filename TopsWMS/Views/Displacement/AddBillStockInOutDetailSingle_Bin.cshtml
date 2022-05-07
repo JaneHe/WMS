@@ -1,0 +1,593 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+
+    string n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+
+    string n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"];
+
+    //在储位信息表ID
+    string n_ReportInventoryCurrentDetail_Id = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("n_ReportInventoryCurrentDetail_Id"))
+    {
+        n_ReportInventoryCurrentDetail_Id = Request.QueryString["n_ReportInventoryCurrentDetail_Id"];
+    }
+
+    //储位二维码
+    string s_ReportInventoryCurrentDetail_Code = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("s_ReportInventoryCurrentDetail_Code"))
+    {
+        s_ReportInventoryCurrentDetail_Code = Request.QueryString["s_ReportInventoryCurrentDetail_Code"];
+    }
+
+    //当前日期
+    string datetime = DateTime.Now.ToString("yyyy-MM-dd");
+
+    //产品号，分类，颜色
+}
+@section Body{
+    <div class="body">
+    
+        <div v-bind:class="RadioTab_Showed">
+            <input type="radio" id="radio1" name="radio" value="无器具装载" v-on:click="f_radio" /><label for="radio1">无器具装载</label>
+            <input type="radio" id="radio2" checked="true" name="radio" value="有器具装载" v-on:click="f_radio" /><label for="radio2">有器具装载</label>
+        </div>
+        <div v-bind:class="SearchTab_Showed">
+            <table>
+                <tr>
+                    <td>
+                        条码
+                    </td>
+                    <td>
+                        <input type="text" v-bind:class="BarCodeClass_Showed" placeholder="请输入条码" v-on:keyup.enter="f_keyupBarCode" />
+                    </td> 
+                    
+                    <td>
+                        原库位
+                    </td>
+                    <td>
+                        <input type="text" v-bind:class="OldSpaceClass_Showed" v-model="DataList.OldSpaceBarCode" readonly="true" disabled="disabled" placeholder="请输入原库位" v-model="vue.DataList.s_Bin_Code" v-on:keyup.enter="f_keyupOldSpaceCode"  />
+                    </td>
+              
+              
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table cellspacing="0"> 
+                <tr>
+                    <td>
+                        条码
+                    </td>
+                    <td colspan="3">
+                    {{  DataList.BarCode }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品编码
+                    </td>
+                    <td colspan="3">
+                    {{  DataList.GoodsProductCode }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品名称
+                    </td>
+                    <td colspan="3">
+                    {{  DataList.GoodsProductName }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        规格型号
+                    </td>
+                    <td colspan="3">
+                    {{  DataList.SpecificationModel }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        车型
+                    </td>
+                    <td>
+                    {{  DataList.CarSeries }}
+                    </td>
+                    <td>
+                        颜色
+                    </td>
+                    <td>
+                    {{  DataList.CarColor }}
+                    </td>
+                </tr>
+                <tr>
+                    
+                    <td>
+                        原器具
+                    </td>
+                    <td>
+                    {{  DataList.s_Bin_Code }}
+                    </td>
+                    <td>
+                        目标器具
+                    </td>
+                    <td>
+                    {{  DataList.s_Bin_NewCode }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        原库位
+                    </td>
+                    <td>
+                    {{  DataList.OldSpaceBarCode }}
+                    </td>
+                    <td>
+                        目标库位
+                    </td>
+                    <td>
+                    {{  DataList.NewSpaceBarCode }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InputTab_Showed">
+            <table>
+                <tr> 
+                    <td>
+                        目标器具
+                    </td>
+                    <td colspan="3">
+                        <input type="text" v-bind:class="BinClass_Showed" readonly="true" placeholder="请输入目标器具码" v-on:keyup.enter="f_keyupBin" v-model="DataList.s_Bin_NewCode"/>
+                    </td> 
+                    <td>
+                        目标库位
+                    </td>
+                    <td>
+                        <input type="text" v-bind:class="NewSpaceClass_Showed" placeholder="请输入目标库位" v-on:keyup.enter="f_keyupNewSpaceBarCode"  />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <div v-bind:class="button_Div_Showed">
+                <div v-on:click="f_doingDisplacement">
+                    确认移位</div>
+            </div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .SearchTab
+        {
+            width: calc(90%);
+            margin: calc(3%) calc(5%) calc(3%) calc(5%); 
+            font-family: 微软雅黑;
+            font-size: 12px;
+            height: 30px;
+            text-align:center;
+        }
+        .SearchTab table, .InfoTab table, .InputTab table
+        {
+            width: 100%;
+            height: 100%;
+        }
+        .SearchTab td:nth-child(1)
+        {
+            width: 11%;
+            line-height: 25px;
+        }
+        .SearchTab td:nth-child(2)
+        {
+            width: 34%;
+            line-height: 25px;
+        }
+        .SearchTab td:nth-child(3)
+        {
+            width: 15%;
+            line-height: 25px;
+        }
+        .SearchTab td:nth-child(4)
+        {
+            width: 36%;
+            line-height: 25px;
+        }
+        
+        .InfoTab
+        {
+            width: calc(90%);
+            margin: calc(1.5%) calc(5%);
+            font-family: 微软雅黑;
+            font-size: 12px;
+            height: 185px;
+            text-align: center;
+        }
+        .InfoTab td:nth-child(odd)
+        {
+            width: 20%;
+            border: 1px solid #a5e0a5;
+            line-height: 20px;
+        }
+        .InfoTab td:nth-child(even)
+        {
+            width: 30%;
+            border: 1px solid #a5e0a5;
+            line-height: 20px;
+        }
+        
+        .InputTab
+        {
+            width: calc(90%);
+            margin: calc(4%) calc(5%);
+            font-family: 微软雅黑;
+            font-size: 12px;
+            height: 30px;
+            text-align:center;
+        }
+        .InputTab td:nth-child(1)
+        {
+            width: 20%;
+            line-height: 25px;
+        }
+        .InputTab td:nth-child(2)
+        {
+            width: 28%;
+            line-height: 25px;
+        }
+        .InputTab td:nth-child(3)
+        {
+            width: 20%;
+            line-height: 25px;
+        }
+        .InputTab td:nth-child(4)
+        {
+            width: 26%;
+            line-height: 25px;
+        }
+        
+        .BarCodeClass
+        {
+            width: 95%;
+            line-height: 20px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .BinClass
+        {
+            width: 95%;
+            line-height: 20px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .OldSpaceClass
+        {
+            width: 95%;
+            line-height: 20px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .NewSpaceClass
+        {
+            width: 95%;
+            line-height: 20px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .RadioTab
+        { 
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        
+        
+        .button_Div div
+        {
+            width: calc(90%);
+            margin: calc(1.5%) calc(0%) calc(0%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Get对象
+        var ajaxobjFirst = null;
+
+        //ajax Post对象
+        var ajaxobjSecond = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    RadioTab_Showed: "RadioTab", //单选框样式
+                    SearchTab_Showed: "SearchTab", //搜索表格样式
+                    BarCodeClass_Showed: "BarCodeClass", //条码文本框样式
+                    InfoTab_Showed: "InfoTab", //信息表格样式
+                    InputTab_Showed: "InputTab", //输入表格的样式
+                    BinClass_Showed: "BinClass", //器具码文本框样式
+                    OldSpaceClass_Showed: "OldSpaceClass", //原库位文本框样式
+                    NewSpaceClass_Showed: "NewSpaceClass", //目标库位文本框样式
+                    button_Div_Showed: "button_Div", //按钮样式
+                    DataList: {
+                        BarCode: "", //条码
+                        OldSpaceBarCode: "", //原库位码
+                        NewSpaceBarCode: "", //目标库位码
+                        s_ReportInventoryCurrent_GoodsProductCode: "", //产品编码
+                        GoodsProductCode: "", //产品编码
+                        GoodsProductName: "", //产品名称
+                        SpecificationModel: "", //规格型号
+                        CarSeries: "", //车型
+                        CarColor: "", //颜色
+                        QualityStatus: 1, //质量状态
+                        n_Warehouse_Id: "@(n_Warehouse_Id)",
+                        n_BillStockInOut_Id: "@(n_BillStockInOut_Id)",
+                        n_ReportInventoryCurrent_Id: "", //在储位信息表外键ID
+                        n_ReportInventoryCurrentDetail_Id: "", //在储位信息明细表外键ID
+                        Batch: "", //批次
+                        SureAmount: "", //移位数量
+                        s_Bin_Code: "", //器具码
+                        s_Bin_NewCode: "", //目标器具码
+                        SpaceSurplusAmount: "---" //剩余库位数量
+                    }
+                },
+                methods: {
+
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("条码扫描");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../Displacement/Index?ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../Displacement/Index?ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+                        //重新聚焦到条码文本框
+                        $(".BarCodeClass").val("").focus();
+                    },
+                    //确认移位
+                    f_doingDisplacement: function () {
+
+                        var obj = event.target;
+                        if ($(obj).is("[disabled]")) {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjSecond != null) {
+                            ajaxobjSecond.abort();
+                            ajaxobjSecond = null;
+                            return;
+                        }
+
+                        $(obj).attr("disabled", "disabled");
+
+                        //对象名 新增移库移位记录
+                        var objectName = "InsertDisplacementBinRecordTransfer";
+
+
+                        //拼接数组
+                        var arr = new Array();
+                        arr.push({
+                            NewSpaceBarCode: vue.DataList.NewSpaceBarCode, //目标储位二维码 
+                            BarCode: vue.DataList.BarCode, //条码二维码
+                            n_BillStockInOut_Id: vue.DataList.n_BillStockInOut_Id, //单据ID
+                            s_Bin_NewCode: vue.DataList.s_Bin_NewCode, //目标储位码
+                            QualityStatus: vue.DataList.QualityStatus, //质量状态
+                            n_ReportInventoryCurrent_Id: vue.DataList.n_ReportInventoryCurrent_Id, //在储位信息表外键ID 
+                            SureAmount: vue.DataList.SureAmount, //确认数量 
+                            s_ReportInventoryCurrent_GoodsProductCode: vue.DataList.s_ReportInventoryCurrent_GoodsProductCode //产品编码
+                        })
+
+                        var param = { Dictionarys: arr };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Post(objectName, param, function (result) {
+
+                            f_commonShowMsg("移位成功!");
+
+                            vue.DataList.BarCode = ""; //条码
+                            vue.DataList.OldSpaceBarCode = ""; //原库位码
+                            vue.DataList.NewSpaceBarCode = ""; //目标库位码
+                            vue.DataList.s_ReportInventoryCurrent_GoodsProductCode = ""; //产品编码
+                            vue.DataList.GoodsProductCode = ""; //产品编码
+                            vue.DataList.GoodsProductName = ""; //产品名称
+                            vue.DataList.SpecificationModel = ""; //规格型号
+                            vue.DataList.CarSeries = ""; //车型
+                            vue.DataList.CarColor = ""; //颜色
+                            vue.DataList.QualityStatus = 1; //质量状态
+                            vue.DataList.n_Warehouse_Id = "@(n_Warehouse_Id)";
+                            vue.DataList.n_BillStockInOut_Id = "@(n_BillStockInOut_Id)";
+                            vue.DataList.n_ReportInventoryCurrent_Id = ""; //在储位信息表外键ID
+                            vue.DataList.n_ReportInventoryCurrentDetail_Id = ""; //在储位信息明细表外键ID
+                            vue.DataList.Batch = ""; //批次
+                            vue.DataList.SureAmount = ""; //移位数量
+                            vue.DataList.SpaceSurplusAmount = "---"; //剩余库位数量
+                            vue.DataList.s_Bin_Code = "" //器具码
+                            vue.DataList.s_Bin_NewCode = "" //目标器具码
+
+                            //location.reload();
+                            ajaxobjSecond = null;
+                            $(obj).removeAttr("disabled");
+
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+                            //重新聚焦
+                            $(".NewSpaceClass").val("").focus();
+                            ajaxobjSecond = null;
+
+                            $(obj).removeAttr("disabled");
+
+                        })
+                    },  
+                    //条码改值事件
+                    f_keyupBarCode: function () {
+
+                        //强制必须有值
+                        if ($(".BarCodeClass").val() == "") {
+                            f_commonShowMsg("请输入条码,才能输入原库位!");
+                            //重新聚焦到条码文本框
+                            $(".BarCodeClass").val("").focus();
+                            return;
+                        }
+
+                        vue.DataList.BarCode = $(".BarCodeClass").val(); 
+                        $(".BarCodeClass").val("") 
+
+                        //重复请求处理
+                        if (ajaxobjFirst != null) {
+                            ajaxobjFirst.abort();
+                            ajaxobjFirst = null;
+                            return;
+                        }
+                        
+                        vue.DataList.OldSpaceBarCode = $(".OldSpaceClass").val();
+                        $(".OldSpaceClass").val("");
+
+                        //对象名  根据喷涂下线QA码查询到相应的货物信息
+                        var objectName = "SelDisplacementSingleBinGoodsInfo_Single";
+                        //传递参数
+                        var param = {
+                            GoodsBarCode: vue.DataList.BarCode, 
+                            s_ReportInventoryCurrent_QualityStatus: 1,
+                            n_BillStockInOut_Id: "@(n_BillStockInOut_Id)" 
+                        };
+
+                        ajaxobjFirst = ajaxhelper.ajax_Get(objectName, param, function (result) {
+
+                            if (result.Data[1].length > 0) {
+                                if (result.Data[1][0].IsExistsBillStockInOut >= 1) {
+
+                                    f_commonShowMsg("该条码已经在单据中，不能重新进行移位!");
+                                    //焦点聚焦于货物标识条码文本框
+                                    $(".BarCodeClass").val("").focus();
+                                    vue.DataList.BarCode = "";
+                                    vue.DataList.OldSpaceBarCode = "";
+
+                                    ajaxobjFirst = null;
+                                    return;
+                                }
+                            }
+
+                            if (result.Data[0].length > 0) {
+                                vue.DataList.GoodsProductCode = result.Data[0][0].s_CustomerCode;
+                                vue.DataList.s_ReportInventoryCurrent_GoodsProductCode = result.Data[0][0].s_CustomerCode;
+                                vue.DataList.GoodsProductName = result.Data[0][0].s_Mother_Desc;
+                                vue.DataList.SpecificationModel = result.Data[0][0].s_CustomerCode;
+                                vue.DataList.CarSeries = result.Data[0][0].s_CarSeries;
+                                vue.DataList.CarColor = result.Data[0][0].s_CarColor;
+                                vue.DataList.Batch = result.Data[0][0].s_Batch;
+                                vue.DataList.SpaceSurplusAmount = result.Data[0][0].s_SurplusAmount;
+                                vue.DataList.SureAmount = result.Data[0][0].s_SurplusAmount;
+                                vue.DataList.n_ReportInventoryCurrent_Id = result.Data[0][0].n_ReportInventoryCurrent_Id;
+                                vue.DataList.n_ReportInventoryCurrentDetail_Id = result.Data[0][0].n_ReportInventoryCurrentDetail_Id;
+                                vue.DataList.s_Bin_Code = result.Data[0][0].s_Bin_Code;
+                                vue.DataList.OldSpaceBarCode = result.Data[0][0].s_Space_BarCode;
+                                vue.DataList.s_Bin_NewCode = "" //目标器具码
+
+                                //重新聚焦于目标库位文本框
+                                $(".BinClass").val("").focus();
+                            } else {
+
+                                f_commonShowMsg("该条码在该储位无对应批次的货物信息,请重新确认!");
+
+                                //清空
+                                vue.DataList.BarCode = "";
+                                vue.DataList.OldSpaceBarCode = "";
+                                vue.DataList.s_Bin_Code = "";
+                                vue.DataList.s_Bin_NewCode = "";
+
+                                //重新聚焦于条码文本框
+                                $(".BarCodeClass").val("").focus();
+                                $(".OldSpaceClass").val("");
+                                $(".BinClass").val(""); 
+                            }
+
+                            ajaxobjFirst = null;
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjFirst = null;
+
+                            //重新聚焦于原库位文本框
+                            $(".OldSpaceBarCode").val("").focus();
+                            vue.DataList.OldSpaceBarCode = "";
+                        })
+
+                    },
+                    //目标库位码改值事件
+                    f_keyupNewSpaceBarCode: function () {
+
+                        //强制必须有值
+                        if ($(".NewSpaceClass").val() == "") {
+                            f_commonShowMsg("请输入目标库位码,才能进行移位!");
+                            //重新聚焦到条码文本框
+                            $(".NewSpaceClass").val("").focus();
+                            return;
+                        }
+
+                        vue.DataList.NewSpaceBarCode = $(".NewSpaceClass").val();
+                        $(".NewSpaceClass").val("");
+                    },
+                    //目标器具改值事件
+                    f_keyupBin: function () {
+
+                        //强制必须有值
+                        if ($(".BinClass").val() == "") {
+                            f_commonShowMsg("请输入目标器具!");
+                            //重新聚焦到条码文本框
+                            $(".BinClass").val("").focus();
+                            return;
+                        }
+
+                        vue.DataList.s_Bin_NewCode = $(".BinClass").val();
+                        $(".BinClass").val("");
+                        $(".NewSpaceClass").val("").focus();
+                    },
+                    //选中库位匹配方式
+                    f_radio: function (event) {
+                        if ($(event.target).attr("value") == "无器具装载") {
+
+                            //跳转至有器具移位扫描界面
+                            location.href = "/Displacement/AddBillStockInOutDetailSingle?ParentIds=" + "@(ParentIds)" +
+                            "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" +
+                            "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)";
+                        }
+                    }
+                }
+            })
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+ 
+    </script>
+}

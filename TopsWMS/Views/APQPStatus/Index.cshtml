@@ -1,0 +1,166 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "APQP阶段基础信息管理";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelAPQPstatusList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+
+    foreach (string key in metas[0].Keys)
+    {
+        metas[0][key].Type = "String";
+    }
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+     
+     
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownloadBasicInformation">
+    <input type="hidden" name="IsPower" value="@(Tops.FRM.TopsUser.Powers.Contains("SelAPQPstatusList_ExcelData".ToUpper()))" />
+    <div id="hiddenlist">
+        <input type="hidden" name="BasicInformationDataName" value="SelAPQPstatusList_ExcelData" />
+        <input type="hidden" name="BasicInformationSheetName" value="APQP阶段基础信息管理" />
+    </div>
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+            string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+            var fieldName = biz.Fields[i].FieldName;
+            var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+            <div class="param_item">
+                @if (lookupField != null && lookupField.ToList().Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                    <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                    </script>
+                }
+                else if (biz.Fields[i].DataList.Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <select name="@(fieldName)" fieldType="select" >
+                        @foreach (var item in biz.Fields[i].DataList)
+                        {
+                            <option value="@(item.Key)">@(item.Value)</option>
+                        }
+                    </select>
+                }
+                else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                }
+                else
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                }
+            </div>
+        }
+        <div style="clear: both;">
+        </div>
+    </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#addBt,#searchBt,#delBt,#exportBt,#checkBt").show();
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        
+        $("#exportBt").attr("value","基础信息导出");
+        $("#checkBt").attr("value","基础信息导入");
+
+        $("#delBt").attr("value","停用");
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelAPQPstatusList',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+
+                f_addTab(rowdata[idKey], "维护[" + rowdata["s_APQPStatus_Name"] + "]", "/APQPStatus/Modify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&Sel_Id="+ rowdata[idKey] +"&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            
+            $('select[name=rp]').val($(".l-bar-group,.l-bar-selectpagesize").find("option:selected").val());
+            grid.options.parms = $("form#paramForm").serializeArray();
+            $('select[name=rp]').change();
+        });
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/APQPStatus/Modify?"+"ctrl=add&" + Math.random());
+        }); 
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        })
+        
+        //基础信息导入
+        $("#checkBt").click(function(){
+            f_addTab("Add", "添加", "/Common/Import?ModuleName="+ 
+            "APQP阶段基础信息管理" + "&TableName="+"tAPQPStatus"+"&Id="+"n_APQPStatus_Id"+"&SelQueryObjectName="+"SelAPQPstatusList_ExcelData"
+            +"&TableColumnsStateName="+"n_APQPStatus_state" + "&TableColumnsUpdatorName="+"s_APQPStatus_Updator"+ "&TableColumnsUpdatimeName="+"d_APQPStatus_UpdateTime" ); 
+        })
+        
+        //查阅是否有权限
+        if($("[name=IsPower]").val() == "False"){
+           $("#checkBt").hide();
+        }
+
+        //停用事件
+        $("#delBt").click(function(){
+            var rows = grid.getSelectedRows();
+             
+            if(rows.length == 0){
+               return;
+            }
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/DelAPQPstatus",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("停用成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+        $("#searchBt").click();
+        
+    });
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+    </script>
+}
+<div id="datagrid">
+</div>

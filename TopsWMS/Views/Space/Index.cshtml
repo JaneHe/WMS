@@ -1,0 +1,334 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "货架信息";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelSpaceList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    foreach (string key in metas[0].Keys)
+    {
+        metas[0][key].Type = "String";
+    }
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+     
+    string Rack_Id = Request.QueryString["Rack_Id"];
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+    <div id="hiddenlist">
+    </div>
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+            string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+            var fieldName = biz.Fields[i].FieldName;
+            var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+            <div class="param_item">
+                @if (lookupField != null && lookupField.ToList().Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                    <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                    </script>
+                }
+                else if (biz.Fields[i].DataList.Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <select name="@(fieldName)" fieldType="select" >
+                        @foreach (var item in biz.Fields[i].DataList)
+                        {
+                            <option value="@(item.Key)">@(item.Value)</option>
+                        }
+                    </select>
+                }
+                else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                }
+                else
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                }
+            </div>
+        }
+        <div style="clear: both;">
+        </div>
+        <input type="hidden" name="Rack_Id" value="@(Rack_Id)" />
+    </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    $(function () {
+        //$("#module_toolbar input").hide();
+        $("#searchBt,#printBt,#addBt,#delBt,#addMoreBt,#addSubtaskBt").show();
+        
+        $("#printBt").attr("value","货架储位打印");
+        $("#addBt").attr("value","添加储位信息"); 
+        $("#delBt").attr("value","停用储位信息");
+        $("#checkBt").attr("value","修改储位信息");
+        $("#addSubtaskBt").attr("value","储位锁定");
+
+        $("#addMoreBt").attr("value","储位合并");
+        //$("#addSubtaskBt").attr("value","储位拆分"); 
+        
+        //复制
+        var unlock = $("#addSubtaskBt").clone();
+        $(unlock).attr("value","储位解锁");
+
+        var $toolbar = $("#module_toolbar").clone(true);
+
+        $("#module_toolbar").empty().append($toolbar.find("#searchBt"))
+        .append($toolbar.find("#addBt")).append($toolbar.find("#checkBt"))
+        .append($toolbar.find("#delBt")).append($toolbar.find("#printBt"))
+        .append($toolbar.find("#addSubtaskBt"))
+        .append($(unlock));
+        //.append($toolbar.find("#addMoreBt")).append($toolbar.find("#addSubtaskBt"));
+
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        
+        $("#paramlist").find(".param_item:eq(0)").hide();
+        $("[name=n_Rack_Id]").val($("[name=Rack_Id]").val());
+
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelSpaceList',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            checkbox:true,
+            heightDiff: -10,
+            enabledSort:true,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+            
+                var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object(); 
+
+                f_addTab("Modify", "维护[" + rowdata["s_Space_BarCode"] + "]", "/Space/Modify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&Rack_Id="+$("[name=Rack_Id]").val()+"&Sel_Id="+ rowdata[idKey] +"&" + Math.random());
+            }, onAfterShowData: function (rowdata) { 
+                if (rowdata.Data.length != 0) {
+                    var obj = rowdata.Data;
+                    
+                    for (var i = 0; i < obj.length; i++) { 
+                        if(obj[i]["n_CombinedSpace_State"] == 1){
+                             $(".l-grid-body-table:eq(1) tbody .l-grid-row:eq(" + (obj[i].__index) + ")")
+                                .css("background-color", "lightBlue");
+                        }
+                    }
+                }
+                
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            $('select[name=rp]').val($(".l-bar-group,.l-bar-selectpagesize").find("option:selected").val());
+            grid.options.parms = $("form#paramForm").serializeArray();
+            $('select[name=rp]').change();
+        });
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/Space/Modify?"+"ctrl=add&Rack_Id="+$("[name=Rack_Id]").val()+"&" + Math.random());
+        }); 
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        })
+        
+        //货架储位打印记录
+        $("#printBt").click(function(){
+            var rows = grid.getSelectedRows();
+             
+            if(rows.length == 0){
+               return;
+            }
+
+            var n_Space_Ids = "";
+
+            //拼装需传递的数组
+            $.each(rows,function(index,value){
+                n_Space_Ids += "'"+value["n_Space_Id"]+"'" + ","
+            })
+            
+            n_Space_Ids = n_Space_Ids.substring(0,n_Space_Ids.length - 1);
+
+            f_addTab("Print", "打印", "/Space/Print?n_Space_Id="+ n_Space_Ids +"&" + Math.random());
+        })
+
+        //停用事件
+        $("#delBt").click(function(){
+            var rows = grid.getSelectedRows();
+           
+            if(!confirm("请确认是否真的需要删除!")){
+               return;
+            }
+            if(rows.length == 0){
+               return;
+            }
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/DelSpace",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("停用成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+
+
+
+        //储位锁定事件
+        $("#addSubtaskBt").click(function(){
+            
+            var rows = grid.getSelectedRows();
+            
+            if(rows.length == 0){
+               return;
+            }
+
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/UpdateSpaceLocationLock",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("锁定成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+
+        //储位合并
+        $("#addMoreBt").click(function(){
+            var rows = grid.getSelectedRows();
+              
+            if(rows.length < 1){
+               alert("请选择需要进行合并的储位信息!");
+               return;
+            }
+
+            var n_Space_Ids = "";
+            var s_Space_BarCodes = "";
+
+            $.each(rows,function(index,value){
+                n_Space_Ids += "'"+ value.n_Space_Id+"'" + ",";
+                s_Space_BarCodes += value.s_Space_BarCode + ",";
+            })
+            
+            n_Space_Ids = n_Space_Ids.substring(1,n_Space_Ids.length - 1);
+            n_Space_Ids = n_Space_Ids.substring(0,n_Space_Ids.length - 1);
+            s_Space_BarCodes = s_Space_BarCodes.substring(0,s_Space_BarCodes.length - 1);
+
+            f_addTab("CombinedModify", "合并储位["+s_Space_BarCodes+"]", "/Space/CombinedModify?"+"ctrl=add&Rack_Id="+$("[name=Rack_Id]").val()+"&Sel_Id="+rows[0].n_Space_Id+"&n_Space_Ids="+n_Space_Ids+"&" + Math.random());
+        })
+
+//        //储位拆分
+//        $("#addSubtaskBt").click(function(){
+//            var rows = grid.getSelectedRows();
+//              
+//            if(rows.length != 1){
+//               alert("请选择需要进行拆分的单储位信息!");
+//               return;
+//            }
+
+//            $.ligerDialog.open({ 
+//               title: '储位拆分', 
+//               url: '/Space/SplitSpaceModify?SpaceCode='+rows[0]["s_Space_BarCode"]+'&SpaceBay='+rows[0]["n_Space_BayNumber"]
+//               +'&SpaceLayer='+rows[0]["n_Space_LayerNumber"]+'&Space_Position='+rows[0]["n_Space_Position"], 
+//               height: 300, 
+//               width: 370,
+//               buttons:[
+//                   {
+//                       text: '保存',
+//                       onclick: function (item, dialog) {
+//                            var SplitCount = dialog.frame.f_getData();
+//                            if(SplitCount == ""){
+//                               return;
+//                            }
+
+//                            $.ajax({
+//                                type:"POST",
+//                                url:"/AjaxPost/AddSplitSpace",
+//                                data:{ n_Space_Id:rows[0]["n_Space_Id"],SplitCount:SplitCount },
+//                                success:function(result){
+//                                    result = JSON.parse(result);
+//                                    if(result.IsSuccess){
+//                                       alert("拆分储位成功!");
+//                                       dialog.hide();
+//                                       $("#searchBt").click();
+//                                    }else{
+//                                       alert(result.Msgs[0]);
+//                                    }
+//                                }
+//                            })
+//                             
+//                       }
+//                   },{
+//                       text: '取消',
+//                       onclick: function (item, dialog) {
+//                            dialog.hide();
+//                       }
+//                   } 
+//               ] 
+//            });
+//        })
+
+        //储位解锁事件
+        $(unlock).click(function(){
+            var rows = grid.getSelectedRows();
+            
+            if(rows.length == 0){
+               return;
+            }
+
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/UpdateSpaceLocationUnLock",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("解锁成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+
+        $("#searchBt").click();
+    });
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+    </script>
+}
+<div id="datagrid">
+</div>

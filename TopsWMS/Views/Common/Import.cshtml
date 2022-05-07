@@ -1,0 +1,145 @@
+﻿@{
+    Layout = null;
+
+    //模块名称
+    string ModuleName = Request.QueryString["ModuleName"];
+
+    //数据表名称
+    string TableName = Request.QueryString["TableName"];
+
+    //标识列名称
+    string Id = Request.QueryString["Id"];
+
+    //查询对象名称 用于获取导入文档的信息
+    string SelQueryObjectName = Request.QueryString["SelQueryObjectName"];
+
+    //表状态字段名称
+    string TableColumnsStateName = Request.QueryString["TableColumnsStateName"];
+    
+    //表修改人字段名称
+    string TableColumnsUpdatorName = Request.QueryString["TableColumnsUpdatorName"];
+
+    //表修改时间字段名称
+    string TableColumnsUpdatimeName = Request.QueryString["TableColumnsUpdatimeName"];
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@(ModuleName)_导入</title>
+    <link href="../../Scripts/zyupload/skins/zyupload-1.0.0.min.css" rel="stylesheet"
+        type="text/css" />
+    <script src="../../TopsLib/Scripts/jquery-1.8.0.js" type="text/javascript"></script>
+    <script src="../../Scripts/zyupload/zyupload-1.0.0.js" type="text/javascript"></script>
+    <script src="../../Scripts/zyupload/WarmMsg.js" type="text/javascript"></script>  
+    @*    <script src="../../Scripts/zyupload/zyupload.drag-1.0.0.min.js" type="text/javascript"></script>*@
+    <style>
+        a
+        {
+            text-decoration: underline;
+            font-family: 微软雅黑;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .Error_Msg
+        {
+            font-family: 微软雅黑;
+            font-size: 18px;
+            width: 42%;
+            font-weight: bold;
+            position: fixed;
+            top: 40px;
+            left: 56%;
+            background: #00b7ee;
+            border-radius: 20px;
+            display: inline-block;
+            color: white;
+            box-shadow: rgb(136, 136, 136) 10px 10px 20px;
+        }
+        .Error_Msg span
+        {
+            display: block;
+            margin-left: 10px;
+        }
+        .Error_Msg label
+        {
+            display: block;
+            margin-left: 10px;
+            color: Red;
+        }
+    </style>
+    <script type="text/javascript">
+        var warmmsg = new WarmMsg();
+
+        var error = new Array();
+
+        var timeState = false;
+
+        $(function () {
+            //文件上传
+            $("#file_Upload").zyUpload({
+                width: "650px",
+                height: "400px",
+                itemWidth: "180px",
+                itemHeight: "100px",
+                url: "/ExcelHelp/ImportBasicInformation?SelQueryObjectName="+ $("[name=SelQueryObjectName]").val()
+                +"&ModuleName="+ $("[name=ModuleName]").val()
+                + "&TableName=" + $("[name=TableName]").val() + "&Id=" + $("[name=Id]").val()
+                + "&TableColumnsStateName=" + $("[name=TableColumnsStateName]").val()
+                + "&TableColumnsUpdatorName=" + $("[name=TableColumnsUpdatorName]").val()
+                + "&TableColumnsUpdatimeName=" + $("[name=TableColumnsUpdatimeName]").val(),
+                fileType: ["xls", "xlsx"],
+                multiple: true,
+                dragDrop: true,
+                del: true,
+                finishDel: true,
+                onSuccess: function (file, response) {
+                    response = JSON.parse(response);
+                    if (response.IsSuccess) {
+                        if ($(".upload_preview .upload_append_list:visible .file_success:hidden").length == 1)
+                            warmmsg.show("上传成功!");
+                    } else {
+                        warmmsg.show("上传失败:" + response.Msg);
+                        error.push({ name: file.name });
+                    }
+                    $(".Error_Msg").empty();
+                },
+                onComplete: function (responseInfo) {
+                    $(".Error_Msg").empty();
+                    setTimeout(f_appendErrorMsg, 1000);
+                }
+            });
+
+            $(".filePicker").text("选择上传文件");
+
+
+        })
+
+        //添加显示错误信息
+        function f_appendErrorMsg() {
+            if (error.length != 0) {
+                $(".Error_Msg").append("<label>上传失败</label>");
+                error.forEach(function (v, i) {
+                    $(".Error_Msg").append("<span>" + v.name + "</span>");
+                })
+            }
+            error.length = 0;
+        }
+    </script>
+</head>
+<body>
+    <div>
+       <input type="hidden" name="SelQueryObjectName" value="@(SelQueryObjectName)" />
+       <input type="hidden" name="ModuleName" value="@(ModuleName)" />
+       <input type="hidden" name="TableName" value="@(TableName)" />
+       <input type="hidden" name="Id" value="@(Id)" />
+       <input type="hidden" name="TableColumnsStateName" value="@(TableColumnsStateName)" />
+       <input type="hidden" name="TableColumnsUpdatorName" value="@(TableColumnsUpdatorName)" />
+       <input type="hidden" name="TableColumnsUpdatimeName" value="@(TableColumnsUpdatimeName)" />
+       @* <a href="../../Content/Excel/湖南艾华工单模板.xls">工单Excel文档模板下载</a>*@
+    </div>
+    <div id="file_Upload">
+    </div>
+    <div class="Error_Msg">
+    </div>
+</body>
+</html>

@@ -1,0 +1,272 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+     
+     
+}
+@section Body{
+    <div class="body">
+        <div>
+            <input type="text" name="GoodsName" v-bind:class="GoodsName_Showed" placeholder="货物名称筛选项" v-on:change="f_changeGoodsName" />
+        </div>
+        <div>
+            <div v-bind:class="titleTab_Showed">
+                <table>
+                    <tr>
+                        <th>
+                            货物编码 
+                        </th>
+                        <th>
+                            货物名称
+                        </th>
+                    </tr>
+                </table>
+            </div>
+            <div v-bind:class="infoTab_Showed">
+                <table>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                   </tr>
+                    <tr v-for="(item,i) in GoodsInfoData" :IsCheckState="item.IsCheckState" :index="i" :ProductCode="item.ProductCode" :ProductName="item.ProductName" :class="{ 'morechecked':item.IsCheckState }" v-on:click="f_checkRecord">
+                        <td :index="i">
+                            {{ item.ProductCode_Begin }}
+                            {{ item.ProductCode_End }}
+                        </td>
+                        <td :index="i">
+                            {{ item.ProductName }} 
+                        </td> 
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div v-bind:class="button_Div_Showed">
+            <div v-on:click="f_SaveCheckGoodsCode">
+                确认选择</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .GoodsName
+        {
+            width: calc(90%);
+            margin: calc(2%) calc(5%);
+            border: 1px solid lightblue;
+            line-height: 22px;
+            text-align: center;
+        }
+        
+        .titleTab
+        {
+            width: calc(90%);
+            height: 30px;
+            margin: calc(1%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        .infoTab
+        {
+            width: calc(90%);
+            height: 130px;
+            margin: calc(0%) calc(5%) calc(2%) calc(5%);
+            text-align: center;
+            overflow-y:scroll;
+        }
+        .titleTab table, .infoTab table
+        {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .titleTab tr th:nth-child(1)
+        {
+            width: 40%;
+            border: 1px solid #a5e0a5;
+            background: rgb(200 220 232);
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .titleTab tr th:nth-child(2)
+        {
+            width: 60%;
+            border: 1px solid #a5e0a5;
+            background: rgb(200 220 232);
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        
+        
+        .infoTab tr td:nth-child(1)
+        { 
+            width: 40%;
+            border: 1px solid #a5e0a5;
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .infoTab tr td:nth-child(2)
+        { 
+            width: 60%;  
+            border: 1px solid #a5e0a5;
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+
+        
+        .button_Div div
+        {
+            width: calc(90%);
+            margin: calc(0%) calc(5%) calc(2.5%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        $(function () {
+
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    input_Div_Showed: "input_Div", //货物编码文本框样式
+                    titleTab_Showed: "titleTab",  //标题结果表格样式
+                    infoTab_Showed: "infoTab", //结果表格样式
+                    button_Div_Showed: "button_Div", //按钮样式
+                    GoodsName_Showed: "GoodsName", //货物编码筛选项样式
+                    GoodsInfoData: [], //货物信息数据源
+                    CheckGoodsInfoData: [] //已选择的货物信息数据源
+                },
+                methods: {
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("WMS-货物编码选择操作");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../InventoryQuerySingle/Index?ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../InventoryQuerySingle/Index?ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+                        //加载货物编码信息
+                        vue.f_SelInventoryQueryGoodsInfo();
+                    },
+                    //加载货物编码信息
+                    f_SelInventoryQueryGoodsInfo: function () {
+                        //对象名 查询塑件与漆件BOM信息
+                        var objectName = "SelInventoryQueryGoodsInfo";
+                        //传递参数
+                        var param = {};
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            if (result.IsSuccess) {
+                                vue.GoodsInfoData = [];
+                                if (result.Data[0].length > 0) {
+                                    //形成数据源加载在界面上
+                                    result.Data[0].forEach(function (value, index) {
+                                        value.IsCheckState = false;
+                                        value.ProductCode_Begin = (value.ProductCode.indexOf("/") > -1 ? value.ProductCode.substring(0, value.ProductCode.indexOf("/")) :
+                                        (value.ProductCode.indexOf("-") > -1 ? value.ProductCode.substring(0, value.ProductCode.indexOf("-")) : value.ProductCode));
+                                        value.ProductCode_End = (value.ProductCode.indexOf("/") > -1 ? value.ProductCode.substring(0, value.ProductCode.indexOf("/")) :
+                                        (value.ProductCode.indexOf("-") > -1 ? value.ProductCode.substring(value.ProductCode.indexOf("-"), value.ProductCode.length) : ""));
+                                        vue.GoodsInfoData.push(value);
+                                    })
+
+                                }
+                            }
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+                    },
+                    //根据货物名称信息模糊匹配加载信息
+                    f_changeGoodsName: function () {
+                        //获取货物名称筛选信息
+                        var GoodsName = $(event.target).val();
+
+                        if (vue.GoodsInfoData != [] && GoodsName != "") {
+                            //获取筛选后的记录
+                            var arr = vue.GoodsInfoData.filter(function (result) {
+
+                                return result.ProductName.toUpperCase().indexOf(GoodsName) != -1
+                                || result.ProductName.toLowerCase().indexOf(GoodsName) != -1;
+                            })
+
+                            //清空
+                            vue.GoodsInfoData = [];
+                            vue.GoodsInfoData = arr;
+                        }
+                        
+                        //重新加载
+                        if (GoodsName == "") {
+                            vue.f_SelInventoryQueryGoodsInfo();
+                        }
+                    },
+                    //点击货物信息行事件
+                    f_checkRecord: function () {
+                        //选择行背景色替换
+                        vue.GoodsInfoData.forEach(function (value, index) {
+                            value.IsCheckState = false;
+                        })
+                        vue.GoodsInfoData[$(event.target).attr("index")].IsCheckState = true;
+                        //已选择的数据源赋值
+                        vue.CheckGoodsInfoData = [];
+                        vue.CheckGoodsInfoData = vue.GoodsInfoData[$(event.target).attr("index")];
+                    },
+                    //确认选择货物信息记录
+                    f_SaveCheckGoodsCode: function () {
+                        //获取货物编码
+                        var GoodsCode = vue.CheckGoodsInfoData.ProductCode;
+
+                        //跳转到选择货物编码页
+                        location.href = "Index?ParentIds=" + "@(ParentIds)" + "&GoodsCode=" + GoodsCode;
+
+                    },
+                    //验证所填是否是数字,不是则清空
+                    checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    }
+                }
+
+            })
+
+            //加载页面后执行 
+            vue.f_reloadPage();
+        })
+    </script>
+}

@@ -1,0 +1,12 @@
+﻿.l-topmenu-logo 
+{
+    float:left;
+}
+.l-topmenu-welcome
+{
+    float:right; 
+}
+.selected_table_row
+{
+    background-color:skyblue;
+}

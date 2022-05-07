@@ -1,0 +1,226 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<XmlUpload >
+  <QueryObject>SelUploadOrderExcelTest</QueryObject> <!--查询对象-->
+  <GetSheet>正面</GetSheet> <!--GetSheet：工作表名称-->
+  <WorkName Position="1,1,15" RowIndex="1" StartCell="1" EndCell="15">固态电容制造命令单</WorkName>
+  <!--IsDetail:true：二级对象，false：一次保存-->
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>IpAddress</FieldName>
+    <Type>string</Type>
+    <Position></Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="%" AttributeType="Replace" State="1">
+    <FieldName>LeachingRate</FieldName>
+    <Type>float</Type>
+    <Position>7,22</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="*" AttributeType="Before" State="1">
+    <FieldName>Width</FieldName>
+    <Type>float</Type>
+    <Position>3,7</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="*" AttributeType="After" State="1">
+    <FieldName>Height</FieldName>
+    <Type>float</Type>
+    <Position>3,7</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>Applicant</FieldName>
+    <!--FieldName：字段名称-->
+    <Type>string</Type>
+    <!--Type：字符类型-->
+    <Position>0,23</Position>    
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>CustomProductCode</FieldName>
+    <Type>string</Type>
+    <Position>2,24</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>ApprovedPerson</FieldName>
+    <Type>string</Type>
+    <Position>2,25,26</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>ConfirmationPerson</FieldName>
+    <Type>string</Type>
+    <Position>0,28,29</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="■" AttributeType="RadioButton" State="1">
+    <FieldName>OrderType</FieldName>
+    <Type>string</Type>
+    <Position>1,16</Position>
+    <DetailName charLength="2">量产,试产,样品</DetailName>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="-" AttributeType="LastCutUut" State="1">
+    <FieldName>BatchNo</FieldName>
+    <Type>string</Type>
+    <Position>2,6</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>Date</FieldName>
+    <Type>DateTime</Type>
+    <Position>2,1,4</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>ProductCode</FieldName>
+    <Type>string</Type>
+    <Position>2,13,15</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>Code</FieldName>
+    <Type>string</Type>
+    <Position>2,13,15</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>Name</FieldName>
+    <Type>string</Type>
+    <Position>2,13,15</Position>
+  </UploadInfo>
+  
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>OutPutSum</FieldName>
+    <Type>int</Type>
+    <Position>3,15,17</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>OutPutCou</FieldName>
+    <Type>int</Type>
+    <Position>3,20,23</Position>
+  </UploadInfo>
+
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>ThroughRate</FieldName>
+    <Type>float</Type>
+    <Position> 3,27,28</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>NewBatchNo</FieldName>
+    <Type>string</Type>
+    <Position>4,9,10</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>WorkCode</FieldName>
+    <Type>string</Type>
+    <Position>2,6</Position>
+  </UploadInfo>
+  
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>UserAgent</FieldName>
+    <Type>string</Type>
+    <Position></Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>Operator</FieldName>
+    <Type>string</Type>
+    <Position></Position>
+  </UploadInfo>
+  
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>CapacitanceMin</FieldName>
+    <Type>float</Type>
+    <Position>5,1,5</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>CapacitanceMax</FieldName>
+    <Type>float</Type>
+    <Position>5,6</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>PositiveFoilCapacity</FieldName>
+    <Type>float</Type>
+    <Position>5,10</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>NegativeFoilCapacity</FieldName>
+    <Type>float</Type>
+    <Position>6,10</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>PositiveFoilLength</FieldName>
+    <Type>float</Type>
+    <Position>5,17</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>NegativeFoilLength</FieldName>
+    <Type>float</Type>
+    <Position>6,17</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>WideFoil</FieldName>
+    <Type>float</Type>
+    <Position>5,22</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>PaperWidth</FieldName>
+    <Type>float</Type>
+    <Position>6,22</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>NegativeFoilExtension</FieldName>
+    <Type>float</Type>
+    <Position>5,27</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>PaperLengthening</FieldName>
+    <Type>float</Type>
+    <Position>6,27</Position>
+  </UploadInfo>
+  
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>LossTangent</FieldName>
+    <Type>float</Type>
+    <Position>6,4</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>LeakageCurrent</FieldName>
+    <Type>float</Type>
+    <Position>7,4</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>SyntheticCapacity</FieldName>
+    <Type>float</Type>
+    <Position>7,10</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>PaperLength</FieldName>
+    <Type>float</Type>
+    <Position>7,17</Position>
+  </UploadInfo>
+  
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>EstimatedCapacity</FieldName>
+    <Type>float</Type>
+    <Position>7,27</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>ESR</FieldName>
+    <Type>float</Type>
+    <Position>8,3,5</Position>
+  </UploadInfo>
+  <UploadInfo IsDetail="false" Mark="" State="1">
+    <FieldName>RIPPLECURRENT</FieldName>
+    <Type>float</Type>
+    <Position>8,17,19</Position>
+  </UploadInfo>
+<!--子表明细数据-->
+  <UploadInfo IsDetail="true" Mark="" AttributeType="" State="1">
+    <FieldName>Type,Name,Code,Amount,Unit</FieldName>
+    <Type>string</Type>
+    <RowIndex>11,13,15,17,19,21,23</RowIndex>
+    <CellIndex>0,1,1,4,7;8,9,9,13,15</CellIndex>
+    <CellEnd></CellEnd>
+    <IsNull></IsNull>
+    <FixedInfo  IsDetail="false" Mark="" State="1">
+      <FieldName>ParentName</FieldName>
+      <Type>string</Type>
+      <Position>2,13,15</Position>
+    </FixedInfo>
+    <FixedInfo  IsDetail="false" Mark="" State="1">
+      <FieldName>ParentCode</FieldName>
+      <Type>string</Type>
+      <Position>2,13,15</Position>
+    </FixedInfo>
+  </UploadInfo>
+
+</XmlUpload>

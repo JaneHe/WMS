@@ -1,0 +1,133 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "小件超市补料确认记录统计";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelSmallSupermarketMaterialRecordList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+
+    foreach (string key in metas[0].Keys)
+    {
+        metas[0][key].Type = "String";
+    }
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+
+    //获取默认选中日期
+    string datetime = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd");
+    
+    //Excel文件名称时间后缀
+    string ExcelDate = DateTime.Now.ToString("yyyyMMdd");
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+    <div id="hiddenlist">
+        <input type="hidden" name="exportdata" value="SelSmallSupermarketMaterialRecordList_ExcelData" />
+        <input type="hidden" name="exportcolumn" value="SelSmallSupermarketMaterialRecordList_ExcelCols" />
+        <input type="hidden" name="exportsheetname" value="小件超市补料记录_@(ExcelDate)" />
+        <input type="hidden" name="exportcondition" value="" />
+        <input type="hidden" name="datetime" value="@(datetime)" />
+    </div>
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+            string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+            var fieldName = biz.Fields[i].FieldName;
+            var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+            <div class="param_item">
+                @if (lookupField != null && lookupField.ToList().Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                    <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                    </script>
+                }
+                else if (biz.Fields[i].DataList.Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <select name="@(fieldName)" fieldType="select" >
+                        @foreach (var item in biz.Fields[i].DataList)
+                        {
+                            <option value="@(item.Key)">@(item.Value)</option>
+                        }
+                    </select>
+                }
+                else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                }
+                else
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                }
+            </div>
+        }
+        <div style="clear: both;">
+        </div>
+    </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#searchBt,#exportBt").show();
+        //渲染插件,#exportBt,
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        //给予默认的日期
+        $("[name=BeginTime]").val($("[name=datetime]").val());
+
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelSmallSupermarketMaterialRecordList',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+                f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/module/modify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            $('select[name=rp]').val($(".l-bar-group,.l-bar-selectpagesize").find("option:selected").val());
+            grid.options.parms = $("form#paramForm").serializeArray();
+            $('select[name=rp]').change();
+        });
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/module/modify?"+"ctrl=add&" + Math.random());
+        }); 
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        })
+        
+        $("#searchBt").click()
+    });
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+    </script>
+}
+<div id="datagrid">
+</div>

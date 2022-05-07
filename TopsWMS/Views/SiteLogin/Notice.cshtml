@@ -1,0 +1,293 @@
+﻿@{
+    Layout = null;
+    string UserNO = Tops.FRM.TopsUser.UserNO;
+    string UserName = Tops.FRM.TopsUser.UserName;
+     
+    
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>主菜单</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="full-screen" content="yes">
+    <script src="../../Scripts/jquery-1.4.4.js" type="text/javascript"></script>
+    <script src="../../Scripts/Mask.js" type="text/javascript"></script>
+    <script src="../../Scripts/Translate.js" type="text/javascript"></script>
+    <style type="text/css">
+        body
+        {
+            margin: 0px;
+            position: relative;
+        }
+        .top
+        {
+            width: 100%;
+            background-color: rgb(6, 137, 213);
+            color: White;
+            font-family: 微软雅黑;
+            text-align: center;
+            font-weight: bold;
+            line-height: 53px;
+            font-size: 25px;
+            width: calc(100%);
+            position: absolute;
+            top: 0px;
+        }
+        .bottom
+        {
+            width: 100%;
+            background-color: rgb(6, 137, 213);
+            color: White;
+            font-family: 微软雅黑;
+            text-align: center;
+            font-weight: bold;
+            line-height: 53px;
+            font-size: 25px;
+            width: calc(100%);
+            position: fixed;
+            bottom: 0px;
+            cursor: pointer;
+        }
+        .container
+        {
+            width: calc(100%);
+            position: absolute;
+            top: 53px;
+        }
+        .Notice
+        {
+            width: calc(80%);
+            margin: 3% 10%;
+        }
+        .Notice table
+        {
+            width: 100%;
+        }
+        
+        .Notice tr
+        {
+            text-align: center;
+        }
+        .Notice td
+        {
+            width: 33%;
+            border: 1px solid white;
+            font-family: 微软雅黑;
+            background: #DBEAFE;
+        }
+        .Notice th
+        {
+            width: 33%;
+            border: 1px solid white;
+            background: lightseagreen;
+            color: white;
+            font-family: 微软雅黑;
+            line-height: 35px;
+        }
+        .content
+        {
+            overflow-y: scroll;
+            height: 225px;
+        }
+        
+        .Readed
+        {
+            font-family: 微软雅黑;
+            font-size: 16px;
+            width: calc(50%);
+            line-height: 38px;
+            font-weight: bold;
+            background: green;
+            border-radius: 5px;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            color: white;
+            margin:0% 25%;
+        }
+        .gray
+        {
+            background: gray !important;
+        }
+    </style>
+    <script>
+        //$.Translate({ moduleText: "现场跟单", language: "es" });
+
+        $(function () {
+            $.ajax({
+                type: "GET",
+                data: {
+                    's_ReceivePerson': $("#Creator").val(),//操作人
+                },
+                url: "/AjaxGet/SelLibraryNotices",
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result.IsSuccess) {
+                        if (result.Data[0].length > 0) {
+                            result.Data[0].forEach(function (value, index) {
+                                $(".content table").append("<tr id='" + value.Id + "'><td>" + value.UnreadOverview + "</td><td>" + value.Creator + "</td><td>" + value.CreateTime + "</td></tr>");
+                            })
+                        } else {
+                            $(".Readed").addClass("gray");
+                        }
+                    } else {
+                        f_commonShowMsg(result.Msgs[0]);
+                    }
+                }
+            })
+
+            //确认已读
+            $(".Readed").dblclick(function () {
+                if (!$(this).hasClass("gray")) {
+                    var paramData = new Array();
+                    $(".content tr").each(function (index, value) {
+                        paramData.push({ Id: $(value).attr("Id") });
+                    })
+                    $.ajax({
+                        type: "POST",
+                        url: "/AjaxPost/UpdateLibraryNotices",
+                        data: { Dictionarys: paramData },
+                        success: function (result) {
+                            result = JSON.parse(result);
+                            if (result.IsSuccess) {
+                                f_commonShowMsg("确认已读成功");
+                                location.reload();
+                            } else {
+                                f_commonShowMsg(result.Msgs[0]);
+                            }
+                        }
+                    })
+                }
+            })
+
+            //返回
+            $(".bottom").click(function () {
+                location.href = "/SiteLogin/Layout";
+            })
+        })
+
+
+        //提示信息方式
+        var msgtimer;
+        function f_commonShowMsg(msg, container) {
+            setTimeout(function () {
+                if (msgtimer) {
+                    clearTimeout(msgtimer);
+                    $(".msgdiv").hide().remove();
+                }
+                var msgdiv = $('<div id="msgdiv" class="msgdiv">' + msg + '</div>');
+                // msgdiv.css({
+                //     "display": "none",
+                //     "position": "absolute",
+                //     "min-width": "100px",
+                //     "max-width": "600px",
+                //     "min-height": "50px",
+                //     "line-height": "50px",
+                //     "background": "#E5EFFE",
+                //     "padding": "0px 10px",
+                //     "color": "black",
+                //     "top": "3px",
+                //     "left": "50%",
+                //     "z-index": "1000",
+                //     "text-align": "center",
+                //     "font-weight": "bold",
+                //     "border-radius": "5px",
+                //     "box-shadow": "0px 0px 5px 2px gray",
+                //     "font-size": "16px"
+                // });
+
+                //移动端调整
+                msgdiv.css({
+                    "display": "none",
+                    "position": "fixed",
+                    "min-width": "320px",
+                    "width": "100%",
+                    "min-height": "50px",
+                    "line-height": "50px",
+                    "background": "#E5EFFE",
+                    "padding": "0px 0px",
+                    "color": "white",
+                    "background-color": "black",
+                    "top": "0px",
+                    "left": "50%",
+                    "z-index": "1000",
+                    "text-align": "center",
+                    "font-weight": "bold",
+                    "border-radius": "0px",
+                    "box-shadow": "0px 2px 5px 2px gray",
+                    "font-size": "18px",
+                    "font-family": "微软雅黑",
+                    "opacity": "0.9"
+                });
+                //end
+
+                if (typeof (container) != 'undefined') {
+                    if ($("#" + container).length > 0) {
+                        $("#" + container).append(msgdiv);
+                    } else if ($("." + container).length > 0) {
+                        $("." + container).append(msgdiv);
+                    } else {
+                        $(document).append(msgdiv);
+                    }
+                } else {
+                    $("body").append(msgdiv);
+                }
+                msgdiv.css("margin-left", -Math.floor(msgdiv.width() / 2) + "px");
+                // if (msgdiv.width() == 600) {
+                //     msgdiv.css("line-height", "25px");
+                // }
+
+                msgdiv.fadeIn(function () {
+                    msgtimer = setTimeout(function () {
+                        msgdiv.fadeOut(function () {
+                            msgdiv.remove();
+                        });
+                    }, 1500);
+                });
+            }, 900);
+        }
+    </script>
+</head>
+<body>
+    <div class="top">
+              <input id="Creator" value="@Tops.FRM.TopsUser.UserNO" hidden="hidden"  style="display:none"/>
+
+        <label>
+            未读通知</label>
+    </div>
+    <div class="container">
+        <div class="Notice">
+            <div class="title">
+                <table cellspacing="0">
+                    <tr>
+                        <th>
+                            通知简述
+                        </th>
+                        <th>
+                            发起人
+                        </th>
+                        <th>
+                            发起时间
+                        </th>
+                    </tr>
+                </table>
+            </div>
+            <div class="content">
+                <table cellspacing="0">
+                   
+                </table>
+            </div>
+        </div>
+        <div class="buttons">
+            <div class="Readed">
+                <span>确认已读</span></div>
+        </div>
+    </div>
+    <div class="bottom">
+        <span>
+            返回</span>
+    </div>
+</body>
+</html>

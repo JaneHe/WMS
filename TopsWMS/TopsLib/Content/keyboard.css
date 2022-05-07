@@ -1,0 +1,49 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+.inputDiv{ width:700px; margin:0px auto; margin-top:20px; }
+#container {
+	margin: 0px auto;
+	width: 900px;
+	margin-top:15px;
+	height:225px;
+}
+.letterDiv{ width:610px; height:225px; float:left; }
+.symbolDiv{ width:280px; height:225px; float:left; margin-left:10px; }
+.keyboard {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.keyboard li {
+	font: 71%/1.5 Verdana, Sans-Serif;
+	font-size:24px;
+	font-weight:bold;
+	float: left;
+	margin: 0 5px 5px 0;
+	width: 80px;
+	height: 60px;
+	line-height: 60px;
+	text-align: center;
+	background: #eee;
+	border: 1px solid #e6e8eb;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+}
+.keyboard .delete {
+	width: 167px;
+}
+.keyboard .capslock {
+	width: 167px;
+}
+.keyboard li:hover {
+	position: relative;
+	top: 1px;
+	left: 1px;
+	border-color: #999;
+	cursor: pointer;
+}
+.uppercase {
+	text-transform:lowercase;
+}

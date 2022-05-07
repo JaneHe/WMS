@@ -1,0 +1,101 @@
+﻿@{
+    ViewBag.Title = "系统后台登录";
+    Layout = "~/TopsLib/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>后台登录</title>
+    <link href="../../TopsLib/Content/login.css" rel="stylesheet" type="text/css" />
+    <style type="text/css">
+       .btn_BM
+        {
+            background-repeat: no-repeat;
+            cursor: pointer;
+            width: 35px;
+            background-position: center;
+            height: 36px;
+            background-size: cover;
+            border: 2px solid #58B9E6;
+            border-radius: 5px;
+        }
+    </style>
+    <script type="text/javascript">
+
+        $(function () {
+            $("#subBt_BM").click(function () {
+
+                var $bt = $(this);
+                $("#error").text('');
+                $("#loading").show();
+                $bt.attr("disabled", "disabled")
+                $.topsAjax({
+                    type: "POST",
+                    url: "/Account/Login",
+                    data: { UserNO: $("#UserNO").val(), Password: $("#Password").val() },
+                    dealError: false,
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            var userObj = $("#UserNO").val();
+
+                            window.location.href = "/Manage/Index?" + Math.random()
+
+                        } else {
+                            $("#error").text(data.Msgs[0]);
+                            $("#loading").hide();
+                            $bt.removeAttr("disabled");
+                        }
+
+                    }
+                });
+            });
+            $("body").keydown(function (e) {
+                if (e.keyCode == 13) {
+                    $("#subBt_BM").click();
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+     <div id="login_main" class="login_main">
+        <div id="login_main_ct" style="position: relative; top: 215px; left: 30px; width: 504px;">
+            <table width="100%" align="center" id="login_main_tab">
+                <tbody>
+                    <tr>
+                        <td>
+                            <span class="login_text">用户名：</span><input type="text" class="login_input" tabindex="1"
+                                id="UserNO" name="UserNO" title="write" />
+                        </td>
+                        <td>
+                            <span class="login_text">密码：</span><input class="login_input" tabindex="2" type="password"
+                                id="Password" name="OldPwd" />
+                        </td>
+                        <td>
+                            <p style="text-align: right; padding-right: 76px;">
+                                <input type="button" class="btn_BM" id="subBt_BM" value="登录" />
+                            </p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3" height="25px;">
+                            <img id="loading" src="../../Content/loading.gif" style="display: none" />
+                            <label  id="error" style="color: Red"></label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">
+                            @* <a href="javascript:void(0)" id="updatePwd" style="margin-right:57px;">修改密码</a>*@
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            @*  <form name="form" action="../Home/Index" method="post"> </form>*@
+        </div>
+        <div style="clear: both;">
+        </div>
+    </div>
+</body>
+</html>

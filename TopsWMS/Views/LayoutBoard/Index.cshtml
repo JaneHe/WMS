@@ -1,0 +1,800 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>全局看板</title>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        body
+        {
+            background-color: black;
+        }
+        
+        .LayoutBoard
+        {
+            border: 1px solid black;
+            height: 1200px;
+            width: 2660px;
+            position: relative; 
+        }
+        .left_top
+        {
+            border: 1px solid black;
+            height: calc(60%);
+            width: calc(50%);
+            position: absolute;
+            top: 0px;
+            left: 0px;
+        }
+        .right_top
+        {
+            border: 1px solid black;
+            height: calc(60%);
+            width: calc(50%);
+            position: absolute;
+            top: 0px;
+            left: calc(50%);
+        }
+        .left_bottom
+        {
+            border: 1px solid black;
+            height: calc(40%);
+            width: calc(50%);
+            position: absolute;
+            top: calc(60%);
+            left: 0px;
+        }
+        .right_bottom
+        {
+            border: 1px solid black;
+            height: calc(40%);
+            width: calc(50%);
+            position: absolute;
+            top: calc(60%);
+            left: calc(50%);
+        }
+        
+        
+        .left_top div:nth-child(1)
+        {
+            border: 1px solid green;
+            height: calc(54%);
+            width: calc(70%);
+            position: absolute;
+            top: 2%;
+            left: 1%;
+        }
+        .left_top div:nth-child(2)
+        {
+            border: 1px solid green;
+            height: calc(38%);
+            width: calc(20%);
+            position: absolute;
+            top: 58%;
+            left: 1%;
+        }
+        .left_top div:nth-child(3)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 58%;
+            left: 22%;
+        }
+        .left_top div:nth-child(4)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 71%;
+            left: 22%;
+        }
+        .left_top div:nth-child(5)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 84%;
+            left: 22%;
+        }
+        .left_top div:nth-child(6)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 58%;
+            left: 47%;
+        }
+        .left_top div:nth-child(7)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 71%;
+            left: 47%;
+        }
+        .left_top div:nth-child(8)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 84%;
+            left: 47%;
+        }
+        .left_top div:nth-child(9)
+        {
+            border: 1px solid green;
+            height: calc(54%);
+            width: calc(27%);
+            position: absolute;
+            top: 2%;
+            left: 72%;
+        }
+        .left_top div:nth-child(10)
+        {
+            border: 1px solid green;
+            height: calc(38%);
+            width: calc(27%);
+            position: absolute;
+            top: 58%;
+            left: 72%;
+        }
+        
+        
+        
+        .right_top div:nth-child(1)
+        {
+            border: 1px solid green;
+            height: calc(30%);
+            width: calc(24%);
+            position: absolute;
+            top: 2%;
+            left: 1%;
+        }
+        .right_top div:nth-child(2)
+        {
+            border: 1px solid green;
+            height: calc(30%);
+            width: calc(23.3%);
+            position: absolute;
+            top: 2%;
+            left: 25.5%; 
+        }
+        .right_top div:nth-child(3)
+        {
+            border: 1px solid green;
+            height: calc(30%);
+            width: calc(24.8%);
+            position: absolute;
+            top: 2%;
+            left: 49.2%;
+            
+        }
+        .right_top div:nth-child(4)
+        { 
+            border: 1px solid green;
+            height: calc(30%);
+            width: calc(36%);
+            position: absolute;
+            top: 34%;
+            left: 1%;
+        }
+        .right_top div:nth-child(5)
+        { 
+            border: 1px solid green;
+            height: calc(30%);
+            width: calc(36%);
+            position: absolute;
+            top: 34%;
+            left: 38%;
+        }
+        .right_top div:nth-child(6)
+        {
+            border: 1px solid green;
+            height: calc(30%);
+            width: calc(36%);
+            position: absolute;
+            top: 66%;
+            left: 1%;
+        }
+        .right_top div:nth-child(7)
+        {
+            border: 1px solid green;
+            height: calc(30%);
+            width: calc(36%);
+            position: absolute;
+            top: 66%;
+            left: 38%;
+        }
+        
+        
+        .right_top div:nth-child(8)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 2%;
+            left: 75%;
+        }
+        .right_top div:nth-child(9)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 15%;
+            left: 75%;
+        }
+        .right_top div:nth-child(10)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 28%;
+            left: 75%;
+        }
+        .right_top div:nth-child(11)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 41%;
+            left: 75%;
+        }
+        .right_top div:nth-child(12)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 54%;
+            left: 75%;
+        }
+        .right_top div:nth-child(13)
+        {
+            border: 1px solid green;
+            height: calc(12%);
+            width: calc(24%);
+            position: absolute;
+            top: 67%;
+            left: 75%;
+        }
+        .right_top div:nth-child(14)
+        {
+            border: 1px solid green;
+            height: calc(16%);
+            width: calc(24%);
+            position: absolute;
+            top: 80%;
+            left: 75%;
+        }
+        
+        .left_bottom div:nth-child(1)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(19%);
+            position: absolute;
+            top: 2%;
+            left: 1%;
+        }
+        .left_bottom div:nth-child(2)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(18.5%);
+            position: absolute;
+            top: 2%;
+            left: 21%;
+        }
+        .left_bottom div:nth-child(3)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(18.5%);
+            position: absolute;
+            top: 2%;
+            left: 40.5%;
+        }
+        .left_bottom div:nth-child(4)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(18.5%);
+            position: absolute;
+            top: 2%;
+            left: 60%;
+        }
+        .left_bottom div:nth-child(5)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(19.5%);
+            position: absolute;
+            top: 2%;
+            left: 79.5%;
+        }
+        
+        
+        .right_bottom div:nth-child(1)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(16%);
+            position: absolute;
+            top: 2%;
+            left: 1%;
+        }
+        .right_bottom div:nth-child(2)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(16%);
+            position: absolute;
+            top: 2%;
+            left: 17.5%;
+        }
+        .right_bottom div:nth-child(3)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(16%);
+            position: absolute;
+            top: 2%;
+            left: 34%;
+        }
+        .right_bottom div:nth-child(4)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(16%);
+            position: absolute;
+            top: 2%;
+            left: 50.5%;
+        }
+        .right_bottom div:nth-child(5)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(16%);
+            position: absolute;
+            top: 2%;
+            left: 67%;
+        }
+        .right_bottom div:nth-child(6)
+        {
+            border: 1px solid green;
+            height: calc(95%);
+            width: calc(15.5%);
+            position: absolute;
+            top: 2%;
+            left: 83.5%;
+        }
+        
+        .left_top table, .right_top table, .left_bottom table, .right_bottom table
+        {
+            width: calc(100%);
+            height: calc(100%);
+        }
+        .left_top td, .right_top td, .left_bottom td, .right_bottom td
+        {
+            border: 1px solid lightblue;
+            font-size: 8px;
+        }
+        
+        .left_top div:nth-child(3) td:nth-child(odd), .left_top div:nth-child(4) td:nth-child(odd), .left_top div:nth-child(5) td:nth-child(odd), .left_top div:nth-child(6) td:nth-child(odd), .left_top div:nth-child(7) td:nth-child(odd), .left_top div:nth-child(8) td:nth-child(odd), .right_top div:nth-child(8) td:nth-child(odd), .right_top div:nth-child(9) td:nth-child(odd), .right_top div:nth-child(10) td:nth-child(odd), .right_top div:nth-child(11) td:nth-child(odd), .right_top div:nth-child(12) td:nth-child(odd), .right_top div:nth-child(13) td:nth-child(odd)
+        {
+            width: 28%;
+        }
+        
+        
+        .right_top div:nth-child(7) td:nth-child(1),.left div:nth-child(10) td:nth-child(1)
+        {
+            width: 58%;
+        } 
+        
+        .right_top div:nth-child(7) td:nth-child(4n+2), 
+        .right_top div:nth-child(7) td:nth-child(4n+3),
+        .right_top div:nth-child(7) td:nth-child(4n+4),
+        .left_top div:nth-child(10) td:nth-child(4n+2),
+        .left_top div:nth-child(10) td:nth-child(4n+3),
+        .left_top div:nth-child(10) td:nth-child(4n+4),
+        .right_top div:nth-child(5) td:nth-child(5n+1),
+        .right_top div:nth-child(5) td:nth-child(5n+2),
+        .right_top div:nth-child(5) td:nth-child(5n+3),
+        
+        .right_top div:nth-child(4) td:nth-child(4n+1),
+        .right_top div:nth-child(4) td:nth-child(4n+3),
+        .right_top div:nth-child(4) td:nth-child(4n+4), 
+        
+        .right_top div:nth-child(1) td:nth-child(4n+2),
+        .right_top div:nth-child(1) td:nth-child(4n+3),
+        .right_top div:nth-child(1) td:nth-child(4n+4), 
+        
+        .right_top div:nth-child(3) td:nth-child(4n+2),
+        .right_top div:nth-child(3) td:nth-child(4n+3),
+        .right_top div:nth-child(3) td:nth-child(4n+4), 
+        
+        .right_top div:nth-child(6) td:nth-child(4n+3),
+        .right_top div:nth-child(6) td:nth-child(4n+4),  
+        
+        .left_top div:nth-child(2) td:nth-child(3n+3),
+        .right_top div:nth-child(2) td:nth-child(3n+3),  
+        .right_top div:nth-child(14) td:nth-child(3n+3), 
+        
+        .left_top div:nth-child(9) td:nth-child(4n+2),
+        .left_top div:nth-child(9) td:nth-child(4n+3),
+        .left_top div:nth-child(9) td:nth-child(4n+4),
+        
+        .left_bottom div td:nth-child(even), 
+        .right_bottom div td:nth-child(even)
+        {
+            text-align:center;
+        } 
+        
+        .left_bottom div tr:nth-child(n+7) td:nth-child(odd)
+        ,.right_bottom div tr:nth-child(7) td:nth-child(odd)
+        ,.right_bottom div tr:nth-child(8) td:nth-child(odd)
+        ,.right_bottom div tr:nth-child(9) td:nth-child(odd)
+        ,.right_bottom div tr:nth-child(n+15) td:nth-child(odd)
+        {
+            text-align:right;
+        }
+        
+        
+        .right_top div:nth-child(4) td:nth-child(4n+1) 
+        {
+            width:calc(10%);
+        }
+        .right_top div:nth-child(4) td:nth-child(4n+2) 
+        {
+            width:calc(46%);
+        }
+        .right_top div:nth-child(4) td:nth-child(4n+3) 
+        .right_top div:nth-child(4) td:nth-child(4n+4) 
+        {
+            width:calc(22%);
+        }
+        
+        .right_top div:nth-child(5) td:nth-child(3-n)  
+        {
+            width:calc(10%);
+        } 
+        .right_top div:nth-child(5) td:nth-child(5n+4) 
+        {
+            width:calc(42%);
+        }
+        .right_top div:nth-child(5) td:nth-child(5n+5) 
+        {
+            width:calc(28%);
+        } 
+        
+        .right_top div:nth-child(3) td:nth-child(4n+1)
+        {
+            width:calc(67%);
+        }
+        .right_top div:nth-child(3) td:nth-child(4n+2),
+        .right_top div:nth-child(3) td:nth-child(4n+3),
+        .right_top div:nth-child(3) td:nth-child(4n+4)
+        {
+            width:calc(11%);
+        }
+        
+        .right_top div:nth-child(2) td:nth-child(3n+1)
+        { 
+            width:calc(27%);
+        }
+        .right_top div:nth-child(2) td:nth-child(3n+2)
+        {
+            width:calc(59%)
+        }
+        .right_top div:nth-child(2) td:nth-child(3n+3)
+        { 
+            width:calc(14%);
+        }
+        
+        .right_top div:nth-child(1) td:nth-child(4n+1)
+        { 
+            width:calc(70%);
+        }
+        .right_top div:nth-child(1) td:nth-child(4n+2),
+        .right_top div:nth-child(1) td:nth-child(4n+3)
+        { 
+            width:calc(9%);
+        }
+        .right_top div:nth-child(1) td:nth-child(4n+4)
+        { 
+            width:calc(12%);
+        }
+        
+         
+        .left_top div:nth-child(9) td:nth-child(4n+1)
+        {
+            width:calc(70%); 
+        }
+        .left_top div:nth-child(9) td:nth-child(4n+2),
+        .left_top div:nth-child(9) td:nth-child(4n+3),
+        .left_top div:nth-child(9) td:nth-child(4n+4)
+        {
+            width:calc(10%);
+        }
+        
+        .left_bottom div td,.right_bottom div td
+        {
+            height:calc(5%);    
+        }  
+         
+        
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            var vue = new Vue({
+                el: ".LayoutBoard",
+                data: {
+                    left_top_1_showdata: new Array(),
+                    left_top_2_showdata: new Array(),
+                    left_top_3_showdata: new Array(),
+                    left_top_4_showdata: new Array(),
+                    left_top_5_showdata: new Array(),
+                    left_top_6_showdata: new Array(),
+                    left_top_7_showdata: new Array(),
+                    left_top_8_showdata: new Array(),
+                    left_top_9_showdata: new Array(),
+                    left_top_10_showdata: new Array(),
+                    right_top_1_showdata: new Array(),
+                    right_top_2_showdata: new Array(),
+                    right_top_3_showdata: new Array(),
+                    right_top_4_showdata: new Array(),
+                    right_top_5_showdata: new Array(),
+                    right_top_6_showdata: new Array(),
+                    right_top_7_showdata: new Array(),
+                    right_top_8_showdata: new Array(),
+                    right_top_9_showdata: new Array(),
+                    right_top_10_showdata: new Array(),
+                    right_top_11_showdata: new Array(),
+                    right_top_12_showdata: new Array(),
+                    right_top_13_showdata: new Array(),
+                    right_top_14_showdata: new Array(),
+                    left_bottom_1_showdata: new Array(),
+                    left_bottom_2_showdata: new Array(),
+                    left_bottom_3_showdata: new Array(),
+                    left_bottom_4_showdata: new Array(),
+                    left_bottom_5_showdata: new Array(),
+                    right_bottom_1_showdata: new Array(),
+                    right_bottom_2_showdata: new Array(),
+                    right_bottom_3_showdata: new Array(),
+                    right_bottom_4_showdata: new Array(),
+                    right_bottom_5_showdata: new Array(),
+                    right_bottom_6_showdata: new Array() 
+                },
+                methods: {
+                    //加载看板数据
+                    f_loadBoardData: function () {
+                      
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelLayoutBoardDataList",
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data != null) { 
+
+                                        var left_top_len = $(".left_top").find("div").length;
+                                        var right_top_len = $(".right_top").find("div").length;
+                                        var left_bottom_len = $(".left_bottom").find("div").length;
+                                        var right_bottom_len = $(".right_bottom").find("div").length;
+
+                                        //左上
+                                        for(var left_top_index = 1;left_top_index <= left_top_len;left_top_index++){
+                                            vue.f_loadData("left_top",left_top_index,result.Data[0 + left_top_index - 1]);
+                                        }
+                                        //右上
+                                        for(var right_top_index = 1;right_top_index <= right_top_len;right_top_index++){
+                                            vue.f_loadData("right_top",right_top_index,result.Data[0 + (left_top_index - 2) + right_top_index]);
+                                        }
+                                        //左下
+                                        for(var left_bottom_index = 1;left_bottom_index <= left_bottom_len;left_bottom_index++){
+                                            vue.f_loadData("left_bottom",left_bottom_index,result.Data[0 + (left_top_index - 2) + (right_top_index - 1) + left_bottom_index]);
+                                        }
+                                        //右下
+                                        for(var right_bottom_index = 1;right_bottom_index <= right_bottom_len;right_bottom_index++){
+                                            vue.f_loadData("right_bottom",right_bottom_index,result.Data[0 + (left_top_index - 2) + (right_top_index - 1) + (left_bottom_index - 1)  + right_bottom_index]);
+                                        }
+
+                                        //小注塑缓存区进出存,大注塑缓存区进出存，喷涂上件缓存区,焊接缓存区进出存 塑件名称标题改动，加上单位：件 
+                                        $(".left_top div[index=10] tr:eq(0) td:eq(0),.right_top div[index=7] tr:eq(0) td:eq(0),.right_top div[index=3] tr:eq(0) td:eq(0)").empty().append("<span>塑件缓存</span><span style='float:right;'>单位:件</span>");
+                                        $(".left_top div[index=9] tr:eq(0) td:eq(0)").empty().append("<span>焊接工序(塑件缓存)</span><span style='float:right;'>单位:件</span>");
+                                        $(".right_top div[index=3] tr:eq(0) td:eq(0)").empty().append("<span>漆件缓存</span><span style='float:right;'>单位:件</span>");
+
+                                        //                                        vue.left_top_1_showdata = result.Data[0];
+                                        //                                        vue.left_top_2_showdata = result.Data[1];
+                                        //                                        vue.left_top_3_showdata = result.Data[2];
+                                        //                                        vue.left_top_4_showdata = result.Data[3];
+                                        //                                        vue.left_top_5_showdata = result.Data[4];
+                                        //                                        vue.left_top_6_showdata = result.Data[5];
+                                        //                                        vue.left_top_7_showdata = result.Data[6];
+                                        //                                        vue.left_top_8_showdata = result.Data[7];
+                                        //                                        vue.left_top_9_showdata = result.Data[8];
+                                        //                                        vue.left_top_10_showdata = result.Data[9];
+                                        //                                        vue.right_top_1_showdata = result.Data[10];
+                                        //                                        vue.right_top_2_showdata = result.Data[11];
+                                        //                                        vue.right_top_3_showdata = result.Data[12];
+                                        //                                        vue.right_top_4_showdata = result.Data[13];
+                                        //                                        vue.right_top_5_showdata = result.Data[14];
+                                        //                                        vue.right_top_6_showdata = result.Data[15];
+                                        //                                        vue.right_top_7_showdata = result.Data[16];
+                                        //                                        vue.right_top_8_showdata = result.Data[17];
+                                        //                                        vue.right_top_9_showdata = result.Data[18];
+                                        //                                        vue.right_top_10_showdata = result.Data[19];
+                                        //                                        vue.right_top_11_showdata = result.Data[20];
+                                        //                                        vue.right_top_12_showdata = result.Data[21];
+                                        //                                        vue.right_top_13_showdata = result.Data[22];
+                                        //                                        vue.right_top_14_showdata = result.Data[23];
+                                        //                                        vue.left_bottom_1_showdata = result.Data[24];
+                                        //                                        vue.left_bottom_2_showdata = result.Data[25];
+                                        //                                        vue.left_bottom_3_showdata = result.Data[26];
+                                        //                                        vue.left_bottom_4_showdata = result.Data[27];
+                                        //                                        vue.left_bottom_5_showdata = result.Data[28];
+                                        //                                        vue.right_bottom_1_showdata = result.Data[29];
+                                        //                                        vue.right_bottom_2_showdata = result.Data[30];
+                                        //                                        vue.right_bottom_3_showdata = result.Data[31];
+                                        //                                        vue.right_bottom_4_showdata = result.Data[32];
+                                        //                                        vue.right_bottom_5_showdata = result.Data[33];
+                                    }
+                                } else {
+                                    alert(result.Msgs[0])
+                                }
+                            }
+                        })
+                    },
+                    //获取数据
+                    f_loadData: function (jqclass, jqindex, data) {
+                        if (data != null) {
+                            $("." + jqclass).find("[index=" + jqindex + "]").empty();
+
+                            var columns = new Array(); 
+
+                            for (var col in data[0]) {
+                                columns.push(col); 
+                            }
+                            var table = $("<table></table>").clone();
+                            $(table).attr({"cellspacing":"0","cellpadding":"0"});
+
+                            for (var index = 0; index < data.length; index++) {
+                                var tr = $("<tr></tr>").clone();  
+
+                                for (var tdindex = 0; tdindex < columns.length; tdindex++) {
+                                    if(columns[tdindex] == "颜色"){  
+                                       //颜色代码
+                                       var color_code = "black";
+                                       if(data[index][columns[tdindex]] != ""){
+                                          color_code = "white";
+                                       }  
+                                       
+                                       tr.find("td:eq(0)").css({ "backgroundColor": data[index][columns[tdindex]] });
+
+                                    }else if(columns[tdindex] == "字体颜色"){  
+                                       //颜色代码 
+                                       tr.css({ "color":"white" });
+                                       tr.find("td:eq(0)").css({ "color":data[index][columns[tdindex]] });
+                                    }else{
+                                       var td = $("<td></td>").clone();
+                                       td.text(data[index][columns[tdindex]]);
+                                       //颜色代码 
+                                       tr.css({ "color":"white" });
+                                       tr.append(td); 
+                                    }
+                                } 
+
+                                $("." + jqclass).find("[index=" + jqindex + "]").append(table);
+                                $("." + jqclass).find("[index=" + jqindex + "] table").append(tr);
+                            }
+                        }
+                    }, 
+                }
+            })
+
+            vue.f_loadBoardData();
+
+            //实时更新
+            setInterval(function(){
+               vue.f_loadBoardData();
+            },60000);
+        })
+    </script>
+</head>
+<body>
+    <div class="LayoutBoard">
+        <div class="left_top">
+            <div index="1" title="立体库">
+            </div>
+            <div index="2" title="集中供料">
+            </div>
+            <div index="3" title="1600A">
+            </div>
+            <div index="4" title="1600B">
+            </div>
+            <div index="5" title="1600C">
+            </div>
+            <div index="6" title="1600D">
+            </div>
+            <div index="7" title="1600E">
+            </div>
+            <div index="8" title="1600F">
+            </div>
+            <div index="9" title="焊接">
+            </div>
+            <div index="10" title="塑件缓存">
+            </div>
+        </div>
+        <div class="right_top">
+            <div index="1" title="在线缓存">
+            </div>
+            <div index="2" title="混漆房投料">
+            </div>
+            <div index="3" title="喷涂上件">
+            </div>
+            <div index="4" title="喷涂QA">
+            </div>
+            <div index="5" title="喷涂PLC">
+            </div> 
+            <div index="6" title="漆件库存">
+            </div>
+            <div index="7" title="塑件库存">
+            </div>
+            <div index="8" title="3200F">
+            </div>
+            <div index="9" title="3200E">
+            </div>
+            <div index="10" title="3200D">
+            </div>
+            <div index="11" title="3200C">
+            </div>
+            <div index="12" title="3200B">
+            </div>
+            <div index="13" title="3200A">
+            </div>
+            <div index="14" title="集中供料">
+            </div>
+        </div>
+        <div class="left_bottom">
+            <div index="1" title="尾门饰板装配">
+            </div>
+            <div index="2" title="扰流板下部件装配">
+            </div>
+            <div index="3" title="扰流板上部件装配">
+            </div>
+            <div index="4" title="门护板装配">
+            </div>
+            <div index="5" title="轮眉装配">
+            </div>
+        </div>
+        <div class="right_bottom">
+            <div index="1" title="5系前保装配">
+            </div>
+            <div index="2" title="5系后保装配">
+            </div>
+            <div index="3" title="5系门槛装配">
+            </div>
+            <div index="4" title="3系前保装配">
+            </div>
+            <div index="5" title="3系后保装配">
+            </div>
+            <div index="6" title="3系门槛装配">
+            </div>
+        </div>
+    </div>
+</body>
+</html>

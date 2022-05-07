@@ -1,0 +1,401 @@
+﻿@using Tops.FRM;
+@{
+    //版本：1.2
+    ViewBag.Title = "仓库信息";
+    ViewBag.ModuleName = "详细资料";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    string QueryName = "SelWarehouse";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    string ctrl = Request.QueryString["ctrl"];
+    string id = Request.QueryString["id"];
+    string Sel_Id = Request.QueryString["Sel_Id"];
+    ctrl = string.IsNullOrEmpty(ctrl) ? "edit" : ctrl;
+    //公开两台配置参数给分部视图
+    ViewBag.Biz = biz;
+    ViewBag.Metas = metas;
+    var moduleConfig = ModuleConfig.GetModuleConfig(metas, biz.Lookups, biz, ctrl);
+
+    //重组显示字段配置
+    foreach (string key in metas[0].Keys)
+    {
+        if (!metas[0][key].Hide)
+        {
+            //宽度大于300的string类型文本默认给文本域
+            if (metas[0][key].Width >= 300)
+            {
+                metas[0][key].Type = "Textarea";
+            }
+        }
+    }
+
+    //查询出厂房与车间的关系信息
+    BizResult br = Tops.FRM.Biz.Execute("SelWarehouseNeedInfo", new System.Data.SqlClient.SqlParameter[] { new System.Data.SqlClient.SqlParameter("@Sel_Id", Sel_Id) }, BizType.Query);
+    List<System.Data.DataTable> list = br.Data as List<System.Data.DataTable>;
+
+    Dictionary<string, string> dic = new Dictionary<string, string>();
+
+    if (list[0].Rows.Count > 0)
+    {
+        for (int index = 0; index < list[0].Rows.Count; index++)
+        {
+            dic.Add(list[0].Rows[index]["n_Shopfloor_Id"].ToString(), list[0].Rows[index]["n_Block_Id"].ToString());
+        }
+    }
+}
+@section Params{
+    <form id="paramForm">
+    <div class="item_title">
+        详细资料：</div>
+    <input type="hidden" name="Sel_Id" value="@(Sel_Id)" />
+    <div id="paramlist" style="width: 1000px;">
+        @foreach (string key in metas[0].Keys)
+        {
+            if (!metas[0][key].Hide)
+            {
+                if (metas[0][key].Type.Equals("String") || metas[0][key].Type.Equals("Int32") || metas[0][key].Type.Equals("Float"))
+                {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span><input type="text" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" />
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("DateTime") || metas[0][key].Type.Equals("BeginDateTime") || metas[0][key].Type.Equals("EndDateTime"))
+                {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span><input type="datetime" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" />
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("Textarea"))
+                {
+            <div class="param_items" style="width:@(metas[0][key].Width + 180)px;display:block;">
+                <span>@(metas[0][key].Caption):</span><textarea rows="3" cols="3" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" ></textarea>
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("Int"))
+                {
+
+                    if (metas[0][key].Field.Equals("n_Warehouse_Shopfloor_Id"))
+                    {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span>
+                <select name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" >
+                    @foreach (string dkey in metas[0][key].DataList.Keys)
+                    {
+                        if (metas[0][key].DataList.Keys.Contains(dkey))
+                        {
+                        <option key="@(dkey)" parentkey="@(dkey.Equals("-1") ? "-1" : dic[dkey])">@(metas[0][key].DataList[dkey])</option>
+                        }
+                    }
+                </select>
+            </div>
+                    }
+                    else
+                    {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span>
+                <select name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" >
+                    @foreach (string dkey in metas[0][key].DataList.Keys)
+                    {
+                        if (metas[0][key].DataList.Keys.Contains(dkey))
+                        {
+                        <option key="@(dkey)">@(metas[0][key].DataList[dkey])</option>
+                        }
+                    }
+                </select>
+            </div>
+                    }
+                }
+            }
+        }
+    </div>
+    @if (metas.Count > 1)
+    { 
+        <div id="detaillist">
+            @Html.Partial("DetailList", ctrl)
+        </div> 
+    }
+    </form>
+}
+@section Script{
+    <style type="text/css">
+        .param_items
+        {
+            display: inline-block;
+            width: 280px;
+            line-height: 30px;
+            text-align: right;
+            margin: 2px;
+        }
+        
+        .param_items input, .param_items textarea
+        {
+            border: 1px solid skyblue;
+            margin-left: 5px;
+        }
+    </style>
+    <script type="text/javascript">
+    var moduleConfig=@Html.Raw(moduleConfig);
+    var topsRender = null;
+    var detailTab = null;
+
+    //旧厂房编码
+    var n_Warehouse_Shopfloor_Id = "";
+
+    var Warehouse_QCStatusShelfLimit_Data = new Array();
+
+    $(function () {
+        $(",#saveBt").show();
+
+        //厂房名称信息选择事件
+        $("[name=n_Warehouse_Block_Id]").change(function(){
+            if($(this).find("option:selected").attr("key")!="-1"){
+               $("[name=n_Warehouse_Shopfloor_Id]").find("option[parentkey!="+$(this).find("option:selected").attr("key")+"]").hide();
+               $("[name=n_Warehouse_Shopfloor_Id]").find("option[parentkey="+$(this).find("option:selected").attr("key")+"]").show();
+            }else{
+               $("[name=n_Warehouse_Shopfloor_Id]").find("option").show(); 
+            }
+        })
+    });
+
+    
+    //获取添加或修改所需要的数组
+    function f_getData(){
+        var obj = new Object();
+        $("#paramForm").find(".param_items").each(function(index,value){
+             if($(value).find("input").length > 0 ){
+                obj[$(value).find("input").attr("name")] = $(value).find("input").val();
+             }else if($(value).find("textarea").length > 0 ){
+                obj[$(value).find("textarea").attr("name")] = $(value).find("textarea").val(); 
+             }else if($(value).find("select").length > 0 ){
+                obj[$(value).find("select").attr("name")] = $(value).find("option:selected").attr("key"); 
+             }
+        })
+        obj.Sel_Id = $("[name=Sel_Id]").val()
+
+         
+        obj.grid = new Array();
+        if(Warehouse_QCStatusShelfLimit_Data.length > 0){
+           Warehouse_QCStatusShelfLimit_Data.forEach(function(value,index){
+               var object = new Object();
+               object.UpdateFlag = "modify"
+               object.n_Warehouse_QCStatusShelfLimit_QCStatus = value["可用状态值"];
+               object.s_Warehosse_QCStatusShelfLimit_QCStatusName = value["可用状态值说明"];
+               object.s_Warehouse_Code = obj["s_Warehouse_Code"];
+               object.s_Warehouse_Name = obj["s_Warehouse_Name"];
+               object.n_Warehouse_Id =  obj["Sel_Id"];
+               obj.grid.push(object);
+           })
+        }
+ 
+        return obj;
+    }
+
+    //加载数据
+    function f_setData(data){
+        for(var d in data){
+            if($("[name="+d+"]").attr("type") == "text" || $("[name="+d+"]").attr("type") == "datetime"){ 
+               $("[name="+d+"]").val(data[d]);
+            }else{  
+               $("[name="+d+"]").find("option[key="+data[d]+"]").attr("selected","selected");  
+            }
+        }
+         
+    }
+    
+    //是否是数字
+    function checkNum() {
+        //检查是否是非数字值
+        if (isNaN(this.value)) {
+            this.value = "";
+        } 
+    }
+
+    //点击可上架货物状态限制进行弹框选择
+    function f_openQCStatusShelfLimit() {
+
+                    $.ligerDialog.open({
+                        title: '可上架货物状态限制',
+                        url: "/Warehouse/QCStatusShelfLimit?s_Warehouse_QCStatusShelfLimit="+ $("[name=s_Warehouse_QCStatusShelfLimit]").val(),
+                        height: 450,
+                        width: 700,
+                        buttons: [{
+                            text: "确定", onclick: function (item, dialog) {
+                                var rows = dialog.frame.f_getcheckData();
+                                if(rows.length == 0){
+                                   alert("请选择可上架货物状态!");
+                                   return;
+                                }
+                                var limit = "";
+                                rows.forEach(function(value,index){
+                                     limit += value["可用状态值"]+";";
+                                })
+
+                                $("[name=s_Warehouse_QCStatusShelfLimit]").val(limit);
+
+                                Warehouse_QCStatusShelfLimit_Data = rows;
+                                dialog.close();
+                            }
+                        }, {
+                            text: "取消", onclick: function (item, dialog) {
+                                dialog.close();
+                            }
+                        }]
+                    }) 
+                }
+
+    </script>
+    @if (ctrl == "add")
+    {
+        <script type="text/javascript">
+
+            $(function () {
+                $("#saveBt").show();
+                //渲染插件
+                topsRender = $("#paramForm *[fieldType]").pluginRender({ moduleConfig: moduleConfig });
+
+                //数字验证
+                $("[name=s_Warehouse_Phone]").keyup(checkNum);
+
+                //可上架货物状态限制事件
+                $("[name=s_Warehouse_QCStatusShelfLimit]").click(f_openQCStatusShelfLimit); 
+
+                //添加保存
+                $("#saveBt").click(function () {
+                    $("#module_toolbar input").attr("disabled", "disabled");
+                    $("#loading_img").show();
+                    //var data = topsRender.serializeData(); 
+                    var data = f_getData();
+
+                    $.topsAjax({
+                        type: "POST",
+                        url: "/AjaxPost/AddWarehouse",
+                        data: data,
+                        dealError: false,
+                        success: function (data) {
+                            if (data.IsSuccess) {
+                                alert("保存成功！");
+                                //添加成功后刷新列表并关闭标签
+                                window.parent.f_flushGrid();
+                                window.parent.f_closeTab("Add");
+                            } else {
+                                if (data.Other1 != null)
+                                    topsRender.setError(data.Other1);
+                                alert("保存失败：" + data.Msgs[0]);
+                            }
+                            $("#module_toolbar input").removeAttr("disabled");
+                            $("#loading_img").hide();
+                        }
+                    });
+                });
+            });
+        </script>
+    }
+    else if (ctrl == "edit")
+    {
+        <script type="text/javascript">
+    var idData =@Html.Raw(Server.UrlDecode(id))
+    $(function () {
+        $("#saveBt").show(); 
+
+        //加载数据
+        $.topsAjax({
+            type: "GET",
+            url: "/AjaxGet/SelWarehouse",
+            data: idData,
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    //渲染插件
+                    topsRender = $("#paramForm *[fieldType]").pluginRender({ data: data.Data,moduleConfig: moduleConfig });
+               
+                    //数字验证
+                    $("[name=s_Warehouse_Phone]").keyup(checkNum);
+
+                    //可上架货物状态限制事件
+                    $("[name=s_Warehouse_QCStatusShelfLimit]").click(f_openQCStatusShelfLimit);
+                    $("[name=s_Warehouse_Code]").attr("disabled","disabled");
+
+                    $("[name=n_Warehouse_Shopfloor_Id]").change(function(){
+                        n_Warehouse_Shopfloor_Id = $(this).find("option:selected").attr("key");
+                    }) 
+
+                    if(data.Data[0].length>0){
+                       f_setData(data.Data[0][0]);
+                    }
+                } else {
+                    alert("获取数据失败：" + data.Msgs[0]);
+                }
+            }
+        });
+    
+        //保存修改
+        $("#saveBt").click(function () {
+           
+            var data = f_getData();
+            var isconfirm = false;
+          
+            if(data["n_Warehouse_Shopfloor_Id"] == n_Warehouse_Shopfloor_Id){
+                isconfirm = true;
+            }
+
+            if(isconfirm){
+               if(!confirm("如需改关联的厂房信息，需要重新打印该库区对应的储位码替换已有的储位码，对应旧储位码的操作记录将更改成对应的新储位码，是否确认继续操作？")){
+                  return;
+               }
+            }
+
+            $("#module_toolbar input").attr("disabled", "disabled");
+            $("#loading_img").show();
+            //var data = topsRender.serializeData(); 
+
+            
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/UpdateWarehouse",
+                data: data ,
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存修改成功！");
+                        //刷新列表
+                        window.parent.f_flushGrid();
+                        window.parent.f_closeTab("Modify");
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("保存修改失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        });
+  
+    });
+     
+        </script>   
+    }
+    <script type="text/javascript">
+        $(function () {
+            detailTab = $("#detaillist").ligerTab({
+                onAfterSelectTabItem: function (tabID) {
+                    var $g = $("div[tabid=" + tabID + "] div[fieldtype=grid]", $(this.element));
+                    if ($g.length == 0) return;
+                    var gIndex = $g.attr("objindex");
+                    topsRender.find("grid" + gIndex).obj.grid.setWidth();
+                }
+            });
+
+
+            //必填项标示
+            var s = '<span style="color:red;">*</span>'
+            $(s).insertBefore($("[name=n_Warehouse_Block_Id]").prev());
+            $(s).insertBefore($("[name=n_Warehouse_Shopfloor_Id]").prev());
+            $(s).insertBefore($("[name=s_Warehouse_Name]").prev());
+            $(s).insertBefore($("[name=s_Warehouse_Code]").prev());
+            $(s).insertBefore($("[name=s_Warehouse_StorageAllocationMethod]").prev());
+            $(s).insertBefore($("[name=s_Warehouse_ShelfForm]").prev());
+            $(s).insertBefore($("[name=s_Warehouse_QCStatusShelfLimit]").prev());
+        });
+    </script>
+}

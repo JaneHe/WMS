@@ -1,0 +1,292 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "模块名称";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelManageLoadingZXD";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+    string ExcelDate = DateTime.Now.ToString("yyyyMMdd"); 
+}
+
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+        <div id="hiddenlist">
+            <input type="hidden" name="exportdata" value="SelManageLoadingZXD_ExcelData" />
+            <input type="hidden" name="exportcolumn" value="SelManageLoadingZXD_ExcelColumns" />
+            <input type="hidden" name="exportsheetname" value="WMS-装箱信息管理_@(ExcelDate)" />
+            <input type="hidden" name="exportcondition" value="" />
+        </div>
+        <div id="paramlist">
+            @for (int i = 0; i < biz.Fields.Count; i++)
+            {
+                string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+                var fieldName = biz.Fields[i].FieldName;
+                var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+                <div class="param_item">
+                    @if (lookupField != null && lookupField.ToList().Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                        <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                        </script>
+                    }
+                    else if (biz.Fields[i].DataList.Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <select name="@(fieldName)" fieldType="select" >
+                            @foreach (var item in biz.Fields[i].DataList)
+                            {
+                                <option value="@(item.Key)">@(item.Value)</option>
+                            }
+                        </select>
+                    }
+                    else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                    {
+                        <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                    }
+                    else
+                    {
+                        <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                    }
+                </div>
+            }
+            <div style="clear: both;"></div>
+        </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+        var topsRender=null;
+        var grid =null;
+        $(function () {
+            $("#module_toolbar input").hide();
+            $(",#exportBt,#delBt,#searchBt").show();
+            //渲染插件
+            topsRender=$("#paramlist *[fieldType]").pluginRender();
+            //初始化表格
+            grid = $("#datagrid").ligerGrid({
+                columns: [
+                     {
+                         "name": "Id",
+                         "display": "Id",
+                         "align": "left",
+                         "width": 160,
+                         "hide": true,
+                         "type": "String"
+                     },
+ {
+     "name": "ASN",
+     "display": "ASN",
+     "align": "left",
+     "width": 160,
+     "hide": true,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "PackingASN",
+     "display": "装箱条码",
+     "align": "left",
+     "width": 160,
+     "hide": false,
+     "type": "String",
+     "editor": null,
+     "frozen": false
+ },
+ {
+     "name": "LogCode",
+     "display": "漆件条码",
+     "align": "left",
+     "width": 160,
+     "hide": false,
+     "type": "String",
+     "editor": null,
+     "frozen": false
+ },
+ {
+     "name": "Names",
+     "display": "品名描述",
+     "align": "left",
+     "width": 160,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "PaintMCode",
+     "display": "客户零件号",
+     "align": "left",
+     "width": 100,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "CarBrand",
+     "display": "品牌",
+     "align": "left",
+     "width": 100,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "Batch",
+     "display": "批次",
+     "align": "left",
+     "width": 100,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "number",
+     "display": "数量",
+     "align": "center",
+     "width": 80,
+     "hide": false,
+     "type": "Int32",
+     "editor": null
+ },
+ {
+     "name": "Creator",
+     "display": "创建人",
+     "align": "left",
+     "width": 100,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "CreateTime",
+     "display": "创建时间",
+     "align": "left",
+     "width": 160,
+     "hide": false,
+     "type": "date",
+     "editor": null
+ }
+                ],
+                url: '/AjaxGridData/SelManageLoadingZXD',
+                method: 'get',
+                delayLoad: true,
+                dataType: "local",
+                dataAction: 'server',
+                root: 'Data',                       //数据源字段名
+                record: 'Other1',                     //数据源记录数字段名
+                rownumbers: true,
+                //data: AllProductData, 
+                showTitle: false,
+                width: '99.5%',
+                height: '100%',
+                heightDiff: -10,
+                enabledSort:false,
+                onSuccess: function (data, b) {
+                    $.topsErrorDeal(data);
+                },
+                onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                    var idKey='@(biz.Sqls[0].Key)';
+                    if($.trim(idKey)=='')return;
+                    var idData=new Object();
+                    idData[idKey]=rowdata[idKey];
+                    //f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/MainModelYellowID/Modify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&" + Math.random());
+                }
+            });
+
+            time();
+            //绑定按钮事件
+            $("#searchBt").click(function () {
+                grid.options.parms = $("form#paramForm").serializeArray();
+                grid.loadServerData(grid.options.parms);
+            });
+            $("#searchBt").click();
+
+            $("#exportBt").click(function(){
+                $("#paramForm").submit();
+            });
+            $("#delBt").click(function(){
+                var rows = grid.getCheckedRows();
+                var BarCode = "";
+                $(rows).each(function ()
+                {
+                    BarCode += this.Id + ",";
+                });
+             
+                BarCode=BarCode.substring(0,BarCode.length-1);
+                $.topsAjax({
+                    type: "Post",
+                    url: "/AjaxPost/DelManageLoadingZXD",
+                    data: { BarCode:BarCode },
+                    success: function (data) {
+                        if(data.IsSuccess){
+                            alert("停用成功!!");
+                            $("#searchBt").click();
+                            
+                        }
+                    }
+                })
+            })
+        });
+
+            function f_flushGrid()
+            {
+                grid.loadData();
+            }
+
+            function time(){
+                var myDate = new Date();
+                //获取当前年
+                var year=myDate.getFullYear();
+
+                //获取当前日
+                var date=myDate.getDate(); 
+
+                //如果月份长度少于2，则前加 0 补位
+                if ((myDate.getMonth() + 1).toString().length == 1) {
+                    month = 0 + "" + (myDate.getMonth() + 1).toString();
+                } else {
+                    month = (myDate.getMonth() + 1).toString();
+                }
+                if((myDate.getDate()).toString().length == 1){
+                    date=0+""+(myDate.getDate()).toString();
+                }else {
+                    date = (myDate.getDate()).toString();
+                }
+
+
+
+                var date2 = myDate.getFullYear()+"-" + (myDate.getMonth()+1) + "-" + myDate.getDate();
+
+                var translateDate = date2.replace("-", "/").replace("-", "/"); ;
+                var newDate = new Date(translateDate);
+                newDate = newDate.valueOf();
+                newDate = newDate - 3 * 24 * 60 * 60 * 1000; //备注 如果是往前计算日期则为减号 否则为加号
+                newDate = new Date(newDate);
+                //获取当前年
+                var year1=newDate.getFullYear();
+
+                //如果月份长度少于2，则前加 0 补位
+                if ((newDate.getMonth() + 1).toString().length == 1) {
+                    monthString = 0 + "" + (newDate.getMonth() + 1).toString();
+                } else {
+                    monthString = (newDate.getMonth() + 1).toString();
+                }
+                if((newDate.getDate()).toString().length == 1){
+                    date1=0+""+(newDate.getDate()).toString();
+                }else {
+                    date1 = (newDate.getDate()).toString();
+                }
+
+
+                $("input[name='BeginTime']").val(year1+"-"+monthString+"-"+date1); 
+                $("input[name='EndTime']").val(year+"-"+month+"-"+date); 
+                
+            }
+    </script>
+}
+<div id="datagrid"></div>
+
+

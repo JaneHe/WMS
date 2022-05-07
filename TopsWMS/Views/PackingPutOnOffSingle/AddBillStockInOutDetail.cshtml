@@ -1,0 +1,697 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+
+    //货物编码
+    string GoodsCode = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("GoodsCode"))
+    {
+        GoodsCode = Request.QueryString["GoodsCode"];
+    }
+
+    //数量
+    string GoodsWorkQuantity = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("GoodsWorkQuantity"))
+    {
+        GoodsWorkQuantity = Request.QueryString["GoodsWorkQuantity"];
+    }
+    if(GoodsWorkQuantity.IndexOf(",") != -1){
+        string[] str = GoodsWorkQuantity.Split(',');
+        
+        int result = 0;
+        foreach(string s in str){
+            result += int.Parse((string.IsNullOrEmpty(s) ? "0" : s));  
+        }
+        GoodsWorkQuantity = result.ToString();
+    }
+    
+    
+    //仓库ID
+    string n_Warehouse_Id = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("n_Warehouse_Id"))
+    {
+        n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+    }
+
+    //货物标识编码
+    string GoodsBarCode = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("GoodsBarCode"))
+    {
+        GoodsBarCode = Request.QueryString["GoodsBarCode"];
+    }
+
+    //上架单据外键ID
+    string n_BillStockInOut_Id = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("n_BillStockInOut_Id"))
+    {
+        n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"];
+    }
+
+    //器具条码
+    string s_BinBarCode = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("s_BinBarCode"))
+    {
+        s_BinBarCode = Request.QueryString["s_BinBarCode"];
+    } 
+     
+    //器具ID
+    string s_BinId = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("s_BinId"))
+    {
+        s_BinId = Request.QueryString["s_BinId"];
+    }
+    
+    if(!string.IsNullOrEmpty(s_BinBarCode)){
+
+        string[] arr = s_BinBarCode.Substring(0, s_BinBarCode.Length - 1).Split(',');
+        string str = string.Empty;
+
+        for (int index = 0; index < arr.Length; index++)
+        {
+
+            var Biz = Tops.FRM.Biz.Execute("SelBinInfoByBarCodes", new System.Data.SqlClient.SqlParameter[] { 
+                new System.Data.SqlClient.SqlParameter { ParameterName = "s_Bin_Code", Value = arr[index] } 
+            }, Tops.FRM.BizType.Query);
+
+            List<System.Data.DataTable> list = Biz.Data as List<System.Data.DataTable>;
+
+            if (list[0].Rows.Count > 0)
+            {
+                s_BinId += list[0].Rows[0]["n_Bin_Id"] + ",";
+            }
+        } 
+    }
+    
+}
+@section Body{
+    <div class="body">
+        <input type="hidden" name="s_BinBarCode" value="@(s_BinBarCode)" />  
+        <input type="hidden" name="s_BinId" value="@(s_BinId)" /> 
+        <div class="RadioTab">
+            <input type="radio" id="radio1" checked="true" name="radio" value="批量录入" v-on:click="f_radio" /><label for="radio1">批量录入</label>
+            <input type="radio" id="radio2" name="radio" value="单件录入" v-on:click="f_radio" /><label for="radio2">单件录入</label>
+        </div>
+        <div>
+            <input type="text" v-bind:class="GoodsBarCode_Showed" placeholder="请输入条码" v-on:keyup.enter="f_keyupGoodsBarCode" value="@(GoodsBarCode)" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="GoodsWorkQuantity_Showed" placeholder="请输入数量" value="@(GoodsWorkQuantity)" v-on:keyup="f_checkNum" v-on:keyup.enter="f_changeGoodsNumber" />
+        </div>
+        <div v-bind:class="TitleTab_Showed">
+            <table cellspacing="0">
+                <tr>
+                    <th>产品名称</th>
+                    <th>颜色</th>
+                    <th>批次/<br />
+                     器具码</th>
+                    <th>数量</th>
+                </tr>
+            </table>
+        </div> 
+        <div v-bind:class="InfoTab_Showed">
+            <table cellspacing="0">
+                <tr v-for="(item,i) in InfoDataList" :index="i" :s_PartDescription_Model="item.s_PartDescription_Model" :class="{ 'morechecked':item.n_isCheck }" v-on:click="f_checkRecord">
+                    <td>{{ item.s_Mother_Desc }}</td>
+                    <td>{{ item.s_CarColor }}</td>
+                    <td>{{ item.s_Batch }} / {{ item.s_BinBarCode }} </td>
+                    <td>{{ item.n_Amount }}</td>
+                </tr>
+            </table>
+        </div> 
+        <div>
+            <input type="text" v-bind:class="BinBarCode_Showed" placeholder="请输入器具条码" v-on:keyup.enter="f_selBinInfo"  />
+        </div>
+        <div>
+            <input type="text" v-bind:class="SpaceAmount_Showed" name="Amount" placeholder="请输入器具装载数量" v-on:keyup.enter="f_reSureSpaceAmount" />
+        </div>
+        <div v-bind:class="button_Div_Showed">
+            <div v-on:click="f_SaveBillStockInOut">
+                确认新建</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .TitleTab
+        {
+            width: calc(90%);
+            height: 44px;
+            margin: calc(3%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        .TitleTab table, .InfoTab table
+        {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .TitleTab th
+        {
+            width: 25%;
+            border: 1px solid #a5e0a5;
+            background: rgb(200 220 232);
+            line-height: 22px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        } 
+        
+        .InfoTab
+        {
+            width: calc(90%); 
+            max-height: 90px;
+            min-height: 90px;
+            margin: calc(0%) calc(5%) calc(3%) calc(5%);
+            text-align: center; 
+            overflow-y:scroll;
+        }
+        .InfoTab table
+        {
+            width: 100%;
+            height: 100%;
+        }
+        .InfoTab td
+        {
+            width: 25%;
+            border: 1px solid #a5e0a5; 
+            font-family: 微软雅黑;
+            font-weight: normal;
+            line-height:22px;
+            font-size: 12px;
+        }
+        
+        .GoodsBarCode, .GoodsWorkQuantity,.BinBarCode
+        {
+            width: calc(90%);
+            margin: calc(3%) calc(5%) calc(0%) calc(5%);
+            border: 1px solid lightblue;
+            height: 22px;
+            text-align: center;
+        }
+        
+        .button_Div div
+        {
+            width: calc(90%);
+            margin: calc(3%) calc(5%) calc(2.5%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        .SpaceAmount
+        { 
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;   
+        }
+        
+        .RadioTab
+        { 
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Post请求变量
+        var ajaxobjFirst = null;
+
+        //ajax Get请求变量
+        var ajaxobjSecond = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    TitleTab_Showed: "TitleTab", //标题结果表格样式 
+                    InfoTab_Showed: "InfoTab", //结果表格样式 
+                    BinBarCode_Showed: "BinBarCode", //器具条码样式
+                    GoodsBarCode_Showed: "GoodsBarCode", //货物标签条码文本框样式
+                    GoodsWorkQuantity_Showed: "GoodsWorkQuantity", //数量文本框样式
+                    button_Div_Showed: "button_Div", //按钮样式
+                    SpaceAmount_Showed: "SpaceAmount",
+                    InfoDataList: [] //货物信息数据源
+                },
+                methods: {
+                    //货物标识条码文本框回车事件
+                    f_keyupGoodsBarCode: function () {
+                        //重复请求处理
+                        if (ajaxobjSecond != null) {
+                            ajaxobjSecond.abort();
+                            ajaxobjSecond = null;
+                            return;
+                        }
+
+                        //获取货物标识条码
+                        var GoodsBarCode = $(".GoodsBarCode").val();
+                        //对象名 根据喷涂下线QA码查询到相应的货物信息
+                        var objectName = "SelPackingPutOnOffSingleGoodsInfo";
+                        //传递参数
+                        var param = { GoodsBarCode: GoodsBarCode, n_Warehouse_Id: "@(n_Warehouse_Id)" };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            //清空数据
+                            vue.f_emptyInfoTab();
+
+                            if (result.IsSuccess) {
+                                //清空
+                                vue.InfoDataList = [];
+                                if (result.Data[0].length > 0) {
+                                    //获取器具编码
+                                    var s_BinBarCode = $("[name=s_BinBarCode]").val();
+                                    //获取器具ID
+                                    var s_BinId = $("[name=s_BinId]").val();
+                                    //储位分配方式
+                                    var s_Warehouse_StorageAllocationMethod = result.Data[1].s_Warehouse_StorageAllocationMethod;
+
+                                    //根据存货基础信息的库位代码对应的可入仓库的信息，与当前单据的仓库信息查看两者是否对应
+                                    //不对应则提示该件不可入库
+                                    var n_Warehouse_Ids = parseInt(result.Data[2][0].IsSameWarehouse);
+                                    var n_Warehouse_Id = "@(n_Warehouse_Id)";
+
+                                    //该单据的仓库对应的上存货基础信息的对应的库位信息，(取消)或者没有指定库位信息的产品可通过
+                                    if (n_Warehouse_Ids > 0) {
+
+                                        result.Data[0].forEach(function (value, index) {
+                                            vue.InfoDataList.push({
+                                                s_Mother_Desc: value.s_Mother_Desc,
+                                                s_CustomerCode: value.s_CustomerCode,
+                                                s_CarColor: value.s_CarColor,
+                                                s_Batch: value.s_Batch,
+                                                s_BinId: "",
+                                                s_BinBarCode: "",
+                                                s_GoodsBarCode: $(".GoodsBarCode").val(),
+                                                s_MotherCode: value.s_MotherCode,
+                                                n_Amount: 0,
+                                                n_isCheck: false,
+                                                s_PartDescription_Model: value.s_PartDescription_Model,
+                                                s_Warehouse_StorageAllocationMethod: result.Data[1][0].s_Warehouse_StorageAllocationMethod,
+                                                f_PartDescription_InventoryCapacity: value.s_PartDescription_PullInventory,
+                                                f_Bin_ApplianceCapacity: 0
+                                            })
+                                        })
+                                    } else {
+                                        f_commonShowMsg("该条码对应的工件不是该库区指定可入库的工件,详情请看存货基础信息!");
+
+                                        //焦点聚焦于货物标识条码文本框
+                                        $(".GoodsBarCode").val("").focus();
+                                        return;
+                                    }
+
+
+                                    //货物标识编码不为空时,说明是返回操作,那么则进行数量更正
+                                    if ($(".GoodsBarCode").val() != "") {
+                                        vue.f_changeGoodsNumber();
+                                    }
+
+                                    if (s_BinBarCode.indexOf(",") != -1) {
+                                        //获取器具编码
+                                        var arr = $("[name=s_BinBarCode]").val().split(",");
+                                        for (var index = 0; index < arr.length; index++) {
+                                            if (index < vue.InfoDataList.length) {
+                                                vue.InfoDataList[index].s_BinBarCode = arr[index];
+                                            }
+                                        }
+                                    } else if (s_BinBarCode != "" && s_BinBarCode.indexOf(",") == -1) {
+                                        vue.InfoDataList[0].s_BinBarCode = $("[name=s_BinBarCode]").val();
+                                    }
+
+                                    if (s_BinId.indexOf(",") != -1) {
+                                        //获取器具ID
+                                        var arr = $("[name=s_BinId]").val().split(",");
+                                        for (var index = 0; index < arr.length; index++) {
+                                            if (index < vue.InfoDataList.length) {
+                                                vue.InfoDataList[index].s_BinId = arr[index];
+                                            }
+                                        }
+                                    } else if (s_BinId != "" && s_BinId.indexOf(",") == -1) {
+                                        vue.InfoDataList[0].s_BinId = $("[name=s_BinId]").val();
+                                    }
+
+                                    //焦点聚焦于数量文本框
+                                    $(".GoodsBarCode").val("");
+                                    $(".GoodsWorkQuantity").val("").focus();
+                                } else {
+
+                                    f_commonShowMsg("该条码无对应的工件信息，请确认BOM是否有该工件信息!");
+                                    //焦点聚焦于货物标识条码文本框
+                                    $(".GoodsBarCode").val("").focus();
+                                }
+                            }
+                            ajaxobjSecond = null;
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            //焦点聚焦于货物标识条码文本框
+                            $(".GoodsBarCode").val("").focus();
+                            ajaxobjSecond = null;
+                        })
+
+
+                    },
+                    //保存上架单据记录,跳转到上架库存扫描进行保存
+                    f_SaveBillStockInOut: function () {
+
+                        //判定是否有对应的信息，没有则不允许进入上架库存扫描
+                        if (vue.InfoDataList == []) {
+                            f_commonShowMsg("该条码无对应的工件信息，请确认BOM是否有该工件信息!");
+                            return;
+                        }
+
+                        if (vue.InfoDataList[0].s_BinBarCode == "") {
+
+                            f_commonShowMsg("请输入器具条码,才能确认新建!");
+                            $(".BinBarCode").focus().select();
+                            return;
+                        }
+
+                        if (parseInt(vue.InfoDataList[0].n_Amount) <= 0) {
+
+                            f_commonShowMsg("输入的数量不能小于等于0,请重新输入!");
+                            $(".BinBarCode").focus().select();
+                            return;
+                        }
+
+                        //检查当前分配记录中是否有存在未扫器具编码的记录，有则需要扫器具编码
+                        var len = vue.InfoDataList.filter(function (result) {
+                            return result.s_BinBarCode == "";
+                        }).length;
+
+                        if (len > 0) {
+                            f_commonShowMsg("当前有记录未扫对应的器具编码,请选中记录并补扫器具编码!");
+                            $(".BinBarCode").focus().select();
+                            return;
+                        }
+
+                        //判定是否有重复器具进行录入
+                        var Bin_arr = new Array();
+                        vue.InfoDataList.forEach(function (value, index) {
+                            var isadd = true;
+                            Bin_arr.forEach(function (v, i) {
+                                if (v.name == value.s_BinBarCode) {
+                                    isadd = false;
+                                    v["num"] += 1;
+                                }
+                            })
+                            if (isadd) {
+                                Bin_arr.push({
+                                    name: value.s_BinBarCode,
+                                    num: 1
+                                })
+                            }
+                        })
+
+                        //判定是否有出现重复的器具条码，有则需要重新扫码
+                        var distinct_bin_len = Bin_arr.filter(function (item) {
+                            return item.num > 1;
+                        })
+
+
+                        if (distinct_bin_len.length > 0) {
+
+                            f_commonShowMsg("已录入的器具码不允许出现重复,请重新录入正确的器具码!");
+                            return;
+                        }
+
+                        //获取批次
+                        var Batch = vue.InfoDataList[0].s_Batch;
+                        //储位分配方式
+                        var s_Warehouse_StorageAllocationMethod = vue.InfoDataList[0].s_Warehouse_StorageAllocationMethod;
+
+                        //数量
+                        var n_Amount = "";
+                        //器具编码
+                        var s_Bin_Code = "";
+
+                        vue.InfoDataList.forEach(function (value, index) {
+                            n_Amount += value.n_Amount + ",";
+                            s_Bin_Code += value.s_BinBarCode + ",";
+                        })
+
+                        //储位分配方式【1 为系统分配，2 为手工指定】
+                        if (s_Warehouse_StorageAllocationMethod == "1") {
+                            //跳转至库位扫描界面
+                            location.href = "LocationScanningUp?ParentIds=" + "@ParentIds" + "&GoodsCode=" + vue.InfoDataList[0].s_CustomerCode + "&Batch=" + Batch + "&GoodsBarCode=" + vue.InfoDataList[0].s_GoodsBarCode
+                        + "&GoodsWorkQuantity=" + n_Amount + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)"
+                        + "&s_BinId=" + "" + "&s_Bin_Code=" + s_Bin_Code + "&s_Warehouse_ShelfForm=2";
+                        } else if (s_Warehouse_StorageAllocationMethod == "2") {
+                            //跳转至库位扫描界面
+                            location.href = "LocationScanningManualUp?ParentIds=" + "@ParentIds" + "&GoodsCode=" + vue.InfoDataList[0].s_CustomerCode + "&Batch=" + Batch + "&GoodsBarCode=" + vue.InfoDataList[0].s_GoodsBarCode
+                        + "&GoodsWorkQuantity=" + n_Amount + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)"
+                        + "&s_BinId=" + "" + "&s_Bin_Code=" + s_Bin_Code + "&s_Warehouse_ShelfForm=2";
+                        }
+
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("条码扫描");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../PackingPutOnOffSingle/Index?ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../PackingPutOnOffSingle/Index?ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+
+                        //货物标识编码不为空时,则进行货物信息查询
+                        if ($(".GoodsBarCode").val() != "") {
+                            vue.f_keyupGoodsBarCode();
+                        } else {
+                            $(".GoodsBarCode").val("").focus();
+                        }
+                    },
+                    //清空数据
+                    f_emptyInfoTab: function () {
+                        //清空
+                        vue.InfoDataList = [];
+
+                    },
+                    //验证所填是否是数字,不是则清空
+                    f_checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    },
+                    //货物数量改值事件
+                    f_changeGoodsNumber: function () {
+                        if (vue.InfoDataList != []) {
+                            //清除上一次结果数组
+                            vue.InfoDataList.splice(1, vue.InfoDataList.length - 1);
+
+                            //获取该产品的库位存量
+                            var f_PartDescription_InventoryCapacity = vue.InfoDataList[0].f_PartDescription_InventoryCapacity;
+
+                            //判定是否有库位存量
+                            if ((f_PartDescription_InventoryCapacity != "" || f_PartDescription_InventoryCapacity != "0") && $(".GoodsWorkQuantity").val().trim() != "") {
+
+                                //获取数量,根据存货基础信息的库位存量得知每个产品在库位的最高库存量去切分出N条记录。
+                                var GoodsWorkQuantity = parseInt($(".GoodsWorkQuantity").val());
+
+                                //得知需要几个完整空闲储位才能够匹配
+                                var SpaceCou = Math.ceil(GoodsWorkQuantity / f_PartDescription_InventoryCapacity);
+
+                                vue.InfoDataList[0].n_Amount = GoodsWorkQuantity > f_PartDescription_InventoryCapacity ? f_PartDescription_InventoryCapacity : GoodsWorkQuantity;
+
+                                for (var index = 2; index <= SpaceCou; index++) {
+                                    var obj = vue.InfoDataList[0];
+                                    vue.InfoDataList.push({
+                                        s_Mother_Desc: obj.s_Mother_Desc,
+                                        s_CustomerCode: obj.s_CustomerCode,
+                                        s_CarColor: obj.s_CarColor,
+                                        s_Batch: obj.s_Batch,
+                                        s_BinId: obj.s_BinId,
+                                        s_BinBarCode: obj.s_BinBarCode,
+                                        s_GoodsBarCode: obj.s_GoodsBarCode,
+                                        s_MotherCode: obj.s_MotherCode,
+                                        n_Amount: GoodsWorkQuantity > (f_PartDescription_InventoryCapacity * index) ? f_PartDescription_InventoryCapacity : GoodsWorkQuantity - (f_PartDescription_InventoryCapacity * (index - 1)),
+                                        n_isCheck: false,
+                                        s_PartDescription_Model: obj.s_PartDescription_Model,
+                                        f_PartDescription_InventoryCapacity: obj.f_PartDescription_InventoryCapacity,
+                                        f_Bin_ApplianceCapacity: obj.f_Bin_ApplianceCapacity
+                                    });
+                                }
+
+                            }
+                            //清空
+                            $(".GoodsWorkQuantity").val("");
+                            //重新焦点到器具条码文本框
+                            $(".BinBarCode").val("").focus();
+
+                            //默认选中第一个
+                            vue.InfoDataList[0].n_isCheck = true;
+
+                        }
+                    },
+                    //确认数量
+                    f_reSureSpaceAmount: function () {
+                        //获取上架数量
+                        var Amount = $(event.target).val();
+
+                        //重新聚焦
+                        if (Amount == "") {
+                            $(".SpaceBarCode").val("").focus();
+                            return;
+                        }
+
+                        //获取剩余数量
+                        var f_PartDescription_InventoryCapacity = 0;
+                        var n_ReportInventoryCurrent_index = 0;
+
+                        vue.InfoDataList.forEach(function (value, index) {
+                            if (value.n_isCheck) {
+                                n_ReportInventoryCurrent_index = index;
+                                f_PartDescription_InventoryCapacity = value.f_PartDescription_InventoryCapacity;
+                            }
+                        })
+
+                        //判定拉动数量是否超过上架数量，超过则予以上架
+                        if (parseInt(f_PartDescription_InventoryCapacity) >= parseInt(Amount)) {
+                            vue.InfoDataList[n_ReportInventoryCurrent_index].n_Amount = Amount;
+
+                            //重新焦点
+                            $(".SpaceAmount").val("");
+                            $(".BinBarCode").val("").focus();
+                        } else {
+
+                            f_commonShowMsg("该储位上架数量已经超过了该储位的可允许的上架数量，请重新输入!");
+                            //聚焦于数量文本框
+                            $(".SpaceAmount").val("").focus();
+                        }
+
+                    },
+                    //根据器具条码查询对应器具信息
+                    f_selBinInfo: function () {
+                        //获取器具条码
+                        var BinBarCode = $(".BinBarCode").val();
+
+                        //获取车型
+                        var s_PartDescription_Model = vue.InfoDataList.filter(function (item) {
+                            return item.n_isCheck == true
+                        })[0]["s_PartDescription_Model"];
+
+                        //对象名 根据器具条码查询对应的器具信息
+                        var objectName = "SelBinInfoByBarCode";
+                        //传递参数
+                        var param = { s_Bin_Code: BinBarCode, s_PartDescription_Model: s_PartDescription_Model };
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+
+                            if (result.Data[1].length > 0) {
+                                f_commonShowMsg("该器具条码已经被未提交的单据产品所占用,请重新输入!");
+                                //重新焦点
+                                $(".BinBarCode").val("").focus();
+                                return;
+                            }
+
+                            //                            if (result.Data[2].length == 0) {
+                            //                                f_commonShowMsg("该器具条码不能用于装载该产品,请重新输入!");
+                            //                                //重新焦点
+                            //                                $(".BinBarCode").val("").focus();
+                            //                                return;
+                            //                            }
+
+                            //获取下一个默认选中的行记录
+                            var next_index = 0;
+
+                            //如果有对应的器具信息，则抽取器具ID
+                            if (result.Data[0].length > 0) {
+
+                                //判定是否已经重复使用该器具去装载，是的话则不允许加入
+                                var isExistsLen = vue.InfoDataList.filter(function (item) {
+                                    return item.s_BinBarCode == result.Data[0][0].s_Bin_Code;
+                                })
+                                 
+                                if (isExistsLen > 0) {
+
+                                    f_commonShowMsg("该器具条码在该单据中已被使用过,请重新输入!");
+
+                                } else {
+                                    vue.InfoDataList.forEach(function (value, index) {
+                                        if (value.n_isCheck) {
+                                            value.s_BinId = result.Data[0][0].n_Bin_Id;
+                                            value.s_BinBarCode = result.Data[0][0].s_Bin_Code;
+                                            value.f_Bin_ApplianceCapacity = result.Data[0][0].f_Bin_ApplianceCapacity;
+                                            if (index != vue.InfoDataList.length - 1) {
+                                                //默认加一
+                                                next_index = index + 1;
+                                            }
+                                        }
+                                        value.n_isCheck = false;
+                                    })
+
+                                    //默认选中下一条记录
+                                    vue.InfoDataList[next_index].n_isCheck = true;
+                                }
+
+
+
+                            } else { //如果没有对应的器具信息，则给于系统无对应器具信息提示
+                                f_commonShowMsg("该器具条码在系统中无对应信息,请先维护器具信息后再重新输入!");
+                            }
+
+                            //清空
+                            $(".BinBarCode").val("").focus();
+
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+                            //清空
+                            $(".BinBarCode").val("").focus();
+                        })
+                    },
+                    //选中库位匹配方式
+                    f_radio: function (event) {
+                        if ($(event.target).attr("value") == "单件录入") {
+
+                            //跳转至单件录入扫描界面 
+                            location.href = "AddBillStockInOutDetailSingle?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)";
+                        }
+                    },
+                    //选择行记录
+                    f_checkRecord: function () {
+                        var trindex = $(event.target).parent().attr("index");
+                        vue.InfoDataList.forEach(function (value, index) {
+                            if (index == trindex) {
+                                value.n_isCheck = true;
+                            } else {
+                                value.n_isCheck = false;
+                            }
+                        })
+                    }
+                }
+            })
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+    </script>
+}

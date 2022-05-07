@@ -1,0 +1,402 @@
+﻿@{  
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+    //查询出库单的可选仓库信息
+    Tops.FRM.BizResult br = Tops.FRM.Biz.Execute("SelWarehousingOrderWarehouseInfo", new System.Data.SqlClient.SqlParameter[] { }, Tops.FRM.BizType.Query);
+    List<System.Data.DataTable> list = br.Data as List<System.Data.DataTable>;
+
+    Dictionary<string, string> dic = new Dictionary<string, string>();
+
+    if (list[0].Rows.Count > 0)
+    {
+        for (int index = 0; index < list[0].Rows.Count; index++)
+        {
+            dic.Add(list[0].Rows[index]["n_Warehouse_Id"].ToString(), list[0].Rows[index]["s_Warehouse_Name"].ToString());
+        }
+    }
+
+    string ParentIds = Request.QueryString["ParentIds"];
+}
+@section Body{
+    <div class="container">
+        <div>
+            <select v-bind:class="WorkOrderWarehouse_Checked">
+                @if (dic.Count > 0)
+                {
+                    foreach (string key in dic.Keys)
+                    { 
+                    <option id="@(key)">@(dic[key])</option>
+                    }
+                }
+            </select>
+        </div>
+        <div>
+            <input type="text" placeholder="请输入货物编码" v-bind:class="WorkOrderCode_Checked" v-on:keyup.enter="f_WorkOrderCodeKeydown" />
+        </div>
+        <div>
+            <input type="text" placeholder="请输入数量" v-bind:class="WorkOrderAmount_Checked" v-on:keyup.enter="f_WorkOrderAmountkeydown"
+                v-on:change="f_changeAmount" />
+        </div>
+        <div v-bind:class="TitleTab_Showed">
+            <table>
+                <tr>
+                    <th>
+                        货物编码
+                    </th>
+                    <th>
+                        货物名称
+                    </th>
+                    <th>
+                        在库数
+                    </th>
+                    <th>
+                        出库数
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table>
+            </table>
+        </div>
+        <div>
+            <div v-bind:class="Save_Div_Showed" v-on:click="f_saveData">
+                形成出库单</div>
+            <div v-bind:class="Delete_Div_Showed" v-on:click="f_deleteRecord">
+                删除</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .WorkOrderWarehouse
+        {
+            width: calc(80%);
+            margin: calc(2%) calc(10%);
+            line-height:30px;
+            border:1px solid lightblue;
+        }
+        .WorkOrderCode
+        {
+            width: calc(80%);
+            margin: calc(2%) calc(10%);
+            line-height:30px;
+            border:1px solid lightblue;
+        }
+        .WorkOrderAmount
+        {
+            width: calc(80%);
+            margin: calc(0%) calc(10%) calc(3%) calc(10%);
+            line-height:30px;
+            border:1px solid lightblue; 
+         }
+        
+        .TitleTab{
+            width: calc(80%);
+            height: 30px; 
+            margin: calc(0%) calc(10%) calc(0%) calc(10%);
+            text-align:center;
+            font
+        }
+        .TitleTab table,.InfoTab table{
+            width: 100%;
+            border-collapse:collapse;
+        }
+        .TitleTab th{
+            width: 30%;
+            border:1px solid lightblue;
+            background:#a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .TitleTab tr th:nth-child(3),.TitleTab tr th:nth-child(4){
+            width: 20%;
+            border:1px solid lightblue;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
+        .InfoTab td{
+            width: 30%;
+            border:1px solid lightblue;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .InfoTab tr td:nth-child(3),.InfoTab tr td:nth-child(4){
+            width: 20%;
+            border:1px solid lightblue;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
+        .InfoTab
+        {
+            width: calc(80%);
+            height: 102px;
+            margin: calc(0%) calc(10%);
+            text-align:center;
+            overflow-y:scroll;
+        }
+        
+        .Save_Div
+        {
+            width: calc(55%);
+            margin: calc(3%) calc(0%) calc(15%) calc(10%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑; 
+            font-size: 20px;
+            line-height: 60px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        .Delete_Div
+        {
+            width: calc(20%);
+            margin: calc(3%) calc(0%) calc(15%) calc(5%);
+            background: #f69797;
+            color: white;
+            font-family: 微软雅黑; 
+            font-size: 20px;
+            line-height: 60px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        
+        .checked
+        {
+            background:#e9e9ac;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxHelper = new ajaxHelper();
+
+        //ajax Get请求变量
+        var ajaxobjFirst = null;
+
+        //ajax Post请求变量
+        var ajaxobjSecond = null;
+
+        $(function () {
+            //内容容器对象
+            var container = new Vue({
+                el: ".container",
+                data: {
+                    WorkOrderWarehouse_Checked: { //仓库文本框样式
+                        WorkOrderWarehouse: true
+                    },
+                    WorkOrderCode_Checked: { //编码文本框样式
+                        WorkOrderCode: true
+                    },
+                    WorkOrderAmount_Checked: { //数量文本框样式
+                        WorkOrderAmount: true
+                    },
+                    TitleTab_Showed: { //标题表格样式
+                        TitleTab: true
+                    },
+                    InfoTab_Showed: { //结果表格样式
+                        InfoTab: true
+                    },
+                    Save_Div_Showed: { //形成入库单按钮样式
+                        Save_Div: true
+                    },
+                    Delete_Div_Showed: { //删除按钮样式
+                        Delete_Div: true
+                    }
+                },
+                methods: {
+                    //形成入库单事件保存方法
+                    f_saveData: function () {
+                        //如果数量事件没有触发，则补触发
+                        if ($(".WorkOrderAmount").val() != "") {
+                            $(".WorkOrderAmount").change();
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjSecond != null) {
+                            ajaxobjSecond.abort();
+                            ajaxobjSecond = null;
+                        }
+
+                        //获取仓库ID
+                        var WarehouseId = $(".WorkOrderWarehouse").find("option:selected").attr("id");
+
+                        //获取所需参数 
+                        var param = new Object();
+                        param.grid1 = new Array();
+
+                        param.n_Warehouse_Id = $(".WorkOrderWarehouse").find("option:selected").attr("id")
+
+                        $(".InfoTab tr").each(function (index, value) {
+                            param.grid1.push({
+                                n_Warehouse_Id_2: WarehouseId,
+                                s_BillStockInOut_BarCode_2: $(value).find("td:eq(0)").text(),
+                                s_BillStockInOut_ExternalName_2: $(value).find("td:eq(1)").text(),
+                                f_BillStockInOut_WorkOrderQuantity_2: $(value).find("td:eq(3)").text()
+                            })
+                        })
+
+                        //对象名称
+                        var objectName = "InsertWarehouseOutOrder";
+                        //传递参数
+                        var params = param;
+
+                        ajaxobjSecond = ajaxHelper.ajax_Post(objectName, params
+                           , function (result) {
+                               f_commonShowMsg("保存成功");
+                               //清空
+                               ajaxobjSecond = null;
+                               container.f_initData();
+
+                           }, function (result) {
+                               f_commonShowMsg(result.Msgs[0]);
+                               //清空
+                               ajaxobjSecond = null;
+                           });
+                    },
+                    //数量文本框修改值方法
+                    f_changeAmount: function (event) {
+
+                        //获取当前工件编码
+                        var CurdeCode = $(".InfoTab tr:eq(0)").find("td:eq(0)").text();
+
+                        //获取结果表格的对应行记录
+                        var $tr = $(".InfoTab").find("tr[CrudeCode=" + CurdeCode + "]");
+
+                        //总数量
+                        var SumAmount = parseInt($tr.find("td:eq(2)").text());
+                        //填写数量
+                        var thisAmount = parseInt($(event.target).val());
+
+                        //判定填写数量不能超过总数量
+                        if (thisAmount > SumAmount) {
+                            f_commonShowMsg("填写数量不能超过该产品目前的在库数量!");
+                            //清空
+                            $(event.target).val("").focus().select();
+
+                        } else {
+
+                            //数量赋值
+                            $tr.find("td:eq(3)").text($(event.target).val());
+                            //清空
+                            $(event.target).val("");
+                        }
+                    },
+                    //货物标识编码回车事件
+                    f_WorkOrderCodeKeydown: function (event) {
+                        if (event.keyCode == 13) {
+                            $(".WorkOrderAmount").focus();
+
+                            //工件标识编码
+                            var WorkOrderCode = $(".WorkOrderCode").val();
+                            //获取仓库ID
+                            var WarehouseId = $(".WorkOrderWarehouse").find("option:selected").attr("id");
+
+                            //对象名称 查询出库单的库存信息
+                            var objectName = "SelWarehouseOutOrderCrudeInfo";
+                            //传递参数
+                            var params = { CrudeCode: $(".WorkOrderCode").val(), n_Warehouse_Id: WarehouseId };
+
+                            //重复请求处理
+                            if (ajaxobjFirst != null) {
+                                ajaxobjFirst.abort();
+                                ajaxobjFirst = null;
+                            }
+
+                            //查询出库单的库存信息
+                            ajaxobjFirst = ajaxHelper.ajax_Get(objectName, params, function (result) {
+                                var tdSecond = "";
+                                var tdThird = "100"
+                                if (result.Data[0].length > 0) {
+                                    tdSecond = result.Data[0][0].s_ReportInventoryCurrent_GoodsProductName;
+                                    tdThird = result.Data[0][0].n_ReportInventoryCurrent_Number
+                                }
+
+                                //查询到塑件或漆件信息直接加到结果表格中
+                                if ($(".InfoTab table tr").length == 0) {
+                                    $(".InfoTab table").append("<tr CrudeCode='" + WorkOrderCode + "'>" +
+                            "<td>" + WorkOrderCode + "</td><td>" + tdSecond + "</td><td>" + tdThird + "</td><td></td></tr>");
+                                } else {
+                                    $("<tr CrudeCode='" + WorkOrderCode + "'>" +
+                            "<td>" + WorkOrderCode + "</td><td>" + tdSecond + "</td><td>" + tdThird + "</td><td></td></tr>").insertBefore($(".InfoTab table tr:eq(0)"));
+                                }
+
+
+                                //清空
+                                ajaxobjFirst = null;
+
+                            }, function (result) {
+                                f_commonShowMsg(result.Msgs[0]);
+                                //清空
+                                ajaxobjFirst = null;
+                            })
+
+                            //清空编码和数量文本框
+                            $(".WorkOrderCode").val("");
+                            $(".WorkOrderAmount").val("").focus().select();
+                        }
+                    },
+                    //数量文本框回车事件
+                    f_WorkOrderAmountkeydown: function (e) {
+                        if (e.keyCode == 13) {
+                            $(".WorkOrderCode").val("").focus().select();
+                        }
+                    },
+                    //清除界面内容
+                    f_initData: function () {
+
+                        //清除结果表格数据
+                        $(".InfoTab").find("tr").remove();
+                        //清空编码
+                        $(".WorkOrderCode").val("").focus().select();
+                        //清空数量
+                        $(".WorkOrderAmount").val("");
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("出库单管理");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //加载返回事件
+                        f_loadEvent("../../../../WarehouseOutOrder/ItemOption?ParentIds=" + "@ParentIds");
+                         
+
+                        $(".WorkOrderCode").focus();
+
+
+                        //行点击事件
+                        $(".InfoTab table tr").live("click", function () {
+                            $(this).addClass("checked");
+                            $(this).siblings().removeClass("checked");
+                        })
+                    },
+                    //删除行记录
+                    f_deleteRecord: function (event) {
+                        $(".InfoTab table tr[class=checked]").remove();
+                    }
+                }
+
+            })
+
+            //先执行
+            container.f_reloadPage();
+        })
+          
+    </script>
+}

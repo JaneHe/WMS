@@ -1,0 +1,322 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+
+    //货物编码
+    string GoodsCode = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("GoodsCode"))
+    {
+        GoodsCode = Request.QueryString["GoodsCode"];
+    }
+
+    //数量
+    string GoodsWorkQuantity = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("GoodsWorkQuantity"))
+    {
+        GoodsWorkQuantity = Request.QueryString["GoodsWorkQuantity"];
+    }
+
+    string RecordID = Request.QueryString["RecordID"];
+    if (Request.QueryString.AllKeys.Contains("RecordID"))
+    {
+        RecordID = Request.QueryString["RecordID"];
+    }
+
+    //仓库ID
+    string n_Warehouse_Id = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("n_Warehouse_Id"))
+    {
+        n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+    }
+
+    //货物标识编码
+    string GoodsBarCode = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("GoodsBarCode"))
+    {
+        GoodsBarCode = Request.QueryString["GoodsBarCode"];
+    }
+
+    //补料单据外键ID
+    string n_BillStockInOut_Id = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("n_BillStockInOut_Id"))
+    {
+        n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"];
+    }
+
+    string NowTime = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+}
+@section Body{
+    <div class="body">
+        <div class="label">
+            <label>
+                数据更新时间:@(NowTime)</label>
+        </div>
+        <div class="TitleTab">
+            <table cellspacing="0">
+                <tr>
+                    <td>
+                        产品编码
+                    </td>
+                    <td>
+                        产品名称
+                    </td>
+                    <td>
+                        安全库存/<br />
+                        库存数/<br />
+                        需补料数
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="InfoTab">
+            <table cellspacing="0" >
+                <tr v-for="(item,i) in GoodsInfo_Obj" :index="i"  :class="{ 'morechecked':item.IsCheckRecord }"  v-on:click="f_CheckRecord">
+                    <td>
+                        {{ item.产品编码 }}
+                    </td>
+                    <td>
+                        {{ item.产品名称 }}
+                    </td>
+                    <td>
+                        {{ item.安全库存 }}/<br />
+                        {{ item.当前储位工件数 }}/<br />
+                        {{ Math.ceil(item.满储位工件数 * item.预警储量 / 100) - item.当前储位工件数 }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="button_Div_Showed">
+            <div v-on:click="f_SaveSmallSupermarketRecord">
+                补料明细</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .TitleTab
+        {
+            width: calc(90%);
+            height: 90px;
+            margin: calc(3%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        .TitleTab table
+        {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .TitleTab td
+        {
+            width: 30%;
+            border: 1px solid #a5e0a5;
+            background: rgb(200 220 232);
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .InfoTab
+        {
+            width: calc(90%);
+            height: 162px;
+            margin: calc(0%) calc(5%);
+            text-align: center;
+            line-height: 22px; 
+            overflow-y:scroll;
+        }
+        .InfoTab table
+        {
+            width: 100%; 
+        }
+        
+        .InfoTab td
+        {
+            width: 30%;
+            border: 1px solid #a5e0a5;
+            line-height: 30px;
+            height:30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        
+        .label
+        {
+            width: calc(90%);
+            margin: calc(3%) calc(5%);
+            color: blue;
+            height: 22px;
+            text-align: center;
+        }
+        
+        
+        .button_Div div
+        {
+            width: calc(90%);
+            margin: calc(5%) calc(5%) calc(2.5%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        
+        .RadioTab
+        {
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Post请求变量
+        var ajaxobjFirst = null;
+
+        //ajax Get请求变量
+        var ajaxobjSecond = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    button_Div_Showed: "button_Div", //按钮样式
+                    GoodsInfo_Obj: new Array()  //货物数据源 
+                },
+                methods: {
+                    //加载数据
+                    f_loadData: function () {
+                        //重复请求处理
+                        if (ajaxobjSecond != null) {
+                            ajaxobjSecond.abort();
+                            ajaxobjSecond = null;
+                            return;
+                        }
+
+                        //对象名 
+                        var objectName = "SelSmallSupermarketSingleGoodsInfo";
+                        //传递参数
+                        var param = { n_BillStockInOut_Id: "@(n_BillStockInOut_Id)" };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            //清空数据
+                            //vue.f_emptyInfoTab();
+
+                            if (result.IsSuccess) {
+                                if (result.Data[0].length > 0) {
+                                    result.Data[0].forEach(function (value, index) {
+                                        value.IsCheckRecord = false;
+                                        vue.GoodsInfo_Obj.push(value);
+                                    })
+
+                                } else {
+                                    f_commonShowMsg("该小件超市暂时无产品库存信息!");
+                                }
+
+                            }
+                            ajaxobjSecond = null;
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjSecond = null;
+                        })
+
+
+                    },
+                    //保存补料单据记录,跳转到补料库存扫描进行保存
+                    f_SaveSmallSupermarketRecord: function () {
+
+                        var check_arr = vue.GoodsInfo_Obj.filter(function (item) {
+                            return item.IsCheckRecord;
+                        })
+
+                        if (check_arr.length == 0) {
+                            f_commonShowMsg("请选择需要进行补料的产品，才能进行补料操作!");
+                            return;
+                        }
+                        
+                        //提示补充存货基础信息
+                        if (check_arr[0]["满储位工件数"] == null) {
+                            f_commonShowMsg("该产品信息不全,请在小件超市物料基础信息管理补齐信息,才能进行补料操作!");
+                            return;
+                        }
+
+                        //跳转至库位扫描界面
+                        location.href = "LocationScanningUp?ParentIds=" + "@ParentIds" + "&GoodsCode=" + check_arr[0]["产品编码"] + "&RecordID= " + check_arr[0]["RecordId"]
+                            + "&GoodsWorkQuantity=" + (Math.ceil(parseInt(check_arr[0]["满储位工件数"]) * parseInt(check_arr[0]["预警储量"]) / 100) - parseInt(check_arr[0]["当前储位工件数"])) + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)"
+                            + "&OldGoodsWorkQuantity=" + check_arr[0]["当前储位工件数"];
+
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("补料产品选择");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../SmallSupermarketSingle/Index?ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../SmallSupermarketSingle/Index?ParentIds=" + "@ParentIds";
+                            })
+                        }
+                        vue.f_loadData();
+                    },
+                    //清空数据
+                    f_emptyInfoTab: function () {
+
+                        vue.GoodsInfo_Obj = new Object();
+
+                    },
+                    //选择行事件
+                    f_CheckRecord: function () {
+                        var index = -1;
+                        if ($(event.target).attr("index") == undefined) {
+                            index = $(event.target).parent().attr("index");
+                        } else {
+                            index = $(event.target).attr("index");
+                        }
+                        //先清除状态
+                        vue.GoodsInfo_Obj.forEach(function (value, index) {
+                            value.IsCheckRecord = false;
+                        })
+                        //标记选中行
+                        vue.GoodsInfo_Obj[index].IsCheckRecord = true;
+
+                    },
+                    //验证所填是否是数字,不是则清空
+                    checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    }
+                }
+            })
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+    </script>
+}

@@ -1,0 +1,213 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "模块名称";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName="SelSubmitProjectinfo";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas=Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols =  ModuleConfig.GetColumns(metas[0], biz.Lookups,biz.Sqls[0], biz);
+}
+
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad" > 
+    <div id="hiddenlist"> 
+    </div>
+    <div id="paramlist"> 
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+        string labelStr=string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+        var fieldName = biz.Fields[i].FieldName;
+        var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+        <div class="param_item">
+            @if (lookupField != null && lookupField.ToList().Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                        <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                        </script>
+                    }
+            else if (biz.Fields[i].DataList.Count > 0)
+            {
+                <label class="plugin_label">@(labelStr):</label>
+                <select name="@(fieldName)" fieldType="select" >
+                    @foreach(var item in biz.Fields[i].DataList){
+                    <option value="@(item.Key)">@(item.Value)</option>
+                    }
+            </select>
+            }else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+            {
+                <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+            }
+            else
+            {
+            <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+            }
+        </div>
+        }
+        <div style=" clear:both;"></div>
+    </div>
+    </form>
+    
+}
+@section Script{
+<script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#addBt,#searchBt").show();
+  
+        $("#module_toolbar").append($("#searchBt2")).append('<a href="../../Content/Excel/检具项目信息操作文档_20210227.docx">检具项目信息操作文档下载</a>');
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns:  [
+                
+                    { display: '检具详细', name: 'n_id', align: 'center', width: 120, "type": "String",
+                        render: function (rowdata, rowindex, value) {
+                            var cl = "AddTab_1('" + rowdata['n_id'] + "','"+rowdata['s_ProjectName']+"')";
+                            return "<input type='button' value='检具详细' style='cursor:pointer; width:80px; font-weight:bold;' onclick=\"" + cl + "\">";
+                        }
+                    },
+
+  {
+      "name": "s_ProjectName",
+      "display": "项目名称",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null
+  },
+  {
+      "name": "s_Series",
+      "display": "系列",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null
+  },
+  {
+      "name": "s_Brand",
+      "display": "品牌",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null
+  },
+  {
+      "name": "s_Remark",
+      "display": "备注",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null
+  },
+  {
+      "name": "n_State",
+      "display": "状态",
+      "align": "right",
+      "width": 100,
+      "hide": true,
+      "type": "Int32",
+      "editor": null
+  },
+  {
+      "name": "s_Creator",
+      "display": "创建人",
+      "align": "left",
+      "width": 100,
+      "hide": true,
+      "type": "String",
+      "editor": null
+  },
+  {
+      "name": "d_CreateTime",
+      "display": "创建时间",
+      "align": "left",
+      "width": 100,
+      "hide": true,
+      "type": "date",
+      "editor": null
+  },
+  {
+      "name": "s_Updator",
+      "display": "修改人",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null
+  },
+  {
+      "name": "d_UpdateTime",
+      "display": "修改时间",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "date",
+      "editor": null
+  }
+            ],
+            url: '/AjaxGridData/SelSubmitProjectinfo',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                @*var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];*@
+                f_addTab("edit",  "维护[" + rowdata.n_id+ "]", "/Submit/SubmitProjectinfoModify?"+"ctrl=edit&id=" +rowdata.n_id+ "&" + Math.random());
+             //   f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/Submit/Modify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+        });
+        $("#searchBt").click();
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/Submit/SubmitProjectinfoModify?"+"ctrl=add&" + Math.random());
+        }); 
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        })
+        
+    });
+    
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+    //模具详细
+    function AddTab_1(n_id,s_ProjectName) {
+        var _param = new Object();
+        _param["n_id"] = n_id;
+        f_addTab("检具详细" + n_id, "检具详细[" + s_ProjectName + "]", "/Submit/Submitinfo?" + "ctrl=edit&id=" + escape($.toJSON(_param)) + "&" + Math.random() + "");
+    }
+</script>
+}
+<div id="datagrid"></div>
+
+

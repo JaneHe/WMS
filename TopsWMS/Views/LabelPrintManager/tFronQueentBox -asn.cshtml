@@ -1,0 +1,1428 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "新增申请单";
+    ViewBag.ModuleName = "新增申请单";
+    Layout = "../../TopsLib/Views/Shared/_Layout.cshtml";
+    var UserNo = Tops.FRM.TopsUser.UserNO;
+}
+
+<html>
+<head>
+    <title>新增申请单</title>
+    <style>
+        /*禁止这个页面内容被选中*/
+        body
+        {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            font-family: 微软雅黑;
+        }
+        /*主容器*/
+        .main
+        {
+            width: 100%;
+            max-width: 100%;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+        /*头部*/
+        .top
+        {
+            width: 95%;
+            height: 110px;
+            margin: auto;
+        }
+
+        .top_centre
+        {
+            width: 100%;
+            float: left;
+            height: 100%;
+        }
+
+            .top_centre > div
+            {
+                height: 100%;
+                float: left;
+            }
+
+
+        /*中部*/
+        #container1
+        {
+            margin: 0px auto;
+            width: 286px;
+            margin-top: 15px;
+            height: 274px;
+            position: absolute;
+            z-index: 1001;
+            margin: -535px 0px 0px 70%;
+            padding: 10px 0px 0px 10px;
+            background: #99CCFF;
+        }
+
+        /*模具【开始】*/
+        .yj
+        {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            width: 60%;
+            height: 35px;
+            font-size: 20px;
+        }
+
+        .yj1
+        {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            width: 72%;
+            font-size: 20px;
+            height: 78px;
+        }
+
+        .d1 input[type=button], .D3_xl input[type=button]
+        {
+            width: 14.4%;
+            cursor: pointer;
+            height: 85px;
+            color: red;
+            float: left;
+            font-weight: bold;
+            font-family: Arial;
+            font-size: 25px;
+            text-align: center;
+            line-height: 85px;
+            white-space: normal;
+            word-wrap: break-word;
+            word-break: break-all;
+            cursor: pointer;
+            margin: 10px 7px 20px 12px;
+            border: 1px solid #000;
+        }
+
+        .d2 input[type=button], .d3 input[type=button]
+        {
+            width: 46%;
+            cursor: pointer;
+            height: 85px;
+            color: red;
+            float: left;
+            font-weight: bold;
+            font-family: Arial;
+            font-size: 25px;
+            text-align: center;
+            line-height: 90px;
+            white-space: normal;
+            word-wrap: break-word;
+            word-break: break-all;
+            cursor: pointer;
+            margin: 8px 20px 8px 20px;
+            border: 1px solid #000;
+        }
+
+        .d2 input[type=button], .d3 input[type=button]
+        {
+            line-height: 36px;
+        }
+        /*模具【结束】*/
+
+        .bot
+        {
+            width: 95%;
+            height: 580px;
+            margin: auto;
+            margin-top: 10px;
+        }
+
+        .l_qx_divone
+        {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 180px;
+            border: 3px solid #0072ffc7;
+        }
+
+        .l_qx_div
+        {
+            height: 165px;
+            font-weight: bold;
+            width: 86%;
+            overflow: hidden;
+        }
+
+        .l_qx_div1
+        {
+            margin-top: 10px;
+            font-weight: 100;
+            height: 350px;
+            border: 3px solid #0072ffc7;
+        }
+
+        .l_qx_div1
+        {
+            overflow-y: auto;
+        }
+
+
+            .l_qx_div1::-webkit-scrollbar
+            { /*滚动条整体样式*/
+                width: 40px; /*高宽分别对应横竖滚动条的尺寸*/
+                height: 1px;
+            }
+
+            .l_qx_div1::-webkit-scrollbar-thumb
+            { /*滚动条里面小方块*/
+                border-radius: 40px;
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                background: #535353;
+            }
+
+            .l_qx_div1::-webkit-scrollbar-track
+            { /*滚动条里面轨道*/
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                border-radius: 40px;
+                background: #EDEDED;
+            }
+
+        /*打印【结束】*/
+
+        .div_d1
+        {
+            height: 100px;
+            width: 49.8%;
+            float: left;
+            overflow: hidden;
+        }
+
+        ul,
+        li
+        {
+            list-style: none;
+        }
+
+
+
+        #scts
+        {
+            border-collapse: collapse;
+            margin: 0 auto;
+            text-align: center;
+            width: 100%;
+            font-size: 20px;
+        }
+
+            #scts td
+            {
+                border: 1px solid #cad9ea;
+                color: #666;
+                height: 30px;
+            }
+
+            #scts thead th
+            {
+                background-color: #CCE8EB;
+                width: 100px;
+            }
+
+            #scts tr:nth-child(odd)
+            {
+                background: #fff;
+            }
+
+            #scts tr:nth-child(even)
+            {
+                background: #F5FAFA;
+            }
+
+        .cp_div
+        {
+            margin-top: 1%;
+            list-style: none;
+            padding: 2px;
+            font-size: 13px;
+            text-align: center;
+            height: 130px;
+            margin-left: 1%;
+            float: left;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid rgb(0, 0, 0);
+            color: #232323;
+            background-color: #fff;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .cpxz_div
+        {
+            color: #000;
+            background-color: rgb(255, 246, 143);
+            margin-top: 1%;
+            list-style: none;
+            padding: 2px;
+            font-size: 13px;
+            text-align: center;
+            height: 130px;
+            margin-left: 1%;
+            float: left;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid rgb(0, 0, 0);
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+
+
+
+
+        .qx_List_div2
+        {
+            overflow-y: auto;
+        }
+
+
+            .qx_List_div2::-webkit-scrollbar
+            { /*滚动条整体样式*/
+                width: 40px; /*高宽分别对应横竖滚动条的尺寸*/
+                height: 1px;
+            }
+
+            .qx_List_div2::-webkit-scrollbar-thumb
+            { /*滚动条里面小方块*/
+                border-radius: 40px;
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                background: #535353;
+            }
+
+            .qx_List_div2::-webkit-scrollbar-track
+            { /*滚动条里面轨道*/
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                border-radius: 40px;
+                background: #EDEDED;
+            }
+
+        .qx_List_div2_li
+        {
+            margin-top: 1%;
+            list-style: none;
+            padding: 2px;
+            font-size: 33px;
+            text-align: center;
+            height: 55px;
+            margin-left: 1%;
+            float: left;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid rgb(0, 0, 0);
+            color: red;
+            background-color: #87CEFA;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .qx_List_div2_li_xz
+        {
+            margin-top: 1%;
+            list-style: none;
+            padding: 2px;
+            font-size: 33px;
+            text-align: center;
+            height: 55px;
+            margin-left: 1%;
+            float: left;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid rgb(0, 0, 0);
+            color: #131212;
+            background-color: #fbe800;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+
+
+
+        #qx_ok
+        {
+            width: 250px;
+            color: #000;
+            background: rgb(255, 246, 143);
+            border: 1px solid #000;
+            font-size: 30px;
+            text-align: center;
+            margin-right: 30px;
+        }
+
+        #qx_no
+        {
+            width: 250px;
+            color: #000;
+            background: rgb(255, 246, 143);
+            border: 1px solid #000;
+            font-size: 30px;
+            text-align: center;
+            margin-right: 30px;
+        }
+
+        #dy_List
+        {
+            width: 67%;
+            height: 74%;
+            top: 14%;
+            left: 10px;
+            display: none;
+            background: #fff;
+            z-index: 8886;
+            position: absolute;
+            border: 2px solid #000;
+        }
+
+        #qx_List
+        {
+            top: 9%;
+            left: 9%;
+            width: 80%;
+            height: 80%;
+            display: none;
+            background: #fff;
+            z-index: 8886;
+            position: absolute;
+            border: 2px solid #000;
+        }
+
+        #BB
+        {
+            width: 59px;
+            height: 32px;
+            cursor: pointer;
+            float: left;
+            text-align: center;
+            line-height: 32px;
+            border-radius: 5px;
+            border: 3px solid #6495ED;
+            background-color: #EAF2FE;
+        }
+
+        .gb_dy_fanhui
+        {
+            float: left;
+            margin-left: 15px;
+            background-color: rgb(66, 151, 215);
+            width: 200px;
+            height: 60px;
+            margin-top: 0px;
+            line-height: 60px;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 25px;
+            text-align: center;
+            display: none;
+        }
+
+        #erji input[type=button]
+        {
+            width: 23.8%;
+            height: 98px;
+        }
+
+        .div_zxHao
+        {
+            height: 46px;
+            font-size: 40px;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+        .div_zxHaoone
+        {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 90px;
+            width: 100%;
+            text-align: center;
+        }
+
+        table
+        {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        td, th
+        {
+            padding: 0;
+        }
+
+        .pure-table
+        {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            empty-cells: show;
+            border: 1px solid #cbcbcb;
+        }
+
+            .pure-table caption
+            {
+                color: #000;
+                font: italic 85%/1 arial,sans-serif;
+                padding: 1em 0;
+                text-align: center;
+            }
+
+            .pure-table td, .pure-table th
+            {
+                border-left: 1px solid #cbcbcb;
+                border-width: 0 0 0 1px;
+                font-size: inherit;
+                margin: 0;
+                overflow: visible;
+                padding: .5em 1em;
+            }
+
+            .pure-table thead
+            {
+                font-size: 12px;
+                background-color: #e0e0e0;
+                color: #000;
+                text-align: left;
+                vertical-align: bottom;
+            }
+
+        #Tables
+        {
+            font-size: 12px;
+            color: #000;
+        }
+
+        .pure-table td
+        {
+            background-color: transparent;
+            border: 1px solid #cbcbcb;
+        }
+
+        .button
+        {
+            background-color: #0072ffc7; /* Green */
+            border-radius: 10px;
+            border: none;
+            color: white;
+            padding: 20px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-transition-duration: 0.4s; /* Safari */
+            transition-duration: 0.4s;
+        }
+
+        .button2:hover
+        {
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        }
+
+        #div_List2_dialog
+        {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            filter: alpha(Opacity=50);
+            -moz-opacity: 0.3;
+            opacity: 0.5;
+            z-index: 5000;
+        }
+    </style>
+</head>
+<body>
+    <div id="div_List2_dialog" style="display: none;"></div>
+    <div style="border: 2px solid #232323; height: 839px">
+        <div class="top">
+            <div class="top_centre">
+                <div class="top_centre_OperType" style="width: 50%; padding: 10px 0px;">
+                    <div style="float: left; height: 40%; width: 50%">
+                        <span style="font-size: 20px; font-weight: bold;">产品名称：</span>
+                        <span style="font-size: 20px; color: #0072ffc7;" id="s_Name"></span>
+                    </div>
+                    <div style="float: left; height: 45%; width: 50%">
+                        <span style="font-size: 20px; font-weight: bold;">客户料号：</span>
+                        <span style="font-size: 20px; color: #0072ffc7;" id="Product_Label"></span>
+                    </div>
+                    <div style="float: left; height: 45%; width: 25%">
+                        <span style="font-size: 20px; font-weight: bold;">计划数量：</span>
+                        <span style="font-size: 20px; color: #0072ffc7;" id="n_Num"></span>
+                    </div>
+                    <div style="float: left; height: 35%; width: 25%">
+                        <span style="font-size: 20px; font-weight: bold;">累&nbsp;计&nbsp;数：</span>
+                        <span style="font-size: 20px; color: #0072ffc7;" id="CLnum">0</span>
+                    </div>
+                    <div style="float: left; height: 40%; width: 25%">
+                        <span style="font-size: 20px; font-weight: bold;">批&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;次：</span>
+                        <span style="font-size: 20px; color: #0072ffc7;" id="Batch"></span>
+                    </div>
+                </div>
+
+
+                <div style="float: left; width: 19%; display: flex; justify-content: flex-start; align-items: center;">
+                    <button id="StopBox_a" style="width: 200px" onclick="StopDX()" class="button button2">开始倒(翻)箱</button>
+                    @*  <button class="button button2" style="margin-left: 10px;">封&nbsp;&nbsp;&nbsp;&nbsp;箱</button>*@
+                </div>
+
+                <div style="float: left; font-size: 20px; font-weight: bold; line-height: 45px; text-align: right; width: 30%; color: black;">
+                    <div>当前用户:&nbsp;<span style="color: #0072ffc7" class="userName">@UserNo</span></div>
+                    <div style="color: #0072ffc7"><span id="sp_date">2018/3/15</span>&nbsp;&nbsp;<span id="sp_time">11:52:15</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="div_List1" style="width: 98%; border: 2px solid #232323; margin: 1px auto;">
+            <div class="main">
+                <div id="mjxz" style="width: 95%; height: 92px; margin: 10px auto;">
+                    <div class="div_d1">
+                        <div class="div_zxHao">
+                            <span class="spanHao" style="font-size: 21px; width: 35%">请扫描装箱单号:</span>
+                            <input type="text" id="ZXhaoOne" class="yj" title="请扫描装箱单号" placeholder="请扫描装箱单号" autocomplete="off" />
+                        </div>
+                        <div class="div_zxHao">
+                            <span class="spanHao1" style="font-size: 21px; width: 35%">请扫描前箱工件标签:</span>
+                            <input type="text" id="ZXhaoTwo" class="yj" title="请扫描前箱工件标签" placeholder="请扫描前箱工件标签" autocomplete="off" />
+                        </div>
+                    </div>
+                    <div class="div_d1">
+                        <div class="div_zxHaoone">
+                            <input type="text" id="ZXhao" disabled="disabled" class="yj1" title="后箱号" autocomplete="off" />
+                            <button id="HouPrint" style="margin-left: 10px; width: 26%" class="button button2">
+                                后箱完成倒箱<br />
+                                打印装箱标签
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bot">
+                    <div class="l_qx_divone">
+                        <div class="l_qx_div"></div>
+                        <button id="QianPrint" style="margin-left: 10px; width: 13%" class="button button2">
+                            &nbsp; 前&nbsp;箱&nbsp;完&nbsp;成&nbsp;
+                        </button>
+                    </div>
+
+                    <div class="l_qx_div1">
+                        <table class="pure-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%; text-align: center">#</th>
+                                    <th style="width: 20%">前箱工件标签</th>
+                                    <th style="width: 15%">产品编号</th>
+                                    <th style="width: 20%">后箱号</th>
+                                    <th style="width: 10%">质量状态</th>
+                                    <th style="width: 10%">更新人</th>
+                                    <th style="width: 20%">更新时间</th>
+                                </tr>
+                            </thead>
+                            <tbody id="Tables">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="qx_List">
+                <div class="qx_List_div2" style="border: 2px solid #0072ffc7; height: 80%; margin: 5px">
+                </div>
+                <div style="height: 20%; display: flex; justify-content: flex-end; flex-wrap: nowrap">
+                    <div style="width: 40%; height: 90%; display: flex; justify-content: center; align-items: center">
+                        <button id="qx_ok" class="button button2">确&nbsp;&nbsp;&nbsp;&nbsp;定</button>
+                        <button id="qx_no" class="button button2">取&nbsp;&nbsp;&nbsp;&nbsp;消</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+
+    $(function () {
+        $("#ZXhaoOne").focus().val();
+        reloop();  //日期显示
+        LoadBacth(); //获取批次
+        onDelete(); // 加载缺陷
+
+
+    })
+
+    // 加载缺陷
+    function onDelete() {
+        $.topsAjax({
+            type: "GET",
+            data: { tts: 1 },
+            url: "/AjaxGet/SeltDeledeBoxLog",
+            success: function (data) {
+                $(".qx_List_div2").html("");
+                var li = "";
+                for (var i = 0; i < data.Data[0].length; i++) {
+                    li += "<li class='qx_List_div2_li' s_DefectID='" + data.Data[0][i].s_DefectID + "'>" + data.Data[0][i].s_Defect + "</li>"
+                }
+                $(".qx_List_div2").append(li);
+            }
+        })
+    }
+
+    //点击开始倒箱
+    function StopDX() {
+
+        var Code = $("#ZXhaoOne").val().trim();
+        var Label = $("#Product_Label").html().trim();
+        var Batch = $("#Batch").html().trim();
+
+        if (Code == "") {
+            $("#ZXhaoOne").val("");
+            $("#ZXhaoOne").focus().val();
+            alert("装箱单不能为空！！！");
+            return;
+        }
+
+        if (Label == "") {
+            $("#ZXhaoOne").val("");
+            $("#ZXhaoOne").focus().val();
+            alert("客户料号不能为空！！！");
+            return;
+        }
+
+        if ($("#ZXhaoOne").attr("disabled") == undefined) {
+            $("#ZXhaoOne").focus().val();
+            alert("请确认装箱单！！！");
+            return;
+        }
+
+
+        $.topsAjax({
+            type: "GET",
+            data: { tts: 1, Label: Label, Batch: Batch, Code: Code },
+            url: "/AjaxGet/SeltQueenBoxLog",
+            success: function (data) {
+                $("#ZXhao").val("");
+                $("#ZXhao").val(data.Data[0][0].orNum);
+            }
+        })
+    }
+
+    //获取回车键
+    $("#ZXhaoOne").keydown(function (e) {
+        if (e.keyCode == 13) {
+            //74245901012050001
+
+            var barcode = $("#ZXhaoOne").val().trim();
+            var Batch = barcode.substring(barcode.length - 10, barcode.length - 4);
+            var Label = barcode.substring(0, barcode.length - 10);
+            var ToLabel = barcode.substring(barcode.length - 10, barcode.length);
+            var sBatch = $("#Batch").html().trim();
+            var QueenNumber = $("#ZXhao").val();
+            var is = 0;
+
+            if (QueenNumber != "") {
+                if (QueenNumber.substring(0, QueenNumber.length - 10) != Label) {
+                    is = 1;
+                }
+            }
+
+            if (is == 1) {
+                $("#ZXhaoOne").val("");
+                $("#ZXhaoOne").focus().val();
+                alert("后箱和装箱单标签不同！！");
+                return;
+            }
+
+
+            if (barcode.trim().length == 0) {
+                alert("装箱单不能为空！！");
+                $("#ZXhaoOne").val("");
+                return;
+            }
+
+            if (barcode.trim().length <= 15) {
+                alert("装箱单不能小于15位！！");
+                $("#ZXhaoOne").val("");
+                return;
+            }
+
+            if (!num(ToLabel)) {
+                $("#ZXhaoOne").val("");
+                alert("批次流水码必须是纯数字！！");
+                return
+            }
+
+            $.topsAjax({
+                type: "GET",
+                data: { tts: 1, Code: barcode, Batch: Batch, Label: Label },
+                url: "/AjaxGet/SelIsBarCode",
+                success: function (data) {
+                    if (data.Data.length > 0) {
+                        $("#Product_Label").html(data.Data[0][0].s_Product_Label);
+                        $("#ZXhaoOne").attr("disabled", "disabled");
+                        if (data.Data[0][0].s_QueenNumber != null) {
+                            $("#ZXhao").val(data.Data[0][0].s_QueenNumber);
+                            $("#StopBox_a").attr("disabled", "disabled");
+                            $("#ZXhaoTwo").focus().val();
+                            onkey(data.Data[0][0].s_QueenNumber);
+
+                        } else {
+                            if (QueenNumber != "") {
+                                $.topsAjax({
+                                    type: "GET",
+                                    data: {
+                                        tts: 2,
+                                        Label: data.Data[0][0].s_Product_Label,
+                                        Batch: sBatch,
+                                        Code: barcode,
+                                        QueenNumber: QueenNumber
+                                    },
+                                    url: "/AjaxGet/SeltQueenBoxLog",
+                                    success: function (datatwo) {
+                                        onkey1(data.Data[0][0], sBatch, QueenNumber);
+                                    }
+                                })
+                            } else {
+                                onkey2(data.Data[0][0], sBatch);
+                            }
+                        }
+                    } else {
+                        $("#ZXhaoOne").val("");
+                        $("#ZXhaoOne").focus().val();
+                        alert("该装箱单已打印，不能在进行扫描！！！");
+                    }
+                }
+            })
+        }
+    });
+
+    function onkey3(data, sBatch) {
+        $("#ZXhaoTwo").focus().val();
+        $.topsAjax({
+            type: "GET",
+            data: {
+                tts: 3,
+                StartId: data.s_StartId,
+                Code: data.s_Product_Label,
+                Batch: sBatch,
+                Label: data.s_Repack_Label
+            },
+            url: "/AjaxGet/SelIsBarCode",
+            success: function (data1) {
+                if (data1.IsSuccess) {
+                    $(".l_qx_div").html("");
+                    var htmls = "";
+                    for (var i = 0; i < data1.Data[0].length; i++) {
+                        if (data1.Data[0][i].n_IsPrint = 2) {
+                            htmls += '<li class="cp_div cpxz_div"  OriginID="' + data1.Data[0][i].s_OriginID
+                                + '";  onclick="onCompleted()"; >本箱产品客户料号：' + data1.Data[0][i].s_Client_PartNo
+                                + '<br /><br />前箱已用数：<span class="alrspana">0</span><br /><br />【合格 0 / 不合格 0 】'
+                                  + ' <br /><br />' + data1.Data[0][i].d_Creatime + '</li>';
+                        } else {
+                            htmls += '<li class="cp_div" OriginID="' + data1.Data[0][i].s_OriginID
+                              + '"  >本箱产品客户料号：' + data1.Data[0][i].s_Client_PartNo
+                              + ' <br /><br />前箱已用数：<span class="alrspana">0</span><br /><br />【合格 0 / 不合格 0 】'
+                              + ' <br /><br />' + data1.Data[0][i].d_Creatime + '</li>';
+                        }
+                    }
+
+                    $(".l_qx_div").prepend(htmls);
+                    $(".spanHao").html("装箱单号:");
+                    $(".spanHao").css("color", "#0072ffc7");
+                    $(".spanHao1").html("前箱工件标签:");
+                    $(".spanHao1").css("color", "#0072ffc7");
+                }
+            }
+        })
+    }
+
+    function onkey2(data, sBatch) {
+        $("#ZXhaoTwo").focus().val();
+        $.topsAjax({
+            type: "GET",
+            data: {
+                tts: 3,
+                StartId: data.s_StartId,
+                Code: data.s_Product_Label,
+                Batch: sBatch,
+                Label: data.s_Repack_Label
+            },
+            url: "/AjaxGet/SelIsBarCode",
+            success: function (data1) {
+                if (data1.IsSuccess) {
+                    $(".l_qx_div").html("");
+                    var htmls = "";
+                    for (var i = 0; i < data1.Data[0].length; i++) {
+                        if (data1.Data[0][i].n_IsPrint = 2) {
+                            htmls += '<li class="cp_div cpxz_div"  OriginID="' + data1.Data[0][i].s_OriginID
+                                + '";  onclick="onCompleted()"; >本箱产品客户料号：' + data1.Data[0][i].s_Client_PartNo
+                                + '<br /><br />前箱已用数：<span class="alrspana">0</span><br /><br />【合格 0 / 不合格 0 】'
+                                  + ' <br /><br />' + data1.Data[0][i].d_Creatime + '</li>';
+                        } else {
+                            htmls += '<li class="cp_div" OriginID="' + data1.Data[0][i].s_OriginID
+                              + '"  >本箱产品客户料号：' + data1.Data[0][i].s_Client_PartNo
+                              + ' <br /><br />前箱已用数：<span class="alrspana">0</span><br /><br />【合格 0 / 不合格 0 】'
+                              + ' <br /><br />' + data1.Data[0][i].d_Creatime + '</li>';
+                        }
+                    }
+
+                    $(".l_qx_div").prepend(htmls);
+                    $(".spanHao").html("装箱单号:");
+                    $(".spanHao").css("color", "#0072ffc7");
+                    $(".spanHao1").html("前箱工件标签:");
+                    $(".spanHao1").css("color", "#0072ffc7");
+                }
+            }
+        })
+    }
+
+    function onkey1(data, sBatch, QueenNumber) {
+        $("#ZXhaoTwo").focus().val();
+        $.topsAjax({
+            type: "GET",
+            data: {
+                tts: 2,
+                StartId: data.s_StartId,
+                Code: data.s_Product_Label,
+                Batch: sBatch,
+                Label: data.s_Repack_Label,
+                QueenNumber: QueenNumber
+            },
+            url: "/AjaxGet/SelIsBarCode",
+            success: function (data1) {
+                if (data1.IsSuccess) {
+                    $("#ZXhaoTwo").focus().val();
+                    onkey(QueenNumber);
+                }
+            }
+        })
+
+    }
+
+    function onkey(s_QueenNumber) {
+        $.topsAjax({
+            type: "GET",
+            data: {
+                tts: 1,
+                QueenNumber: s_QueenNumber
+            },
+            url: "/AjaxGet/SelIsQueenNumber",
+            success: function (data) {
+                if (data.IsSuccess) {
+                    $(".l_qx_div").html("");
+                    var htmls = "";
+                    for (var i = 0; i < data.Data[0].length; i++) {
+                        if (data.Data[0][i].n_IsPrint == 2) {
+                            htmls += '<li class="cp_div cpxz_div"  OriginID="' + data.Data[0][i].s_OriginID
+                              + '";  onclick="onCompleted()"; >本箱产品客户料号：' + data.Data[0][i].s_Client_PartNo
+                              + '<br /><br />前箱已用数：<span class="alrspana">'
+                                + data.Data[0][i].ZongNum + '</span><br /><br />【合格 '
+                                + data.Data[0][i].OKNum + ' / 不合格 '
+                                + data.Data[0][i].NoNum + '】'
+                                + ' <br /><br />' + data.Data[0][i].d_Creatime + '</li>';
+                        } else {
+                            htmls += '<li class="cp_div" OriginID="' + data.Data[0][i].s_OriginID
+                                + '"  >本箱产品客户料号：' + data.Data[0][i].s_Client_PartNo + '<br /><br />前箱已用数：<span class="alrspana">'
+                                + data.Data[0][i].ZongNum + '</span><br /><br />【合格 '
+                                + data.Data[0][i].OKNum + ' / 不合格 '
+                                + data.Data[0][i].NoNum + '】'
+                                + ' <br /><br />' + data.Data[0][i].d_Creatime + '</li>';
+                        }
+                    }
+
+                    $(".l_qx_div").prepend(htmls);
+                    $(".spanHao").html("装箱单号:");
+                    $(".spanHao").css("color", "#0072ffc7");
+                    $(".spanHao1").html("前箱工件标签:");
+                    $(".spanHao1").css("color", "#0072ffc7");
+                    LoadtQueenBoxLog(s_QueenNumber);
+                }
+            }
+        })
+    }
+
+    // 点击缺陷信息弹出
+    function onCompleted() {
+        var is = event.currentTarget;
+        var OriginID = $(is).attr("OriginID"); //获取当前元素，类同this
+
+        $.topsAjax({
+            type: "GET",
+            data: { tts: 2, OriginID: OriginID },
+            url: "/AjaxGet/SeltDeledeBoxLog",
+            success: function (data) {
+                if (data.IsSuccess) {
+                    if (data.Data[0][0].num > 0) {
+                        $("#qx_List").css({ "display": "block " })
+                        $("#div_List2_dialog").css({ "display": "block " })
+                    } else {
+                        alert("没有待定信息不能录入缺陷！！");
+                    }
+                }
+            }
+        })
+    }
+
+    // 缺陷取消按钮
+    $("#qx_no").click(function () {
+        $("#qx_List").css({ "display": "none " })
+        $("#div_List2_dialog").css({ "display": "none " })
+    })
+
+    // 缺陷确认按钮
+    $("#qx_ok").click(function () {
+        var DefectID = $(".qx_List_div2_li_xz:eq(0)").attr("s_DefectID");
+        var DefectName = $(".qx_List_div2_li_xz:eq(0)").html();
+        var Originid = $(".cpxz_div:eq(0)").attr("originid");
+        var ToQueenNumber = $("#ZXhao").val();
+
+        if (DefectID == null) {
+            alert("请选择相应的缺陷！！");
+            return;
+        }
+
+
+
+        $.topsAjax({
+            type: "GET",
+            data: { tts: 3, DefectID: DefectID, DefectName: DefectName, OriId: Originid },
+            url: "/AjaxGet/SeltDeledeBoxLog",
+            success: function (data) {
+                if (data.IsSuccess) {
+                    $("#qx_List").css({ "display": "none " })
+                    $("#div_List2_dialog").css({ "display": "none " })
+                    $("#ZXhaoTwo").val("");
+                    $("#ZXhaoTwo").focus().val();
+                    onkey(ToQueenNumber);
+                }
+            }
+        })
+    })
+
+    //选择缺陷
+    $(".qx_List_div2 li").live("click", function () {
+        $(".qx_List_div2_li_xz").removeClass("qx_List_div2_li_xz");
+        $(this).addClass("qx_List_div2_li_xz");
+    });
+
+    // 获取前箱工件标签
+    $("#ZXhaoTwo").keydown(function (e) {
+        if (e.keyCode == 13) {
+            var barcode = $("#ZXhaoTwo").val();
+            var code = $("#ZXhaoOne").val();
+            var QueenNumber = $("#ZXhao").val().trim();
+            var Batch = $("#Batch").html().trim();
+            var Label = barcode.substring(0, barcode.length - 10);
+            var ToLabel = barcode.substring(barcode.length - 10, barcode.length);
+            var ToQueenNumber = $("#ZXhao").val();
+
+            if (Label != code.substring(0, code.length - 10)) {
+                $("#ZXhaoTwo").val("");
+                $("#ZXhaoOne").focus().val();
+                alert("装箱单号和工件标签不相同,请重新扫码！！");
+                return;
+            }
+
+            if (ToQueenNumber == "") {
+                alert("请先点击开始倒（翻）箱！！");
+                return;
+            }
+
+
+            if (code == "") {
+                $("#ZXhaoOne").focus().val();
+                $("#ZXhaoTwo").val("");
+                alert("请先扫描装箱单号！");
+                return;
+            }
+
+            if (!num(ToLabel)) {
+                $("#ZXhaoTwo").val("");
+                $("#ZXhaoTwo").focus().val();
+                alert("批次流水码必须是纯数字！！");
+                return
+            }
+
+            if (barcode.length <= 14) {
+                $("#ZXhaoTwo").val("");
+                $("#ZXhaoTwo").focus().val();
+                alert("工件标签必须大于14位！");
+                return;
+            }
+
+            $.topsAjax({
+                type: "GET",
+                data: { tts: 1, barCode: barcode },
+                url: "/AjaxGet/SelIsBarCodeList",
+                success: function (data) {
+                    if (data.Data[0][0].num == 0) {
+                        $.topsAjax({
+                            type: "Post",
+                            url: "/AjaxPost/AddIsBarCodeList",
+                            data: { barCode: barcode, Code: code, CurdeCode: Label, Batch: Batch, QueenNumber: QueenNumber },
+                            async: false,
+                            success: function (Addnum) {
+                                if (Addnum.IsSuccess) {
+                                    if (Addnum.OutPut.NumBer == "0") {
+                                        alert("产品标签不匹配！！");
+                                        $("#ZXhaoTwo").val("");
+                                        $("#ZXhaoTwo").focus().val();
+                                        onkey(ToQueenNumber);
+                                    } else if (Addnum.OutPut.QualityNum == "0") {
+                                        var r = confirm("已达到标准装箱数量，是否继续料号" + $("#Product_Label").html() + "倒箱");
+
+                                        if (r == true) {
+                                            $.topsAjax({
+                                                type: "GET",
+                                                data: { tts: 1, barCode: $("#ZXhao").val() },
+                                                url: "/AjaxGet/SeltQueenNumberPrint",
+                                                success: function (datas) {
+                                                    if (datas.IsSuccess) {
+                                                        $.topsAjax({
+                                                            type: "GET",
+                                                            data: {
+                                                                tts: 1,
+                                                                Barcode: $("#ZXhaoOne").val(),
+                                                                Batch: $("#Batch").html().trim()
+                                                            },
+                                                            url: "/AjaxGet/SelIsBarCodePrint",
+                                                            success: function (datas1) {
+                                                                if (datas1.IsSuccess) {
+                                                                    $("#StopBox_a").removeAttr("disabled");
+                                                                    $("#ZXhaoTwo").val("");
+                                                                    $("#Tables").html("");
+                                                                    debugger;
+                                                                    LoadFronBox(code, code.substring(code.length - 10, code.length - 4), code.substring(0, code.length - 10));
+                                                                    window.open("../LabelPrintManager/tFronPrint?Serial=" + $("#ZXhao").val());
+                                                                    $("#ZXhao").val("");
+                                                                }
+                                                            }
+                                                        })
+                                                    }
+                                                }
+                                            })
+                                        } else {
+                                            $.topsAjax({
+                                                type: "GET",
+                                                data: { tts: 1, barCode: $("#ZXhao").val() },
+                                                url: "/AjaxGet/SeltQueenNumberPrint",
+                                                success: function (datat) {
+                                                    if (datat.IsSuccess) {
+                                                        $.topsAjax({
+                                                            type: "GET",
+                                                            data: {
+                                                                tts: 1,
+                                                                Barcode: $("#ZXhaoOne").val(),
+                                                                Batch: $("#Batch").html().trim()
+                                                            },
+                                                            url: "/AjaxGet/SelIsBarCodePrint",
+                                                            success: function (datat1) {
+                                                                console.log(datat1);
+                                                                if (datat1.IsSuccess) {
+                                                                    console.log($("#ZXhao").val());
+                                                                    window.open("../LabelPrintManager/tFronPrint?Serial=" + $("#ZXhao").val());
+                                                                    location.reload();
+                                                                }
+                                                            }
+                                                        })
+                                                    }
+                                                }
+                                            })
+                                        }
+                                    } else {
+                                        $("#ZXhaoTwo").val("");
+                                        $("#ZXhaoTwo").focus().val();
+                                        onkey(ToQueenNumber)
+                                    }
+                                }
+                            }
+                        });
+                    } else {
+                        $("#ZXhaoTwo").val("");
+                        $("#ZXhaoTwo").focus().val();
+                        alert("存在相同前箱工件标签！！");
+                    }
+                }
+            })
+        }
+    })
+
+    // 加载后箱结果信息
+    function LoadtQueenBoxLog(obj) {
+        $.topsAjax({
+            type: "GET",
+            data: { tts: 2, QueenNumber: obj },
+            url: "/AjaxGet/SelIsBarCodeList",
+            success: function (data) {
+                $("table #Tables").html("");
+                var tr = ""
+                for (var i = 0; i < data.Data[0].length; i++) {
+                    if (data.Data[0][i].N_QualityState == "待定") {
+                        tr += "<tr style='background:#99CCFF;'><td  style='text-align:center'>" + (i + 1)
+                      + "</td><td>" + data.Data[0][i].s_Origin_Label
+                      + "</td><td>" + data.Data[0][i].s_CurdeCode
+                      + "</td><td>" + data.Data[0][i].s_QueenNumber
+                      + "</td><td>" + data.Data[0][i].N_QualityState
+                      + "</td><td>" + data.Data[0][i].s_Updator
+                      + "</td><td>" + data.Data[0][i].d_Updatime
+                      + "</td></tr>"
+                    } else {
+                        tr += "<tr><td  style='text-align:center'>" + (i + 1)
+                      + "</td><td>" + data.Data[0][i].s_Origin_Label
+                      + "</td><td>" + data.Data[0][i].s_CurdeCode
+                      + "</td><td>" + data.Data[0][i].s_QueenNumber
+                      + "</td><td>" + data.Data[0][i].N_QualityState
+                      + "</td><td>" + data.Data[0][i].s_Updator
+                      + "</td><td>" + data.Data[0][i].d_Updatime
+                      + "</td></tr>"
+                    }
+                }
+                $("#Tables").prepend(tr);
+                HouNumber();   // 加载后箱累计数
+            }
+        })
+    }
+
+    // 批次
+    function LoadBacth() {
+        var time = new Date();
+        var year = time.getFullYear();
+        var month = time.getMonth() + 1;
+        var day = time.getDate();
+
+        if (month < 10) {
+            month = "0" + month;
+        }
+        if (day < 10) {
+            day = "0" + day;
+        }
+
+        $("#Batch").html(year.toString().substring(2, 4) + month + day);
+
+        setTimeout("LoadBacth()", 3000000);
+    }
+
+    //日期时间显示
+    function reloop() {
+        var time = new Date();
+        var year = time.getFullYear();
+        var month = time.getMonth() + 1;
+        var day = time.getDate();
+        var hour = time.getHours();
+        var minute = time.getMinutes();
+        var second = time.getSeconds();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        if (second < 10) {
+            second = "0" + second;
+        }
+        $("#sp_date").html(year + "/" + month + "/" + day);
+        $("#sp_time").html(hour + ":" + minute + ":" + second);
+        setTimeout("reloop()", 1000);
+    }
+
+    //验证全是数字
+    function num(value) {
+        var n = /^[0-9]*$/;
+        var re = new RegExp(n);
+        if (re.test(value)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // 点击前箱打印
+    $("#QianPrint").click(function () {
+        var barcode = $("#ZXhaoOne").val();
+        var sBatch = $("#Batch").html().trim();
+        var Code = $("#ZXhao").val();
+
+        if ($("#ZXhaoOne").val().trim() == "") {
+            $("#ZXhaoOne").val("");
+            $("#ZXhaoOne").focus().val();
+            alert("装箱单不能为空！！！");
+            return;
+        }
+
+        if ($("#ZXhaoOne").attr("disabled") == undefined) {
+            $("#ZXhaoOne").focus().val();
+            alert("请确认装箱单！！！");
+            return;
+        }
+
+        $.topsAjax({
+            type: "GET",
+            data: {
+                tts: 1,
+                Barcode: barcode,
+                Batch: sBatch
+            },
+            url: "/AjaxGet/SelIsBarCodePrint",
+            success: function (data) {
+                if (data.IsSuccess) {
+                    if (data.Data.length > 0) {
+                        $(".l_qx_div").html("");
+                        $("#ZXhaoTwo").val("");
+                        $("#ZXhaoOne").val("");
+                        $("#ZXhaoOne").removeAttr("disabled");
+                        $("#ZXhaoOne").focus().val();
+                        onkey(Code);
+
+                    } else {
+                        alert("该前箱没有存在后箱信息！！");
+                    }
+                }
+            }
+        })
+    });
+
+    // 点击后箱打印标签
+    $("#HouPrint").click(function () {
+        var barcode = $("#ZXhao").val();
+        var sBatch = $("#Batch").html().trim();
+
+        var code = $("#ZXhaoOne").val();
+        var Batch = code.substring(code.length - 10, code.length - 4);
+        var Label = code.substring(0, code.length - 10);
+        if (barcode == "") {
+            alert("后箱装箱单不能为空！！");
+            return;
+        }
+
+
+
+        if ($("#ZXhaoOne").val() == "") {
+            $.topsAjax({
+                type: "GET",
+                data: { tts: 1, barCode: barcode },
+                url: "/AjaxGet/SeltQueenNumberPrint",
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        window.open("../LabelPrintManager/tFronPrint?Serial=" + barcode);
+                        location.reload();
+                    }
+                }
+            })
+        }
+        else {
+            var r = confirm("继续料号" + $("#Product_Label").html() + "倒箱");
+            if (r == true) {
+                $.topsAjax({
+                    type: "GET",
+                    data: { tts: 1, barCode: barcode },
+                    url: "/AjaxGet/SeltQueenNumberPrint",
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            $.topsAjax({
+                                type: "GET",
+                                data: {
+                                    tts: 1,
+                                    Barcode: code,
+                                    Batch: sBatch
+                                },
+                                url: "/AjaxGet/SelIsBarCodePrint",
+                                success: function (data1) {
+                                    if (data1.IsSuccess) {
+                                        $("#StopBox_a").removeAttr("disabled");
+                                        $("#ZXhao").val("");
+                                        $("#Tables").html("");
+                                        LoadFronBox(code, Batch, Label);
+
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+            } else {
+                $.topsAjax({
+                    type: "GET",
+                    data: { tts: 1, barCode: barcode },
+                    url: "/AjaxGet/SeltQueenNumberPrint",
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            $.topsAjax({
+                                type: "GET",
+                                data: {
+                                    tts: 1,
+                                    Barcode: code,
+                                    Batch: sBatch
+                                },
+                                url: "/AjaxGet/SelIsBarCodePrint",
+                                success: function (data1) {
+                                    if (data1.IsSuccess) {
+                                        window.open("../LabelPrintManager/tFronPrint?Serial=" + barcode);
+                                        location.reload();
+                                    }
+                                }
+                            })
+                        }
+                    }
+                })
+            }
+        }
+    });
+
+
+    function LoadFronBox(code, Batch, Label) {
+
+        var sBatch = $("#Batch").html().trim();
+
+        $.topsAjax({
+            type: "GET",
+            data: { tts: 2, Code: code, Batch: Batch, Label: Label },
+            url: "/AjaxGet/SeltQueenNumberPrint",
+            success: function (data) {
+                if (data.IsSuccess) {
+                    onkey3(data.Data[0][0], sBatch);
+                }
+            }
+        })
+    }
+
+    // 加载后箱累计数
+    function HouNumber() {
+        var QueenNumber = $("#ZXhao").val();
+
+        $.topsAjax({
+            type: "GET",
+            data: {
+                tts: 2,
+                QueenNumber: QueenNumber
+            },
+            url: "/AjaxGet/SelIsQueenNumber",
+            success: function (data) {
+                if (data.IsSuccess) {
+                    $("#CLnum").html("");
+                    $("#CLnum").html(" " + data.Data[0][0].OKNum + " / " + data.Data[0][0].ZongNum + " ");
+                }
+            }
+        })
+    }
+
+</script>

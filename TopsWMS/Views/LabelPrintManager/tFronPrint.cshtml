@@ -1,0 +1,321 @@
+﻿@using Tops.FRM;
+@{
+    string Serial = Request.QueryString["Serial"];
+    string SerialNum = Request.QueryString["SerialNum"];
+    var UserNo = Tops.FRM.TopsUser.UserNO;
+    
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>print</title>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/js/jquery.jqprint-0.3.js"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <script src="../../TopsLib/Scripts/QRCodeJs/jquery-barcode-2.0.2.min.js" type="text/javascript"></script>
+</head>
+<body>
+    <style>
+        /**
+        {
+            margin: 0px;
+            padding: 0px;
+        }*/
+        *
+        {
+            font-family: 黑体;
+        }
+
+        #promt_DY
+        {
+            /*width: 135px;
+            cursor: pointer;
+            height: 50px;
+            float: left;
+            font-size: 20px;
+            font-family: Arial;
+            font-weight: bold;
+            border-radius: 5px;
+            background-color: #EAF2FE;
+            border: 4px solid #6495ED;
+            color: #6495ED;
+            margin-left: 20px;*/
+            display: none;
+        }
+    </style>
+    <script>
+        $(function () {
+            $("#promt_DY").click(function () {
+                setTimeout(function () {
+                    $(".printlabel").jqprint();//传参数指定打印div区域   
+                }, 1500);
+                setTimeout(function () {
+                    javascript: window.opener = null; window.open('', '_self');
+                    window.close();
+                }, 5000);
+            });
+        });
+    </script>
+
+    <div class="printlabel"></div>
+    <input type="button" value="Print" id="promt_DY">
+    <span id="ZXBatch" style="display: none;"></span>
+
+    <div class="PrintingDame" style="display: none; /*height: 300px; */ /*border: 1px solid #000000*/">
+        <table class="Tables" style="border: 1px solid #000000; font-size: 10px; font-weight: bold; border-collapse: collapse; border-spacing: 0; text-align: center; font-family: 黑体;" cellpadding="0" cellspacing="0">
+            <tr style="">
+                <td style="width: 50px; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <div>零件</div>
+                    <div>描述</div>
+                </td>
+                <td style="width: 230px; border: 1px solid #000000; text-align: center; font-size: 20px; font-weight: bold" class="MouldName"></td>
+
+                <td style="width: 50px; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <div>客户</div>
+                    <div>零件号</div>
+                </td>
+                <td style="width: 200px; border: 1px solid #000000; text-align: center;">
+                    <div class="CustomerNo" style="margin: 0px auto;"></div>
+                </td>
+            </tr>
+
+
+            <tr style="">
+                <td style="width: 50px; border: 1px solid #000000; text-align: center;">
+                    <div>U9</div>
+                    <div>料号</div>
+                </td>
+                <td style="width: 230px; border: 1px solid #000000; text-align: center;">
+                    <div class="StockCode" style="margin: 0px auto; font-size: 20px"></div>
+                </td>
+                <td style="width: 50px; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <p>AI号</p>
+
+                </td>
+                <td style="width: 200px; border: 1px solid #000000; text-align: center;">
+                    <div style="width: 49px; margin: 0 auto;">
+                        <div class="AI" style="margin: 0px auto;"></div>
+                        @*<img id="AI" src="" style="width: 100%; height: 100%;" />*@
+                    </div>
+                </td>
+            </tr>
+
+
+            <tr style="">
+                <td style="width: 50px; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <div>包装</div>
+                    <div>单号</div>
+                </td>
+                <td style="width: 230px; border: 1px solid #000000; text-align: center;">
+                    <div class="BarCode" style="margin: 0px auto;"></div>
+                    @*  <svg width="100%" height="100%" class="BarCode" />*@
+                </td>
+                <td style="width: 50px; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <div>装箱</div>
+                    <div>数量</div>
+                </td>
+                <td style="width: 200px; border: 1px solid #000000; text-align: center;">
+                    <div class="sBatch" style="margin: 0px auto;"></div>
+                    @*<svg width="100%" height="100%" class="Batch" />*@
+                </td>
+            </tr>
+
+            @*      <tr style="" class="data2">
+                <td style="width: 50px; text-align: center; border: 1px solid #000000;">
+                    <div>零件</div>
+                    <div>描述</div>
+                </td>
+
+                <td style="width: 230px; border: 1px solid #000000; text-align: center; font-size: 15px; font-weight: bold" class="MouldName2"></td>
+                <td style="width: 50px; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <div>客户</div>
+                    <div>零件号</div>
+                </td>
+                <td style="width: 200px; border: 1px solid #000000; text-align: center;">
+                </td>
+            </tr>
+
+            <tr style="" class="data2">
+                <td style="width: 50px; border: 1px solid #000000; text-align: center; font-size: 15px;">
+                    <div>U9</div>
+                    <div>料号</div>
+                </td>
+                <td style="width: 230px; border: 1px solid #000000; font-size:20px;text-align: center;">
+                </td>
+
+                <td style="text-align: center; border: 1px solid #000000;">
+                    <p>AI号</p>
+                    <span class="AI2"></span>
+                </td>
+                <td style="width: 200px; border: 1px solid #000000; text-align: center;">
+                    <div style="width: 49px; margin: 0 auto;">
+                    </div>
+                </td>
+            </tr>
+            <tr style="">
+                <td style="width: 50px; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <div>包装</div>
+                    <div>单号</div>
+                </td>
+                <td style="width: 230px; border: 1px solid #000000; text-align: center;">
+                </td>
+                <td style="width: 50px; border: 1px solid #000000; text-align: center;">
+                    <div>装箱</div>
+                    <div>数量</div>
+                </td>
+                <td style="width: 200px; border: 1px solid #000000; text-align: center;">
+                </td>
+            </tr>*@
+            <tr style="border-left: 2px #ffffff solid; border-right: 2px #ffffff solid; border-bottom: 2px #ffffff solid">
+                <td style="border: 0px; text-align: right;" colspan="4">
+                    <div>后箱装箱单</div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script>
+
+
+        $(function () {
+         //   $(".Tables").css({ "width": mmToPx(146), "height": mmToPx(89), "margin-bottom": mmToPx(10) });
+
+            // 批次
+            LoadBacth();
+
+
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGET/SeltFronPrint",
+                data: {
+                    Serial: "@Serial",
+                    SerialNum: "@SerialNum",
+                    Bacth: $("#ZXBatch").html().trim()
+                },
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        //$(".PrintingDame").css({ "width": mmToPx(146 * parseInt(data.Data[0].length)), "height": mmToPx(89 * parseInt(data.Data[0].length)) });
+                        data.Data[0].forEach(function (value, index) {
+                            $(".StockCode").text(data.Data[0][0].s_U9_PartNo)
+                            $(".MouldName").text(data.Data[0][0].s_Product_Name);
+
+                            $(".Tables").css({ "width": mmToPx(146), "height": mmToPx(89), "margin-bottom": mmToPx(10) });
+                            $label = $(".PrintingDame .Tables").clone();
+                          
+
+                            $label.find(".BarCode").barcode(value.s_Pack_Number, "code128", {
+                                output: 'css',        //渲染方式 css/bmp/svg/canvas 
+                                color: 'black',       //条码颜色
+                                barWidth: 1.2,          //单条条码宽度
+                                barHeight: 30,        //单体条码高度
+                                fontSize: 15,         //条码字体大小
+                                marginHRI: 5,         //条码字体距条码中心的高度 
+                                addQuietZone: false   //是否添加空白区（内边距）
+                            });
+
+                            $label.find(".CustomerNo").barcode(value.s_Product_Label, "code128", {
+                                output: 'css',        //渲染方式 css/bmp/svg/canvas 
+                                color: 'black',       //条码颜色
+                                barWidth: 1.2,          //单条条码宽度
+                                barHeight: 30,        //单体条码高度
+                                fontSize: 20,         //条码字体大小
+                                marginHRI: 1,         //条码字体距条码中心的高度 
+                                addQuietZone: false   //是否添加空白区（内边距）
+                            });
+
+                            $label.find(".sBatch").barcode(value.n_Origin_Quantity.toString(), "code128", {
+                                output: 'css',        //渲染方式 css/bmp/svg/canvas 
+                                color: 'black',       //条码颜色
+                                barWidth: 1.2,          //单条条码宽度
+                                barHeight: 30,        //单体条码高度
+                                fontSize: 20,         //条码字体大小
+                                marginHRI: 1,         //条码字体距条码中心的高度 
+                                addQuietZone: false   //是否添加空白区（内边距）
+                            });
+                            $label.find(".AI").barcode(value.s_AI.toString(), "code128", {
+                                output: 'css',        //渲染方式 css/bmp/svg/canvas 
+                                color: 'black',       //条码颜色
+                                barWidth: 1.2,          //单条条码宽度
+                                barHeight: 30,        //单体条码高度
+                                fontSize: 20,         //条码字体大小
+                                marginHRI: 1,         //条码字体距条码中心的高度 
+                                addQuietZone: false   //是否添加空白区（内边距）
+                            });
+
+                            $(".printlabel").append($label);
+                        })
+
+
+                        //生成二维码（DM）
+
+                        //$.ajax({
+                        //    type: "post",
+                        //    url: "/DM/Index",
+                        //    data: { "CustomerNo": data.Data[0][0].CustomerNo + '-' + data.Data[0][0].AI },
+                        //    async: false,
+                        //    success: function (src) {
+                        //        $("#AI").attr("src", src)
+                        //    }
+                        //})
+                    }
+                }
+            })
+            //如果选中，则直接打印
+            $("#promt_DY").click();
+
+        })
+
+        // 批次
+        function LoadBacth() {
+            var time = new Date();
+            var year = time.getFullYear();
+            var month = time.getMonth() + 1;
+            var day = time.getDate();
+
+            if (month < 10) {
+                month = "0" + month;
+            }
+            if (day < 10) {
+                day = "0" + day;
+            }
+
+            $("#ZXBatch").html(year.toString().substring(2, 4) + month + day);
+
+            setTimeout("LoadBacth()", 3000000);
+        }
+
+        //获取DPI，图像每英寸长度内的像素点数
+        function getDPI() {
+            var arrDPI = new Array;
+            if (window.screen.deviceXDPI) {
+                arrDPI[0] = window.screen.deviceXDPI;
+                arrDPI[1] = window.screen.deviceYDPI;
+            } else {
+                var tmpNode = document.createElement("DIV");
+                tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
+                document.body.appendChild(tmpNode);
+                arrDPI[0] = parseInt(tmpNode.offsetWidth);
+                arrDPI[1] = parseInt(tmpNode.offsetHeight);
+                tmpNode.parentNode.removeChild(tmpNode);
+            }
+            return arrDPI;
+        }
+
+        //px转毫米
+        function pxToMm(value) {
+            var inch = value / getDPI()[0];
+            var c_value = inch * 25.4;
+            return c_value;
+        };
+
+        //毫米转px
+        function mmToPx(value) {
+            var inch = value / 25.4;
+            var c_value = inch * getDPI()[0];
+            return c_value;
+        }
+
+    </script>
+</body>
+</html>

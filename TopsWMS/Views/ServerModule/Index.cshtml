@@ -1,0 +1,291 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "模块vs服务器";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelServerModuleList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    metas[0]["菜单名称"].Width = 180;
+     
+    metas[0]["服务器内网址"].Width = 200;
+    metas[0]["服务器外网址"].Width = 200;
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+
+
+    string QueryNameOne = "SelChildServerModuleList";
+    Tops.FRM.Biz bizOne = Tops.FRM.Biz.GetBiz(QueryNameOne, Tops.FRM.BizType.Query);
+    var metasOne = Tops.FRM.TopsMeta.LoadMetas(QueryNameOne);
+    //metasOne[0]["内网URL地址"].Width = 400;
+    //metasOne[0]["外网URL地址"].Width = 400;
+    metasOne[0]["菜单名称"].Width = 180;
+    metasOne[0]["服务器内网址"].Width = 200;
+    metasOne[0]["服务器外网址"].Width = 200;
+
+    var colsOne = ModuleConfig.GetColumns(metasOne[0], bizOne.Lookups, bizOne.Sqls[0], bizOne);
+     
+
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+    <div id="hiddenlist">
+    </div>
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+            string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+            var fieldName = biz.Fields[i].FieldName;
+            var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+            <div class="param_item">
+                @if (lookupField != null && lookupField.ToList().Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                    <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                    </script>
+                }
+                else if (biz.Fields[i].DataList.Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <select name="@(fieldName)" fieldType="select" >
+                        @foreach (var item in biz.Fields[i].DataList)
+                        {
+                            <option value="@(item.Key)">@(item.Value)</option>
+                        }
+                    </select>
+                }
+                else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                }
+                else
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                }
+            </div>
+        }
+        <div style="clear: both;">
+        </div>
+    </div>
+    </form>
+}
+@section Script{
+    <style>
+        .Operator
+        {
+            font-family: 微软雅黑;
+            font-size: 16px;
+            width: 140px;
+            line-height: 18px;
+            font-weight: bold;
+            background: #00b7ee;
+            border-radius: 5px;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    var gird = null;
+    var DetailID = 0;
+
+    $(function () {
+        $("#module_toolbar input").hide();
+        $(",#searchBt").show();
+        $("#module_toolbar").append("<span style='color:red;margin-left:10px;'>说明:以菜单内模块对应的服务器地址为准。</span>")
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelServerModuleList',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            usePager:false,
+            width: '99.5%',
+            height: '100%',
+            frozen: false,
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+                f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/module/modify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&" + Math.random());
+            },
+            detail: {
+                onShowDetail: showDetail, height: 'auto'  
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+        });
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/module/modify?"+"ctrl=add&" + Math.random());
+        }); 
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        })
+        $("#searchBt").click();
+    });
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+
+
+    //展示明细
+        function showDetail(row, detailPanel, rollback) {
+            gird = document.createElement("div");
+            gird.id = "detailgrid" + DetailID;
+            $(detailPanel).append(gird);
+            //初始化表格
+            grid2 = $(gird).css('margin-left', 8).css('margin-top', 20).css('margin-bottom', 20).ligerGrid({
+                columns: [{
+    "name": "ModuleID",
+    "display": "ModuleID",
+    "align": "left",
+    "width": 100,
+    "hide": true,
+    "type": "String",
+    "editor": null,
+    "frozen": false
+  },
+  {
+    "name": "菜单名称",
+    "display": "菜单名称",
+    "align": "left",
+    "width": 180,
+    "hide": false,
+    "type": "String",
+    "editor": null,
+    "frozen": false
+  },
+  {
+    "name": "Tag",
+    "display": "权限",
+    "align": "right",
+    "width": 100,
+    "hide": true,
+    "type": "Int32",
+    "editor": null,
+    "frozen": false
+  },
+  {
+    "name": "ParentID",
+    "display": "ParentID",
+    "align": "left",
+    "width": 100,
+    "hide": true,
+    "type": "String",
+    "editor": null,
+    "frozen": false
+  },
+  {
+    "name": "服务器内网址",
+    "display": "服务器内网址",
+    "align": "left",
+    "width": 200,
+    "hide": false,
+    "type": "String",
+    "editor": null,
+    "frozen": false
+  },
+  {
+    "name": "服务器外网址",
+    "display": "服务器外网址",
+    "align": "left",
+    "width": 200,
+    "hide": false,
+    "type": "String",
+    "editor": null,
+    "frozen": false
+  },
+  {
+    "name": "数据库名称",
+    "display": "数据库名称",
+    "align": "left",
+    "width": 200,
+    "hide": false,
+    "type": "String",
+    "editor": null,
+    "frozen": false
+  },
+  {
+    "name": "",
+    "display": "操作说明文档",
+    "align": "left",
+    "width": 150,
+    "hide": false,
+    "type": "String",
+    "editor": null,
+    "frozen": false,
+    "render": function(item){
+        if(item.DOCFileUrl == ""){
+           return '';
+        
+        }else{
+           return '<div onclick="f_download(this)" DOCFileUrl="'+item.DOCFileUrl+'" class="Operator">操作说明文档下载</div>';
+        }
+    }
+  }],
+
+                url: '/AjaxGridData/SelChildServerModuleList?ModuleID=' + row.ModuleID ,
+                method: 'get',
+                //delayLoad: true,
+                dataType: "local",
+                frozen: false,
+                usePager: true,
+                dataAction: 'server',
+                root: 'Data',                       //数据源字段名
+                record: 'Other1',                     //数据源记录数字段名
+                rownumbers: true,
+                data: [{ Row: [], Total: 0 }],
+                showTitle: false,
+                checkbox: true,
+                checkboxAll: true, 
+                //width:'100%',
+                isScroll: false,
+                //            columnWidth:'200px',
+                height: 'auto',
+                heightDiff: -10,
+                enabledSort: false,
+                onSelectRow: function (rowdata) {
+                    rows = rowdata;
+                },
+                onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+
+                }, 
+                onAfterShowData: function (data) {
+                    
+                }
+            });
+
+            DetailID++;
+        }
+
+        //下载操作说明DOC文档
+        function f_download(obj){
+
+            window.open($(obj).attr("DOCFileUrl"),"_target");
+        }
+    </script>
+}
+<div id="datagrid">
+</div>

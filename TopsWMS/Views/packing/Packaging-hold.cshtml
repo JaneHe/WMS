@@ -1,0 +1,932 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "单件流装箱";
+    ViewBag.ModuleName = "单件流装箱";
+    Layout = "../../TopsLib/Views/Shared/_Layout.cshtml";
+    var UserNo = Tops.FRM.TopsUser.UserNO;
+}
+
+<html>
+
+<head>
+    <title>单件流打包</title>
+    <style>
+        /*禁止这个页面内容被选中*/
+        body
+        {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            font-family: 微软雅黑;
+        }
+        /*主容器*/
+        .main
+        {
+            width: 100%;
+            max-width: 100%;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+        /*头部*/
+        .top
+        {
+            width: 95%;
+            height: 200px;
+            margin: auto;
+        }
+
+        .top_centre
+        {
+            width: 100%;
+            float: left;
+            height: 100%;
+            font-size: 20px;
+        }
+
+            .top_centre > div
+            {
+                height: 100%;
+                float: left;
+            }
+
+        /*模具【开始】*/
+        .yj
+        {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            width: 70%;
+            height: 35px;
+            font-size: 20px;
+        }
+
+        .yj1
+        {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            width: 72%;
+            font-size: 30px;
+            height: 70px;
+            padding-left: 10px;
+        }
+
+        input
+        {
+            outline: medium;
+        }
+
+        /*模具【结束】*/
+        .bot
+        {
+            width: 95%;
+            height: 250px;
+            margin: auto;
+            margin-top: 10px;
+            font-size: 25px;
+        }
+
+        .l_qx_divone
+        {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 180px;
+            border: 3px solid #0072ffc7;
+        }
+
+        .l_qx_div
+        {
+            height: 165px;
+            font-weight: bold;
+            width: 86%;
+            overflow: hidden;
+        }
+
+        .l_qx_div1
+        {
+            margin-top: 10px;
+            font-weight: 100;
+            height: 755px;
+            border: 3px solid #0072ffc7;
+            overflow-y: auto;
+        }
+
+
+            .l_qx_div1::-webkit-scrollbar
+            { /*滚动条整体样式*/
+                width: 40px; /*高宽分别对应横竖滚动条的尺寸*/
+                height: 1px;
+            }
+
+            .l_qx_div1::-webkit-scrollbar-thumb
+            { /*滚动条里面小方块*/
+                border-radius: 40px;
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                background: #535353;
+            }
+
+            .l_qx_div1::-webkit-scrollbar-track
+            { /*滚动条里面轨道*/
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                border-radius: 40px;
+                background: #EDEDED;
+            }
+
+        /*打印【结束】*/
+
+        .div_d1
+        {
+            height: 100px;
+            width: 100%;
+            float: left;
+            overflow: hidden;
+        }
+
+        ul, li
+        {
+            list-style: none;
+        }
+
+        .cp_div
+        {
+            margin-top: 1%;
+            list-style: none;
+            padding: 2px;
+            font-size: 13px;
+            text-align: center;
+            height: 130px;
+            margin-left: 1%;
+            float: left;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid rgb(0, 0, 0);
+            color: #232323;
+            background-color: #fff;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .cpxz_div
+        {
+            color: #000;
+            background-color: rgb(255, 246, 143);
+            margin-top: 1%;
+            list-style: none;
+            padding: 2px;
+            font-size: 13px;
+            text-align: center;
+            height: 130px;
+            margin-left: 1%;
+            float: left;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid rgb(0, 0, 0);
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+
+
+
+
+        .qx_List_div2
+        {
+            overflow-y: auto;
+        }
+
+
+            .qx_List_div2::-webkit-scrollbar
+            { /*滚动条整体样式*/
+                width: 40px; /*高宽分别对应横竖滚动条的尺寸*/
+                height: 1px;
+            }
+
+            .qx_List_div2::-webkit-scrollbar-thumb
+            { /*滚动条里面小方块*/
+                border-radius: 40px;
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                background: #535353;
+            }
+
+            .qx_List_div2::-webkit-scrollbar-track
+            { /*滚动条里面轨道*/
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                border-radius: 40px;
+                background: #EDEDED;
+            }
+
+        .qx_List_div2_li
+        {
+            margin-top: 1%;
+            list-style: none;
+            padding: 2px;
+            font-size: 33px;
+            text-align: center;
+            height: 55px;
+            margin-left: 1%;
+            float: left;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid rgb(0, 0, 0);
+            color: red;
+            background-color: #87CEFA;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .qx_List_div2_li_xz
+        {
+            margin-top: 1%;
+            list-style: none;
+            padding: 2px;
+            font-size: 33px;
+            text-align: center;
+            height: 55px;
+            margin-left: 1%;
+            float: left;
+            padding-left: 1%;
+            padding-right: 1%;
+            border: 1px solid rgb(0, 0, 0);
+            color: #131212;
+            background-color: #fbe800;
+            border-top-right-radius: 5px;
+            border-top-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-bottom-left-radius: 5px;
+        }
+
+
+
+
+        #qx_ok
+        {
+            width: 250px;
+            color: #000;
+            background: rgb(255, 246, 143);
+            border: 1px solid #000;
+            font-size: 30px;
+            text-align: center;
+            margin-right: 30px;
+        }
+
+        #qx_no
+        {
+            width: 250px;
+            color: #000;
+            background: rgb(255, 246, 143);
+            border: 1px solid #000;
+            font-size: 30px;
+            text-align: center;
+            margin-right: 30px;
+        }
+
+        #dy_List
+        {
+            width: 67%;
+            height: 74%;
+            top: 14%;
+            left: 10px;
+            display: none;
+            background: #fff;
+            z-index: 8886;
+            position: absolute;
+            border: 2px solid #000;
+        }
+
+        #qx_List
+        {
+            top: 9%;
+            left: 9%;
+            width: 80%;
+            height: 80%;
+            display: none;
+            background: #fff;
+            z-index: 8886;
+            position: absolute;
+            border: 2px solid #000;
+        }
+
+        .div_zxHao
+        {
+            height: 46px;
+            font-size: 40px;
+            width: 100%;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+        }
+
+            .div_zxHao > span
+            {
+                margin-left: 30PX;
+                font-size: 21px;
+                width: 35%;
+            }
+
+        .div_zxHaoone
+        {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 90px;
+            width: 100%;
+            text-align: center;
+        }
+
+        table
+        {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        td, th
+        {
+            padding: 0;
+        }
+
+        .pure-table
+        {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            empty-cells: show;
+            border: 1px solid #cbcbcb;
+        }
+
+            .pure-table caption
+            {
+                color: #000;
+                font: italic 85%/1 arial,sans-serif;
+                padding: 1em 0;
+                text-align: center;
+            }
+
+            .pure-table td, .pure-table th
+            {
+                border-left: 1px solid #cbcbcb;
+                border-width: 0 0 0 1px;
+                font-size: inherit;
+                margin: 0;
+                overflow: visible;
+                padding: .5em 1em;
+            }
+
+            .pure-table thead
+            {
+                font-size: 12px;
+                background-color: #e0e0e0;
+                color: #000;
+                text-align: left;
+                vertical-align: bottom;
+            }
+
+        #Tables
+        {
+            font-size: 12px;
+            color: #000;
+        }
+
+        .pure-table td
+        {
+            background-color: transparent;
+            border: 1px solid #cbcbcb;
+        }
+
+        .button
+        {
+            background-color: #0072ffc7; /* Green */
+            border-radius: 10px;
+            border: none;
+            color: white;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-transition-duration: 0.4s; /* Safari */
+            transition-duration: 0.4s;
+        }
+
+        .button3
+        {
+            background: #DDDDDD; /* Green */
+            border-radius: 10px;
+            border: none;
+            color: #000;
+            padding: 20px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-transition-duration: 0.4s; /* Safari */
+            transition-duration: 0.4s;
+        }
+
+        .button2:hover
+        {
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        }
+
+        #div_List2_dialog
+        {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            filter: alpha(Opacity=50);
+            -moz-opacity: 0.3;
+            opacity: 0.5;
+            z-index: 5000;
+        }
+
+        #QianPrint
+        {
+            margin-left: 80px;
+            width: 77%;
+        }
+    </style>
+    <style media="screen and (max-width: 900px) ">
+        .top_centre
+        {
+            font-size: 12px;
+        }
+
+        .div_d1
+        {
+            height: 100px;
+            width: 99.8%;
+            overflow: hidden;
+        }
+
+        .div_zxHao > span
+        {
+            margin-left: 5PX;
+            font-size: 15px;
+            width: 26%;
+        }
+
+        .div_zxHao > .yj
+        {
+            margin-left: 10PX;
+        }
+
+        #QianPrint
+        {
+            font-size: 10px;
+            margin-left: 10px;
+            width: 18%;
+        }
+
+        .l_qx_div1
+        {
+            height: 250px;
+        }
+
+        .inputs
+        {
+            height: 30px;
+            font-size: 25px;
+            width: 75%;
+        }
+    </style>
+</head>
+<body>
+    <div id="div_List2_dialog" style="display: none;"></div>
+    <div style="border: 2px solid #232323; height: 1400px;">
+        <div class="top">
+            <div class="top_centre">
+                <div class="top_centre_OperType" style="width: 70%; padding: 10px 0px;">
+                    <button id="fxBox" style="width: 442px; height: 160px; font-size: 70px;" class="button button2">&nbsp; 确&nbsp;认&nbsp;封&nbsp;箱&nbsp;</button>
+                </div>
+
+                <div style="float: left; font-weight: bold; line-height: 45px; text-align: right; width: 30%; color: black; font-size: 30px;">
+                    <div>当前用户:&nbsp;<span style="color: #0072ffc7" class="userName">@UserNo</span></div>
+                    <div style="color: #0072ffc7"><span id="sp_date">2018/3/15</span>&nbsp;&nbsp;<span id="sp_time">11:52:15</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="div_List1" style="width: 98%; border: 2px solid #232323; margin: 1px auto;">
+            <div class="main">
+                <div id="mjxz" style="width: 95%; height: 92px; margin: 10px auto;">
+                    <div class="div_d1">
+                        <div class="div_zxHaoone">
+                            <button id="HouPrint" style="width: 26%; font-size: 30px; font-weight: bold;" class="button3">
+                                单件流条码
+                            </button>
+                            <input type="text" id="s_LogCode" style="margin-left: 15px;" class="yj1" title="单件流条码" autocomplete="off" />
+                        </div>
+                    </div>
+                </div>
+                <div class="bot">
+                    <table style="width: 100%; height: 100%">
+                        <tr>
+                            <td style="margin-right: 0px;">工件名称：
+                                      <input class="inputs" style="border-top-right-radius: 10px; border-top-left-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; color: #0072ffc7; height: 40px; width: 50%; font-size: 18px;" type="text" id="s_CarType" readonly="readonly" />
+                            </td>
+                            <td style="margin-right: 0px;">客户料号：
+                                   <input class="inputs" style="border-top-right-radius: 10px; border-top-left-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; color: #0072ffc7; height: 40px; width: 50%; font-size: 18px;" type="text" id="s_PaintMCode" readonly="readonly" />
+
+
+                            </td>
+                        </tr>
+                        <tr>
+
+                            <td style="margin-right: 0px;">工件颜色：
+                                  <input class="inputs" style="border-top-right-radius: 10px; border-top-left-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; color: #0072ffc7; height: 40px; width: 50%; font-size: 18px;" type="text" id="s_CarColor" readonly="readonly" />
+                            </td>
+                            <td style="margin-right: 0px;">品&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;牌：
+                                  <input class="inputs" style="border-top-right-radius: 10px; border-top-left-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; color: #0072ffc7; height: 40px; width: 50%; font-size: 18px;" type="text" id="s_CarBrand" readonly="readonly" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="margin-right: 0px;">车&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;系：
+                                   <input class="inputs" style="border-top-right-radius: 10px; border-top-left-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; color: #0072ffc7; height: 40px; width: 50%; font-size: 18px;" type="text" id="s_CarSeries" readonly="readonly" />
+                            </td>
+                            <td style="margin-right: 0px;">批&nbsp;&nbsp;&nbsp;   &nbsp;&nbsp;次：
+                                   <input class="inputs" style="border-top-right-radius: 10px; border-top-left-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; color: #0072ffc7; height: 40px; width: 50%; font-size: 18px;" type="text" id="s_Batch" readonly="readonly" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="margin-right: 0px;">装箱数量：
+                                    <input class="inputs" style="border-top-right-radius: 10px; border-top-left-radius: 10px; border-bottom-right-radius: 10px; border-bottom-left-radius: 10px; color: #0072ffc7; height: 40px; width: 50%; font-size: 18px;" type="text" id="n_number" />
+                            </td>
+                            <td style="margin-right: 10px !important;">
+                                <button id="QianPrint" style="font-size: 33px; height: 80px;" class="button button2">
+                                    &nbsp; 确&nbsp;认&nbsp;入&nbsp;箱&nbsp;
+                                </button>
+                            </td>
+
+                        </tr>
+
+                    </table>
+                </div>
+                <div class="l_qx_div1">
+                    <table class="pure-table" id="table1">
+                        <thead>
+                            <tr style="text-align: center">
+                                <th style="width: 5%; text-align: center">#</th>
+                                <th style="width: 15%">单件流条码</th>
+                                <th style="width: 15%">工件名称</th>
+                                <th style="width: 15%">客户料号</th>
+                                <th style="width: 15%">工件颜色</th>
+                                <th style="width: 5%">品牌</th>
+                                <th style="width: 10%">车系</th>
+                                <th style="width: 10%">批次</th>
+                                <th style="width: 20%">装箱数量</th>
+                            </tr>
+                        </thead>
+                        <tbody id="Tables">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div id="qx_List">
+            <div class="qx_List_div2" style="border: 2px solid #0072ffc7; height: 80%; margin: 5px">
+            </div>
+            <div style="height: 20%; display: flex; justify-content: flex-end; flex-wrap: nowrap">
+                <div style="width: 40%; height: 90%; display: flex; justify-content: center; align-items: center">
+                    <button id="qx_ok" class="button button2">确&nbsp;&nbsp;&nbsp;&nbsp;定</button>
+                    <button id="qx_no" class="button button2">取&nbsp;&nbsp;&nbsp;&nbsp;消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script src="../../TopsLib/Scripts/tFronQueentJs.js"></script>
+<script type="text/javascript">
+
+
+    $(function () {
+        $("#s_LogCode").focus().val();
+        reloop();  //日期显示
+        f_preventKeyBoardsss();  //失去键盘事件
+    })
+    // 单件流条码回车事件
+    $("#s_LogCode").keydown(function (e) {
+        if (e.keyCode == 13) {
+            var s_LogCode = $("#s_LogCode").val();
+
+            if (s_LogCode == "" || s_LogCode == undefined || s_LogCode == null) {
+                alertN("请扫入条码！");
+                $("#s_LogCode").val("");
+                $("#s_LogCode").focus().val();
+                return;
+            }
+            $.topsAjax({
+                type: "GET",
+                data: {
+                    LogCode: s_LogCode
+                },
+                url: "/AjaxGet/SelPWByLogCode",
+                success: function (data) {
+                    //有值赋值
+                    if (data.Data[1].length > 0) {
+                        alertN("该条码已扫描,请重新扫码！");
+                        $("#s_LogCode").val("");
+                        $("#s_LogCode").focus().val();
+                        return;
+
+                    }
+                    if (data.Data[0].length > 0) {
+                        $("#s_LogCode").val(data.Data[0][0].s_LogCode);
+                        $("#s_CarColor").val(data.Data[0][0].s_CarColor);
+                        $("#s_PaintMCode").val(data.Data[0][0].n_PaintMCode);
+                        $("#s_CarBrand").val(data.Data[0][0].s_CarBrand);
+                        $("#s_CarSeries").val(data.Data[0][0].s_CarSeries);
+                        $("#s_CarType").val(data.Data[0][0].s_CarType);
+                        $("#s_Batch").val(data.Data[0][0].s_Batch);
+                        $("#n_number").val();
+                    } else {
+                        alertN("条码信息不存在,请重新扫入条码！");
+                        $("#s_LogCode").val("");
+                        $("#s_LogCode").focus().val();
+                        return;
+                    }
+                }
+            })
+        }
+    });
+
+
+    //日期时间显示
+    function reloop() {
+        var time = new Date();
+        var year = time.getFullYear();
+        var month = time.getMonth() + 1;
+        var day = time.getDate();
+        var hour = time.getHours();
+        var minute = time.getMinutes();
+        var second = time.getSeconds();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        if (second < 10) {
+            second = "0" + second;
+        }
+        $("#sp_date").html(year + "/" + month + "/" + day);
+        $("#sp_time").html(hour + ":" + minute + ":" + second);
+        setTimeout("reloop()", 1000);
+    }
+    var nusberss = 0;
+    var datass = [];
+
+    var LogCode = "";   // 漆件条码
+    var number = "";    // 装箱数量
+    // 点击前箱完成
+    $("#QianPrint").click(function () {
+        var s_LogCode = $("#s_LogCode").val();
+        var s_CarType = $("#s_CarType").val();
+        var s_PaintMCode = $("#s_PaintMCode").val();
+        var s_CarColor = $("#s_CarColor").val();
+        var s_CarBrand = $("#s_CarBrand").val();
+        var s_CarSeries = $("#s_CarSeries").val();
+        var s_Batch = $("#s_Batch").val();
+        var n_number = $("#n_number").val();
+
+        if (s_LogCode == "" || s_LogCode == undefined || s_LogCode == null) {
+            alertN("请先扫入条码！");
+            $("#s_LogCode").val("");
+            $("#s_LogCode").focus().val();
+            return;
+        }
+        if (n_number.length == 0) {
+            alertN("装箱数量不能为空！");
+            return;
+        }
+        if (!isNumber(n_number)) {
+            alertN("装箱数量必须为整数！");
+            $("#n_number").val("");
+            return;
+        }
+
+        for (var i = 0; i < datass.length; i++) {
+            if (datass[i] == s_LogCode) {
+                alertN("该条码已录入！");
+                $("#s_LogCode").val("");
+                $("#s_CarType").val("");
+                $("#s_PaintMCode").val("");
+                $("#s_CarColor").val("");
+                $("#s_CarBrand").val("");
+                $("#s_CarSeries").val("");
+                $("#s_Batch").val("");
+                $("#n_number").val("");
+                $("#s_LogCode").focus().val();
+                return;
+            }
+        }
+        datass[nusberss] = s_LogCode;
+        nusberss = nusberss + 1;
+        var tr = ""
+
+        tr += "<tr style='background:#99CCFF;'><td  style='text-align:center'>" + nusberss
+             + "</td><td>" + s_LogCode
+              + "</td><td>" + s_CarType
+              + "</td><td>" + s_PaintMCode
+              + "</td><td>" + s_CarColor
+              + "</td><td>" + s_CarBrand
+              + "</td><td>" + s_CarSeries
+              + "</td><td>" + s_Batch
+              + "</td><td>" + n_number
+              + "</td></tr>"
+
+        $("#Tables").prepend(tr);
+
+
+        LogCode += s_LogCode + ",";
+        number += n_number + ",";
+
+
+
+        $("#s_LogCode").val("");
+        $("#s_CarType").val("");
+        $("#s_PaintMCode").val("");
+        $("#s_CarColor").val("");
+        $("#s_CarBrand").val("");
+        $("#s_CarSeries").val("");
+        $("#s_Batch").val("");
+        $("#n_number").val("");
+        $("#s_LogCode").focus().val();
+
+    });
+
+    //验证全是数字
+    function isNumber(value) {
+        var n = /^[0-9]*$/;
+        var re = new RegExp(n);
+        if (re.test(value)) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    // 打印信息
+    var checkClick = true;
+    // 封箱
+    $("#fxBox").click(function () {
+        if (checkClick == true) {
+            checkClick = false;
+
+            setTimeout(function () {
+                checkClick = true;
+            }, 4000);
+
+            var s_PackingASN = "";
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/AddSelBatch",
+                data: {},
+                success: function (data) {
+                    $("#loading,.coverDiv").hide();
+                    s_PackingASN = data.OutPut.s_code;
+
+                    var parameter = new Object();
+                    parameter.s_LogCode = LogCode.substring(0, LogCode.lastIndexOf(","));
+                    parameter.n_number = number.substring(0, number.lastIndexOf(","));
+                    parameter.s_PackingASN = s_PackingASN;
+
+                    if (parameter.s_LogCode.length > 10) {
+                        $.topsAjax({
+                            type: "Post",
+                            url: "/AjaxPost/AddPacking",
+                            data: parameter,
+                            async: false,
+                            success: function (data1) {
+                                if (data1.IsSuccess) {
+                                    console.log(s_PackingASN);
+                                    //window.open("../packing/Print?s_PackingASN=" + s_PackingASN);
+                                    CT(s_PackingASN);
+
+                                    LogCode = "";
+                                    number = "";
+                                }
+                            }
+                        });
+                    } else {
+                        alertN("无装箱数据,请先录入！");
+                    }
+                }
+            })
+        } else {
+            alert("请勿重复点击");
+        }
+    });
+
+    function CT(s_PackingASN) {
+        ws.send(localStorage.UserNo + "{[-=+" + localStorage.FriendUserId + "{[-=+" + s_PackingASN + "{[-=+{[-=+NotOne");
+        window.location.reload();
+    }
+
+    //* 阻止键盘弹出
+    function f_preventKeyBoardsss() {
+        $("#n_number").click(function () {
+            $(this).attr("readonly", "readonly");
+            nowfocus = $(this);
+            setTimeout(function () {
+                nowfocus.removeAttr("readonly");
+            }, 100);
+        });
+        $("#s_LogCode").click(function () {
+            $(this).attr("readonly", "readonly");
+            nowfocus = $(this);
+            setTimeout(function () {
+                nowfocus.removeAttr("readonly");
+            }, 100);
+        });
+
+        //focus
+        $("#n_number").focus(function () {
+            $(this).attr("readonly", "readonly");
+            nowfocus = $(this);
+            setTimeout(function () {
+                nowfocus.removeAttr("readonly");
+            }, 100);
+        });
+        $("#s_LogCode").focus(function () {
+            $(this).attr("readonly", "readonly");
+            nowfocus = $(this);
+            setTimeout(function () {
+                nowfocus.removeAttr("readonly");
+            }, 100);
+        });
+    }
+
+</script>
+<script>
+    $(function () {
+        //页面初始化滚动条默认在底部
+        $('.container .right .chat.active-chat').scrollTop(2000);
+
+        //服务器端
+        localStorage.UserNo = "TheServer";
+
+        //手持机端
+        localStorage.FriendUserId = "Packaging";
+
+        //初始化默认
+        $('.chat[data-chat=person' + localStorage.FriendUserId + ']').addClass('active-chat');
+        $('.person[data-chat=person' + localStorage.FriendUserId + ']').addClass('active');
+
+        f_Link();
+        //setInterval("f_Link()", 10000);
+    });
+
+    var ws;
+    var url = "ws://10.50.10.104:8205";
+
+    function f_Link() {
+
+        if ("WebSocket" in window) {
+            ws = new WebSocket(url);
+        }
+        else if ("MozWebSocket" in window) {
+            ws = new MozWebSocket(url);
+        }
+        else
+            alert("浏览器版本过低，请升级您的浏览器。\r\n浏览器要求：IE10+/Chrome14+/FireFox7+/Opera11+");
+
+        //注册各类回调
+        ws.onopen = function () {
+            console.log("连接服务器成功");
+            ws.send(localStorage.UserNo + "{[-=+" + localStorage.FriendUserId + "{[-=+{[-=+One");
+        }
+
+        ws.onclose = function () {
+            console.log("与服务器断开连接");
+        }
+        ws.onerror = function () {
+            console.log("数据传输发生错误");
+        }
+        ws.onmessage = function (receiveMsg) {
+        }
+    }
+
+    function Send() {
+        var text = $("#InputBox").val();
+        if (text != '') {
+            var str = '<div class="bubble me">' + text + '</div>';
+            $('.person' + localStorage.FriendUserId).append(str);
+
+            $("#InputBox").val('')
+            ws.send(localStorage.UserNo + "{[-=+" + localStorage.FriendUserId + "{[-=+" + text + "{[-=+{[-=+NotOne");
+        }
+    }
+
+
+</script>

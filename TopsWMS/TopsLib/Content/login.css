@@ -1,0 +1,40 @@
+﻿body
+{
+    margin: 0px;
+    font-family: Verdana, "宋体" , Vrinda, serif;
+    color: #486086;
+    font-size: 12px;
+}
+.keyImg{ position: absolute; width: 90px; height: 38px; margin:-10px 0px 0px 58px; cursor: pointer; }
+.login_text {
+	color: #7a7a7a; font-weight: bold
+}
+.login_input
+{
+    border-bottom: #d1d1d1 1px solid;
+    border-left: #d1d1d1 1px solid;
+    width: 100px;
+    font-family: Arial, Helvetica, sans-serif;
+    height: 30px;
+    line-height:30px;
+    border-top: #d1d1d1 1px solid;
+    border-right: #d1d1d1 1px solid;
+    font-size:16px;
+    font-weight:bold;
+    font-family:微软雅黑;
+}
+
+
+.login_main{ width:580px; height:348px; margin:0px auto; margin-top:100px; background-image:url('login_bg_img.gif'); background-repeat:no-repeat; }
+.min_login
+{
+    margin:0; position:static;background-image:url()
+}
+#subBt{ width:90px; height:38px; }
+
+#updatePwd{ text-decoration:none; }
+#updatePwd:hover{ text-decoration:underline; }
+.updatePwdInfo{ display:none; width:30%; float:right; margin:70px 25px 0px 0px; border:1px solid #ccc; line-height:49px; text-align:center; border-radius:10px; overflow:hidden; }
+.updatePwdInfo h3{ background-color:#86D6F7; text-align:left; padding-left:10px; height:30px; line-height:30px; margin-bottom:10px; }
+.pwdInput{ border:#d1d1d1 1px solid; width:150px; height:23px; font-size:16px; font-weight:bold; font-family:微软雅黑; }
+.updatePwdInfo p input[type=button]{ width:70px; height:28px; margin-right:5px; margin-left:5px; border-radius:6px; border:1px solid #0280C7; background-color:#5BC1FF; color:White; font-weight:bold; cursor:pointer;  }

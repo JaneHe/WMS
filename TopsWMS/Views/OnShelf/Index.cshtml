@@ -1,0 +1,719 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+    
+    string ParentIds = Request.QueryString["ParentIds"];
+}
+ 
+@section Body{
+    <div class="body">
+        <div>
+            <select v-bind:class="Warehouse_Class" >
+                <option :id="item.n_Warehouse_Id" v-for="(item,i) in WarehouseDataList">
+                {{ item.s_Warehouse_Name }}
+                </option>
+            </select>
+        </div>
+        <div>
+            <input type="text" v-bind:class="WorkOrderCode_Class" placeholder="请输入货物标识编码" v-on:keyup.enter="f_checkWorkOrderCode" />
+        </div> 
+          
+         
+        <div> 
+            <input type="text" v-bind:class="WorkOrderQrCode_Class" placeholder="请输入储位二维码" v-on:keyup.enter="f_checkWorkOrderQrCode" />
+            <input type="hidden" name="n_Space_Id" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="WorkOrderAmount_Class" placeholder="请输入下架数量" v-on:keyup.enter="f_checkWorkOrderAmount" />
+        </div> 
+        <div>
+            <input type="text" v-bind:class="WorkOrderReason_Class" placeholder="请输入下架原因" v-on:keyup.enter="f_changeReason" />
+        </div>
+        
+        <div v-bind:class="TitleTab_Showed">
+            <table>
+                <tr> 
+                    <th>
+                        货物编码
+                    </th>
+                    <th>
+                        货物名称
+                    </th>
+                    <th style="display:none;">
+                        下架数量
+                    </th> 
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table>
+                <tr>
+                    <td>{{ s_ReportInventoryCurrent_GoodsProductName }}  
+                    </td>
+                    <td>{{ s_ReportInventoryCurrent_GoodsProductCode }}  
+                    </td> 
+                    <td style="display:none;">{{ n_ReportInventoryCurrent_Number }} 
+                    </td> 
+                </tr>
+            </table>
+        </div> 
+        <div v-bind:class="QrCodeTitleTab_Showed" >
+           <table>
+               <tr>
+                  <th>
+                      储位二维码
+                  </th>
+                  <th>
+                      储位信息
+                  </th>
+                  <th>
+                      下架数/在位数
+                  </th>
+               </tr> 
+           </table>
+        </div>
+        <div v-bind:class="QrCodeInfoTab_Showed" >
+           <table> 
+               <tr v-for="(item,i) in InfoDataList" :s_Space_BarCode="item.s_Space_BarCode" :s_ReportInventoryCurrent_GoodsProductName="item.s_ReportInventoryCurrent_GoodsProductName" :s_ReportInventoryCurrent_GoodsProductCode="item.s_ReportInventoryCurrent_GoodsProductCode" :n_ReportInventoryCurrent_Number="item.n_ReportInventoryCurrent_Number" :n_OldReportInventoryCurrent_Number="item.n_OldReportInventoryCurrent_Number" :n_Space_Id="item.n_Space_Id">
+                  <td>
+                      {{ item.s_Space_BarCode }}
+                  </td>
+                  <td>
+                      {{ item.s_Space_Description }} 
+                  </td>
+                  <td>
+                      {{ item.n_ReportInventoryCurrent_Number }} / {{ item.n_OldReportInventoryCurrent_Number }}
+                  </td>
+               </tr>
+           </table>
+        </div> 
+        <div>
+            <div v-bind:class="Save_Div_Showed" v-on:click="f_saveData">
+                下架</div>
+            <div v-bind:class="Delete_Div_Showed" v-on:click="f_delData">
+                删除</div>
+        </div>
+    </div>
+}
+@section Script{
+<style type="text/css">
+        .Warehouse
+        { 
+            width:calc(90%);
+            margin:calc(1.5%) calc(5%) calc(1%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderAmount
+        {
+            width:calc(90%);
+            margin:calc(1%) calc(5%) calc(2%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderReason
+        {
+            width:calc(90%);
+            margin:calc(1%) calc(5%) calc(1.5%) calc(5%);
+            border:1px solid lightblue;
+            display:none;
+            line-height:30px; 
+        }
+        .WorkOrderCode
+        {
+            width:calc(90%);
+            margin:calc(1%) calc(5%) calc(1.5%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderQrCode
+        {
+            width:calc(90%);
+            margin:calc(1%) calc(5%) calc(1.5%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px; 
+        }
+        
+         .TitleTab{
+            width: calc(90%);
+            height: 20px; 
+            margin: calc(0%) calc(5%) calc(0%) calc(5%);
+            text-align:center;
+        }
+        .TitleTab table,.InfoTab table,.QrCodeTitleTab table,.QrCodeInfoTab table{
+            width: 100%;
+            border-collapse:collapse;
+        }
+        .TitleTab th{
+            width: 43%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .TitleTab tr th:nth-child(3){
+            width: 14%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        } 
+        .InfoTab
+        {
+            width: calc(90%);
+            height: 22px;
+            margin: calc(0%) calc(5%);
+            text-align:center; 
+        }
+        .InfoTab td{
+            width: 43%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .InfoTab tr td:nth-child(3){
+            width: 14%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        } 
+        
+        
+        .QrCodeTitleTab
+        {
+            width: calc(90%);
+            height: 23px; 
+            text-align:center; 
+            margin:calc(0.5%) calc(5%) calc(0%) calc(5%);
+        } 
+        .QrCodeTitleTab tr th:nth-child(1){
+            width: 30%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeTitleTab tr th:nth-child(2){
+            width: 46%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeTitleTab tr th:nth-child(3){
+            width: 22%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeTitleTab tr td:nth-child(1){
+            width: 30%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeTitleTab tr td:nth-child(2){
+            width: 46%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeTitleTab tr td:nth-child(3){
+            width: 22%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        
+        
+        .QrCodeInfoTab
+        {
+            width: calc(90%);
+            height: 78px; 
+            text-align:center; 
+            margin:calc(0%) calc(5%) calc(0.5%) calc(5%);
+            overflow-y:scroll;
+        } 
+        .QrCodeInfoTab tr th:nth-child(1){
+            width: 30%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeInfoTab tr th:nth-child(2){
+            width: 50%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeInfoTab tr th:nth-child(3){
+            width: 18%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeInfoTab tr td:nth-child(1){
+            width: 30%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeInfoTab tr td:nth-child(2){
+            width: 50%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeInfoTab tr td:nth-child(3){
+            width: 18%;
+            border:1px solid #a5e0a5; 
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        
+        .Save_Div
+        {
+            width: calc(79%);
+            margin: calc(1%) calc(10%) calc(1%) calc(10%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑; 
+            font-size: 20px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        .Delete_Div
+        {
+            width: calc(35%);
+            margin: calc(1%) calc(0%) calc(1%) calc(7%);
+            background: #f69797;
+            color: white;
+            font-family: 微软雅黑; 
+            font-size: 20px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+            display:none;
+        }
+        
+        .checked
+        {
+            background:#e9e9ac;
+        }
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Get请求变量
+        var ajaxobjFirst = null;
+
+        //ajax Post请求变量
+        var ajaxobjSecond = null;
+
+        $(function () {
+
+            //内容容器
+            var body = new Vue({
+                el: ".body",
+                data: {
+                    WorkOrderQrCode_Class: { //储位编码文本框样式
+                        WorkOrderQrCode:true,
+                    },
+                    WorkOrderCode_Class: { //货物标识编码文本框样式
+                        WorkOrderCode: true
+                    },
+                    WorkOrderAmount_Class: { //下架数量文本框样式
+                        WorkOrderAmount: true
+                    },
+                    WorkOrderReason_Class: { //下架原因文本框样式
+                        WorkOrderReason: true
+                    },
+                    Warehouse_Class: { //仓库选择框样式
+                        Warehouse: true
+                    }, 
+                    QrCodeTitleTab_Showed:{ //储位标题二维码样式
+                        QrCodeTitleTab:true
+                    },
+                    QrCodeInfoTab_Showed:{ //储位信息二维码样式
+                        QrCodeInfoTab:true
+                    },
+                    TitleTab_Showed: { //标题表格样式
+                        TitleTab: true
+                    },
+                    InfoTab_Showed: { //结果表格样式
+                        InfoTab: true
+                    },
+                    InfoDataList: [], //结果表格数据
+                    InfoDataList_BillStockInOutDetail: [], //出库单明细数据获取
+                    WarehouseDataList: [], //仓库选择数据源
+                    Save_Div_Showed: { //下架按钮样式
+                        Save_Div: true
+                    },
+                    Delete_Div_Showed: { //删除按钮样式
+                        Delete_Div: true
+                    },
+                    s_ReportInventoryCurrent_GoodsProductName:"" //货物产品信息显示 
+                    ,
+                    s_ReportInventoryCurrent_GoodsProductCode:"" //货物产品编码显示
+                    ,
+                    n_ReportInventoryCurrent_Number:"" //货数量信息显示
+                    
+                },
+                methods: {
+                    //加载仓库选择数据源
+                    f_loadWarehouseDataList: function () {
+                        //对象名 查询入库操作的所需可选仓库信息
+                        var objectName = "SelWarehousingWarehouseInfo";
+                        //参数
+                        var param = {};
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            //拼装仓库选择数据源
+                            body.WarehouseDataList = [];
+                            if (result.Data[0].length > 0) {
+                                result.Data[0].forEach(function (value, index) {
+                                    body.WarehouseDataList.push({
+                                        n_Warehouse_Id: value.n_Warehouse_Id,
+                                        s_Warehouse_Name: value.s_Warehouse_Name
+                                    })
+                                })
+                            }
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+
+                        //页面初始化
+                        //this.f_reloadPage();
+                    },
+                    //根据货物标识编码查询相应信息
+                    f_checkWorkOrderCode:function(event){ 
+                        if ($(event.target).val() == "") {
+                            return;
+                        }
+                        
+                        if(event.keyCode == 13){
+                           
+                            //对象名 根据货物编码查询出对应的在库位信息
+                            var objectName = "SelOnShelfWorkOrderInfo";
+                            //参数
+                            var param = { s_ReportInventoryCurrent_GoodsProductCode: $(".WorkOrderCode").val(),n_WarehouseId:$(".Warehouse").find("option:selected").attr("Id") };
+
+                            ajaxobjFirst = ajaxhelper.ajax_Get(objectName, param, function (result) {
+                                
+                                body.InfoDataList = [];
+                                body.s_ReportInventoryCurrent_GoodsProductName = "";
+                                body.s_ReportInventoryCurrent_GoodsProductCode = "";
+                                body.n_ReportInventoryCurrent_Number = 0;
+                                $(".QrCodeInfoTab").find("tr").removeClass("morechecked");
+
+                                if(result.Data[0].length > 0){
+                                   result.Data[0].forEach(function(value,index){
+                                        body.InfoDataList.push({
+                                            n_Space_Id:value.n_Space_Id,
+                                            s_Space_BarCode:value.s_Space_BarCode,
+                                            s_Space_Description:value.s_Space_Description,
+                                            s_ReportInventoryCurrent_GoodsProductName:value.s_ReportInventoryCurrent_GoodsProductName,
+                                            s_ReportInventoryCurrent_GoodsProductCode:value.s_ReportInventoryCurrent_GoodsProductCode,
+                                            n_ReportInventoryCurrent_Number:0,
+                                            n_OldReportInventoryCurrent_Number:value.n_ReportInventoryCurrent_Number,
+                                            n_ReportInventoryCurrent_OKProductCou:value.n_ReportInventoryCurrent_OKProductCou
+                                        })
+
+                                        body.s_ReportInventoryCurrent_GoodsProductName = result.Data[0][0].s_ReportInventoryCurrent_GoodsProductName;
+                                        body.s_ReportInventoryCurrent_GoodsProductCode = result.Data[0][0].s_ReportInventoryCurrent_GoodsProductCode;
+                                        body.n_ReportInventoryCurrent_Number = 0;
+                                   }) 
+
+                                   //默认选中
+                                   $(".QrCodeInfoTab").find("tr:eq(0)").click();
+                                }
+
+                                //出库单明细数据获取
+                                if(result.Data[1].length > 0){
+                                   body.InfoDataList_BillStockInOutDetail = result.Data[1]; 
+                                }  
+                                
+                                //清空
+                                $(".WorkOrderCode").val("");
+                                $(".WorkOrderQrCode").focus().select();
+                            }, function (result) {
+                                f_commonShowMsg(result.Msgs[0]);
+                                //清空
+                                $(".WorkOrderCode").val("").focus().select(); 
+                            })
+                        }
+
+                    }, 
+                    //修正数量信息
+                    f_checkWorkOrderAmount: function () {
+                        if ($(event.target).val() == "") {
+
+                            //货物标识编码焦点事件
+                            $(".WorkOrderCode").focus().select();
+                            return;
+                        }
+
+                        //弹出框提示字符串
+                        var alterStr = ""
+                        
+                        //得出选中储位信息的在位数量
+                        var n_OldReportInventoryCurrent_Number = $(".QrCodeInfoTab").find("tr[class=morechecked]").attr("n_OldReportInventoryCurrent_Number");
+                        //得出选中储位信息的储位码
+                        var s_Space_BarCode = $(".QrCodeInfoTab").find("tr[class=morechecked]").attr("s_Space_BarCode");
+                        
+                        //查看在架数量是否不满足于填写数量，如果是，则不允许修改
+                        if(parseInt(n_OldReportInventoryCurrent_Number) >= parseInt($(event.target).val())){
+                           body.InfoDataList.forEach(function(value,index){
+                                if(value.s_Space_BarCode == s_Space_BarCode){
+                                   value.n_ReportInventoryCurrent_Number = $(event.target).val();
+                                   return false;
+                                }
+                           })
+
+                        }else{
+                           alterStr = "填写的数量不能超过该储位的已在位数量"; 
+                        } 
+
+                        //填写数量超额提示
+                        if(alterStr != ""){
+                            f_commonShowMsg(alterStr);
+                            $(event.target).val("").focus().select(); 
+                            return;
+                        }
+                        //清空
+                        $(event.target).val("");
+                        //焦点
+                        $(".WorkOrderQrCode").val("").focus().select();
+                    },
+                    //扫储位二维码去对应相应的储位信息
+                    f_checkWorkOrderQrCode:function(){
+                        var WorkOrderQrCode = $(".WorkOrderQrCode").val();
+                        //清空
+                        $(".WorkOrderQrCode").val("");
+                        
+                        //找到对应的储位信息行进行选中
+                        $(".QrCodeInfoTab").find("tr[s_Space_BarCode="+ WorkOrderQrCode +"]").addClass("morechecked");
+                        $(".QrCodeInfoTab").find("tr[s_Space_BarCode="+ WorkOrderQrCode +"]").siblings().removeClass("morechecked");;
+                        //下架数量自动选中
+                        $(".WorkOrderAmount").val($(".QrCodeInfoTab").find("tr[s_Space_BarCode="+ WorkOrderQrCode +"]").attr("n_OldReportInventoryCurrent_Number")).focus();
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("WMS-下架操作");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+                         
+                        //加载返回事件 
+                        window.parent.f_loadEvent("../../../../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + "@ParentIds");
+                         
+                        $(".WorkOrderCode").focus();
+                        
+//                        //行点击事件
+//                        $(".QrCodeInfoTab table tr").live("click", function () { 
+//                           
+//                            $(this).addClass("checked");
+//                            $(this).siblings().removeClass("checked");
+//                            $(".WorkOrderAmount").val("").focus().select();
+//                            
+//                            body.s_ReportInventoryCurrent_GoodsProductName = $(this).attr("s_ReportInventoryCurrent_GoodsProductName");
+//                            body.s_ReportInventoryCurrent_GoodsProductCode = $(this).attr("s_ReportInventoryCurrent_GoodsProductCode");
+//                            body.n_ReportInventoryCurrent_Number = $(this).attr("n_ReportInventoryCurrent_Number");
+//                        })
+                    },
+                    //下架
+                    f_saveData: function () {
+
+                        //重复请求处理
+                        if (ajaxobjSecond != null) {
+                            ajaxobjSecond.abort();
+                            ajaxobjSecond = null;
+                        }  
+
+                        //参数集合
+                        var param = new Array();
+                        var arr = new Array();
+
+                        //弹出框提示
+                        var alertStr = "";
+
+                        //遍历获取当前行的数据
+                        $(".QrCodeInfoTab table tr[n_ReportInventoryCurrent_Number!=0]").each(function (index, value) {
+                             
+                                //出库单明细外键ID
+                                var n_BillStockInOutDetail_Id = "";
+                                //该产品的数量
+                                var n_ReportInventoryCurrent_Number = parseInt($(value).attr("n_ReportInventoryCurrent_Number"));
+                                //产品编码
+                                var s_ReportInventoryCurrent_GoodsProductCode = $(value).attr("s_ReportInventoryCurrent_GoodsProductCode");
+                                //储位二维码
+                                var s_ReportInventoryCurrent_Code = $(".QrCodeInfoTab").find("tr:eq("+ index +")").find("td:eq(0)").text().trim();
+                                
+                                //进行出库单明细ID匹配，并且进行数量扣减
+                                body.InfoDataList_BillStockInOutDetail.forEach(function(value,index){
+                                    if(s_ReportInventoryCurrent_GoodsProductCode == value.s_BillStockInOutDetail_GoodsProductCode){
+                                        if( n_ReportInventoryCurrent_Number / value.f_BillStockInOutDetail_WorkOrderQuantity >= 0
+                                        || n_ReportInventoryCurrent_Number % value.f_BillStockInOutDetail_WorkOrderQuantity >= 0){
+                                             //该产品的数量扣减
+                                             //先取值
+                                             var Number = ( n_ReportInventoryCurrent_Number - value.f_BillStockInOutDetail_WorkOrderQuantity > 0?
+                                             n_ReportInventoryCurrent_Number - value.f_BillStockInOutDetail_WorkOrderQuantity : 0);
+                                              
+                                             n_BillStockInOutDetail_Id = value.n_BillStockInOutDetail_Id;
+
+                                             //查询带出的出库单数量扣减
+                                             //先取值
+                                             var WorkOrderQuantity =  ( value.f_BillStockInOutDetail_WorkOrderQuantity - n_ReportInventoryCurrent_Number > 0?
+                                             value.f_BillStockInOutDetail_WorkOrderQuantity - n_ReportInventoryCurrent_Number:0);
+
+                                             //扣减数量
+                                             n_ReportInventoryCurrent_Number = Number;
+                                             value.f_BillStockInOutDetail_WorkOrderQuantity = WorkOrderQuantity;
+
+                                             return false;
+                                        }
+                                    }
+                                })
+                                 
+                                //如果此次下架的记录已经匹配到一条出库单明细信息，并且下架数量已经超出出库单申请的数量，那么需要对其情况进行提示
+                                if(n_ReportInventoryCurrent_Number > 0){
+                                    alertStr = "该货物在货架储位"+ s_ReportInventoryCurrent_Code+"的下架数量已经超出"+
+                                    n_ReportInventoryCurrent_Number+",请重新修正!";
+
+                                    return false;
+                                }
+
+                                arr.push({
+                                    n_BillStockInOutDetail_Id: n_BillStockInOutDetail_Id,
+                                    s_ReportInventoryCurrent_GoodsProductCode: $(value).attr("s_ReportInventoryCurrent_GoodsProductCode"), 
+                                    f_ListPutOnOff_WorkOrderQuantity: $(value).attr("n_ReportInventoryCurrent_Number"),
+                                    s_ListPutOnOffReason_Reason: $(value).attr("s_LaunchReason_Name"),
+                                    s_ListPutOnOffReason_Id: "",
+                                    n_Space_Id:$(value).attr("n_Space_Id"),
+                                    s_ReportInventoryCurrent_Code:$(".QrCodeInfoTab").find("tr:eq("+ index +")").find("td:eq(0)").text().trim(),
+                                    n_ListPutOnOff_Id:""
+                                })
+                            
+                        })
+
+                        //提示下架数量超出出库单明细数量
+                        if(alertStr!=""){
+                            f_commonShowMsg(alertStr);
+                            //焦点
+                            $(".WorkOrderAmount").val("").focus();
+
+                            //还原出库单明细已经扣减的数量
+                            if(body.InfoDataList_BillStockInOutDetail.length > 0){
+                               body.InfoDataList_BillStockInOutDetail.forEach(function(value,index){
+                                    value.f_BillStockInOutDetail_WorkOrderQuantity = value.f_BillStockInOutDetail_OldWorkOrderQuantity;
+                               })
+                            }
+
+                            return;
+                        }
+                         
+
+                        //对象名 新增下架操作记录
+                        var objectName = "InsertOnShelfListStockInOut";
+                        //参数
+                        var param = { Dictionarys: arr };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Post(objectName, param, function (result) {
+                            f_commonShowMsg("下架成功!");
+                            //清空数据
+                            $(".QrCodeInfoTab table tr").remove();
+                             
+                            //焦点
+                            $(".WorkOrderCode").val("").focus().select();
+                            ajaxobjSecond = null;
+
+                            //清空
+                            body.InfoDataList= []; //结果表格数据
+                            body.InfoDataList_BillStockInOutDetail= []; //出库单明细数据获取  
+                            body.s_ReportInventoryCurrent_GoodsProductName=""; //货物产品信息显示 
+                     
+                            body.s_ReportInventoryCurrent_GoodsProductCode=""; //货物产品编码显示
+                    
+                            body.n_ReportInventoryCurrent_Number=0; //货数量信息显示
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjSecond = null;
+                        })
+                    },
+                    //删除行记录
+                    f_delData: function () {
+                        
+                        $(".QrCodeInfoTab table tr[class=morechecked]").remove();
+                        $(".WorkOrderCode").val("").focus().select();
+
+                    },
+                    //下架原因记录
+                    f_changeReason: function (event) {
+
+                        //遍历所有结果记录行.如果记录表里有该记录，则进行选中标识操作 
+                        body.InfoDataList.forEach(function (value, index) {
+                            if (index == 0) {
+                                value.ListPutOnOffReason_Reason = $(event.target).val();
+                            }
+                        })
+                        //清空
+                        $(event.target).val("");
+                        $(".WorkOrderCode").val("").focus().select();
+                    }
+                }
+            })
+            
+            body.f_loadWarehouseDataList();
+            body.f_reloadPage();
+        })
+
+    </script>
+}

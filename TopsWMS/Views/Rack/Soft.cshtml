@@ -1,0 +1,178 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>工作站序列</title>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/JQuery-Gridly/jquery.gridly.js" type="text/javascript"></script>
+    <link href="../../Scripts/JQuery-Gridly/jquery.gridly.css" rel="stylesheet" type="text/css" />
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <style type="text/css">
+        body
+        {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        .gridly
+        {
+            position: relative;
+            width: 1000px;
+        }
+        .brick.small
+        {
+            width: 140px;
+            height: 60px;
+            background: skyblue;
+            cursor: pointer;
+            border-radius: 15px;
+        }
+        .gridly span
+        {
+            display: block;
+            width: 140px;
+            line-height: 60px;
+            text-align: center;
+            font-size: 16px;
+            font-family: 微软雅黑;
+            font-weight: bold;
+        }
+        
+        .items
+        {
+            margin-bottom: 20px;
+        }
+        .btnsure
+        {
+            font-family: 微软雅黑;
+            font-size: 18px;
+            font-weight: bold;
+            background: #00b7ee;
+            border-radius: 20px;
+            width: 150px;
+            line-height: 50px;
+            text-align: center;
+            cursor: pointer;
+            color: white;
+            box-shadow: rgb(136, 136, 136) 5px 5px 10px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        .btnsure:active
+        {
+            background: #6FA587;
+        }
+        .info
+        {
+            color: Red;
+            font-family: 微软雅黑;
+            display: inline-block;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            var body = new Vue({
+                el: ".content",
+                data: {
+                    WarehouseSequence_Data: new Array() //数据源 
+                },
+                methods: {
+                    //加载数据
+                    f_loadWarehouseSequence: function () { 
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelWarehouseSequence",
+                            success: function (data) {
+                                data = JSON.parse(data);
+                                if (data.IsSuccess) {
+                                    if (data.Data[0].length > 0) {
+                                        vue.WarehouseSequence_Data = data.Data[0];
+                                    }
+
+                                    //加载插件
+                                    $('.gridly').gridly({
+                                        base: 60, // px     // base 每加一 left 会加二
+                                        gutter: 20, // px      // gutter 每加一 left 会加二 top 会加一
+                                        columns: 12         // 一行div的个数为colums/2
+                                    });
+                                }
+                            }
+                        })
+                    },
+                    //保存序列按钮点击事件
+                    f_btnsure: function (event) {
+                        var arr = new Array();
+                        $(".gridly div").each(function (index, value) {
+
+                            arr.push({ name: $(event.target).text(), sum: $(value).position().top + "" + ($(value).position().left == 0 ? "000" : $(value).position().left), OldSequence: $(event.target).attr("Sequence"), Id: $(event.target).attr("Id") });
+                        })
+
+                        arr = arr.sort(compare("sum"));
+                        arr.map(function (value, index) {
+                            return value.Sequence = index + 1;
+                        })
+
+                        arr = arr.filter(function (item) {
+                            return item.OldSequence != item.Sequence;
+                        })
+
+                        if (arr.length == 0) {
+                            return;
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/AjaxPost/UpdateWarehouseSequence",
+                            data: { Dictionarys: arr },
+                            success: function (data) {
+                                data = JSON.parse(data);
+                                if (data.IsSuccess) {
+                                    alert("保存成功!");
+                                    window.location.reload();
+                                }
+                            }
+                        })
+                    }
+                }
+            })
+
+
+
+            var compare = function (prop) {
+                return function (obj1, obj2) {
+                    var val1 = parseInt(obj1[prop]);
+                    var val2 = parseInt(obj2[prop]); if (val1 < val2) {
+                        return -1;
+                    } else if (val1 > val2) {
+                        return 1;
+                    } else {
+                        return 0;
+                    }
+                }
+            }
+
+
+        })
+    </script>
+</head>
+<body class="content">
+    <div class="items">
+        <div class="btnsure" v-on:click="f_btnsure"> 
+            保存序列</div>
+        <div class="info">
+            <span>说明:每个项是一个工作站,括号内表示的是该工作站在全部站里面所排的顺序,可以拖动项改变他的次序,点击保存即可保存序列</span>
+        </div>
+    </div>
+    <div>
+        <div class='gridly'>
+            <div class='brick small' v-for="(item,index) in WarehouseSequence_Data" :Id="item.Id" :Sequence="item,Sequence">
+                <span>({{ item.Sequence }})  item.WarehouseName  </span> 
+            </div>
+        </div>
+    </div>
+   
+</body>
+</html>

@@ -1,0 +1,153 @@
+﻿@{
+    Layout = null;
+    string n_Space_Id = Request.QueryString["n_Space_Id"];
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>货架储位打印</title>
+    <script src="../../Scripts/QRCodeJs/jquery-1.4.4.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/QRCodeJs/barcode.js" type="text/javascript"></script>
+    <style type="text/css">
+        .QrCode
+        {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            margin-left: 5%;
+        }
+        .PrintDiv
+        {
+            width: 550px;
+            height: 150px;
+            margin: 80px 20%;
+        }
+        .QrCodeInfo
+        {
+            display: inline-block;
+            height: 150px;
+            font-family: 微软雅黑;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .QrCodeInfo table
+        {
+            height: 100%;
+        }
+        .copymodel
+        {
+            display: none;
+        }
+        
+        .printBt
+        {
+            font-family: 微软雅黑;
+            font-size: 20px;
+            width: 180px;
+            line-height: 58px;
+            font-weight: bold;
+            background: #00b7ee;
+            border-radius: 25px;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGet/SelSpacePrintList",
+                data: { n_Space_Id: $("[name=n_Space_Id]").val() },
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result.IsSuccess) {
+                        f_setQRCode(result.Data[0]);
+                    } else {
+                        alert(result.Msgs[0]);
+                    }
+                }
+            })
+
+            //打印事件
+            $(".printBt").click(function () {
+                f_bulidPrintArea();
+            })
+        })
+
+        //组成展示在界面观看的二维码
+        function f_setQRCode(data) {
+            for (var index = 0; index < data.length; index++) {
+                var $PrintDiv = $(".copymodel").find(".PrintDiv").clone(true);
+                $PrintDiv.find(".QrCode").removeAttr("id").attr("id", "QrCode_" + index);
+                $PrintDiv.removeAttr("id").attr("id", "PrintDiv_" + index);
+                $(".showPrintDiv").append($PrintDiv);
+                //二维码
+                var qrcode = new QRCode("QrCode_" + index, { width: 150, height: 150 });
+                qrcode.makeCode(data[index].s_Space_BarCode);
+                //信息显示
+                $("#PrintDiv_" + index).find(".QrCodeInfo").find("label:eq(0)").text(data[index].s_Warehouse_Name);
+                $("#PrintDiv_" + index).find(".QrCodeInfo").find("label:eq(1)").text(data[index].s_Rack_Code);
+                $("#PrintDiv_" + index).find(".QrCodeInfo").find("label:eq(2)").text(data[index].s_Space_BarCode);
+            }
+        }
+
+        //构建打印区域
+        function f_bulidPrintArea() {
+
+            var headstr = "<html><head><title></title></head><body>";
+            var footstr = "</body>";
+            var printData = $(".showPrintDiv").html(); // 获得 div 里的所有 html 数据
+            var oldstr = document.body.innerHTML;
+            document.body.innerHTML = headstr + printData + footstr;
+            window.print();
+            document.body.innerHTML = oldstr;
+
+        }
+
+    </script>
+</head>
+<body>
+    <input type="hidden" name="n_Space_Id" value="@(n_Space_Id)" />
+    <div class="printBt">
+        打印
+    </div>
+    <div class="showPrintDiv">
+    </div>
+    <div class="copymodel">
+        <div id="PrintDiv" class="PrintDiv" style="width: 550px; height: 150px; margin: 80px 20%;">
+            <div id="QrCode" class="QrCode" style="display: inline-block; width: 150px; height: 150px;
+                margin-left: 5%;">
+            </div>
+            <div class="QrCodeInfo" style="display: inline-block; height: 150px; font-family: 微软雅黑;
+                font-weight: bold;margin-left: 15px;">
+                <table style="height: 100%;">
+                    <tr>
+                        <td colspan="2">
+                            <span>所属仓库:</span>
+                            <label>
+                            </label>
+                        </td> 
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <span>货架储位位置:</span>
+                            <label>
+                            </label>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td rowspan="2">
+                            <span>货架储位码:</span> 
+                        </td>
+                        <td rowspan="2">
+                            <label style="font-size:45px;">
+                            </label>
+                        </td>
+                    </tr> 
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,244 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "模块名称";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SeltJITSTDBOM";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+}
+
+@section Params{
+    <form id="paramForm">
+        <div id="search_title">查询条件：</div>
+        <div id="paramlist">
+            @for (int i = 0; i < biz.Fields.Count; i++)
+            {
+                string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+                var fieldName = biz.Fields[i].FieldName;
+                var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+                <div class="param_item">
+                    @if (lookupField != null && lookupField.ToList().Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                        <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                        </script>
+                    }
+                    else if (biz.Fields[i].DataList.Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <select name="@(fieldName)" fieldType="select" >
+                            @foreach (var item in biz.Fields[i].DataList)
+                            {
+                                <option value="@(item.Key)">@(item.Value)</option>
+                            }
+                        </select>
+                    }
+                    else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                    {
+                        <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                    }
+                    else
+                    {
+                        <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                    }
+                </div>
+            }
+            <div style="clear: both;"></div>
+        </div>
+    </form>
+
+}
+@section Script{
+    <script type="text/javascript">
+        var topsRender=null;
+        var grid =null;
+        $(function () {
+            $("#module_toolbar input").hide();
+            $("#searchBt,#saveBt").show();
+            //渲染插件
+            topsRender=$("#paramlist *[fieldType]").pluginRender();
+            //初始化表格
+            grid = $("#datagrid").ligerGrid({
+                columns: [
+    {
+        "name": "s_Name",
+        "display": "产品名称",
+        "align": "left",
+        "width": 250,
+        "hide": false,
+        "type": "String"
+    },
+    {
+        "name": "s_U9_No",
+        "display": "U9料号",
+        "align": "center",
+        "width": 90,
+        "hide": false,
+        "type": "String",
+        "editor": null
+    },
+    {
+        "name": "s_Part_No",
+        "display": "客户零件号",
+        "align": "center",
+        "width": 80,
+        "hide": false,
+        "type": "String"
+    },
+    {
+        "name": "s_Type",
+        "display": "物料属性",
+        "align": "left",
+        "width": 80,
+        "hide": false,
+        "type": "String"
+    },
+    { display: 'AI', name: 's_AI', align: 'center', width: 80, editor: { type: 'string'} }, 
+    { display: '标准装箱量', name: 'n_Qty_Package', align: 'center', width: 80, editor: { type: 'string'} },
+    { display: '尾数装箱量', name: 'n_Qty_Package1', align: 'center', width: 80, editor: { type: 'string'} },
+    {
+        "name": "s_Supplier_Name",
+        "display": "供应商名称",
+        "align": "left",
+        "width": 80,
+        "hide": false,
+        "type": "String"
+    },
+    {
+        "name": "s_Creator",
+        "display": "创建人",
+        "align": "left",
+        "width": 80,
+        "hide": false,
+        "type": "String"
+    },
+    {
+        "name": "d_Creatime",
+        "display": "创建时间",
+        "align": "left",
+        "width": 80,
+        "hide": false,
+        "type": "date"
+    }
+                ],
+                url: '/AjaxGridData/SeltJITSTDBOM',
+                method: 'get',
+                statusName: "UpdateFlag",
+                delayLoad: true,
+                dataType: "local",
+                dataAction: 'server',
+                root: 'Data',                       //数据源字段名
+                record: 'Other1',                     //数据源记录数字段名
+                rownumbers: true,
+                //data: AllProductData, 
+                showTitle: false,
+                width: '99.5%',
+                height: '100%',
+                heightDiff: -10,
+                allowUnSelectRow: true, //是否允许取消选择行 
+                enabledEdit: true,
+                clickToEdit: true,
+                selectRowButtonOnly: false,
+                onSuccess: function (data, b) {
+                    $.topsErrorDeal(data);
+                },
+                onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                    var idKey='@(biz.Sqls[0].Key)';
+                    if($.trim(idKey)=='')return;
+                    var idData=new Object();
+                    idData[idKey]=rowdata[idKey];
+                    f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/AddresseeList/Modify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&" + Math.random());
+                }
+            });
+            //绑定按钮事件
+            $("#searchBt").click(function () {
+                grid.options.parms = $("form#paramForm").serializeArray();
+                grid.loadServerData(grid.options.parms);
+            });
+
+            $("#searchBt").click();
+            $("#addBt").click(function () {
+                f_addTab("Add", "添加", "/AddresseeList/Modify?"+"ctrl=add&" + Math.random());
+            });
+
+            $("#saveBt").click(function () {
+                $("#saveBt").attr("disable", "disable");
+                //先保存在客户端
+                grid.endEdit();
+                //再保存到服务器
+                var data = grid.getData();
+                var paramData = new Array();
+                $.each(data, function () {
+                    if (this.UpdateFlag != 'nochanged') {
+                        var param = {};
+                        param.n_Id=this.n_Id;
+                        param.s_AI=this.s_AI;
+                        param.n_Qty_Package=this.n_Qty_Package == "" ? 0 :this.n_Qty_Package;
+                        paramData.push(param);
+                    }
+                });
+                paramData = JSON.stringify(paramData);
+                $.ajax({
+                    type: "GET",
+                    url: "/AjaxGet/SelIsTestNetwork",
+                    data: {  },
+                    success: function (result) {
+                        result = JSON.parse(result);
+                        if (result.IsSuccess) {
+                            console.log(result);
+                            save_ajax = $.ajax({
+                                type: "POST",
+                                url: "/JITMan/UpdateJITMan",
+                                data: { param: paramData },
+                                success: function (data) {
+                                    if (data.IsSuccess) {
+                                        alert("保存成功");
+                                        $("#searchBt").click();
+                                    }
+                                    save_ajax = null;
+                                }
+                            })
+                        } else {
+                            alert(result.Msgs[0]);
+                        }
+                    }
+                })
+
+
+
+               
+
+               
+              
+
+                //$.ajax({
+                //    type: "GET",
+                //    url: "/JITMan/UpdateJITMan",
+                //    data: {  },
+                //    dealError: false,
+                //    success: function (data) {
+                //        console.log(data); 
+                //        //if (data.IsSuccess) {
+                //        //    alert("保存成功");
+                //        //    $("#searchBt").click();
+                //        //} else {
+                //        //    alert("保存失败，" + data.Msgs[0]);
+                //        //}
+                //        //$("#saveBt").removeAttr("disable");
+                //    }
+                //});
+            }); 
+        });
+            function f_flushGrid()
+            {
+                grid.loadData();
+            }
+    </script>
+}
+<div id="datagrid"></div>
+
+

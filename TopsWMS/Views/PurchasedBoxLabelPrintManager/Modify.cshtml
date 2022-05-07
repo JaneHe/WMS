@@ -1,0 +1,546 @@
+﻿@{ 
+    string BeginTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss").Substring(0, 16);
+    string NowTime = DateTime.Now.ToString("yyyyMMdd").Substring(2, 6);
+
+    string ReceiveTime = DateTime.Now.ToString("yyyy-MM-dd");
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>外购件箱单标签打印</title>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <script src="../../TopsLib/Scripts/QRCodeJs/jquery-barcode-2.0.2.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/js/JsBarcode.all.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        .PrintLabel_Tab
+        {
+            margin: 10px 0px;
+        }
+        .PrintLabel
+        {
+            width: 400px;
+            font-size: 15px;
+        }
+        .PrintLabel_Tab table
+        {
+            width: 100%;
+            text-align: center;
+        }
+        .PrintLabel_Tab td
+        {
+            border: 1px solid black;
+            line-height: 30px;
+        }
+        .PrintLabel_Tab td:nth-child(1)
+        {
+            width: 16%;
+        }
+        .PrintLabel_Tab td:nth-child(2)
+        {
+            width: 35%;
+        }
+        .PrintLabel_Tab td:nth-child(3)
+        {
+            width: 6%;
+        }
+        .PrintLabel_Tab td:nth-child(4)
+        {
+            width: 11%;
+        }
+        .PrintLabel_Tab td:nth-child(5)
+        {
+            width: 12%;
+        }
+        .PrintLabel_Tab td:nth-child(6)
+        {
+            width: 20%;
+        }
+        .PrintLabel_Tab td div
+        {
+            margin: 0px auto;
+            width: 150px;
+        }
+        
+        .ParamForm
+        {
+            margin: 10px 0px;
+        }
+        
+        .printBt
+        {
+            font-family: 微软雅黑;
+            font-size: 16px;
+            width: 120px;
+            line-height: 35px;
+            font-weight: bold;
+            background: #00b7ee;
+            border-radius: 25px;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            margin: 5px 0px;
+        }
+        .reloadBt
+        {
+            font-family: 微软雅黑;
+            font-size: 16px;
+            width: 120px;
+            line-height: 35px;
+            font-weight: bold;
+            background: #00b7ee;
+            border-radius: 25px;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            margin: 5px 0px;
+        }
+        
+        
+        .param_item
+        {
+            width: 21vw;
+            display: inline-block;
+            margin: 5px 5px;
+        }
+        .param_item input
+        {
+            width: 12vw;
+        }
+    </style>
+    <script type="text/javascript">
+        var body = null;
+
+        Vue.component("param_item", {
+            props: ["item"],
+            template: "<div class='param_item'><label>{{ item.labeltext }}</label><input v-bind:type='item.type' v-bind:value='item.value' v-bind:list='item.datalist' v-bind:name='item.name'  v-bind:disabled='item.disabled' v-on:keyup='f_changeval(item.index)' v-on:change='f_changeval(item.index)' v-on:blur='f_finishval(item.index)' ><datalist v-bind:id='item.datalist'></datalist></div>",
+            methods: {
+                //修改值事件
+                f_changeval: function (index) {
+                    var name = $(event.target).attr("name");
+                    body.label_Obj[name] = $(event.target).val();
+                    eval(body.param_item_data[index].keyup_fc);
+                },
+                //离开值事件
+                f_finishval: function (index) {
+
+                    eval(body.param_item_data[index].blur_fc);
+                }
+            }
+        })
+
+
+        $(function () {
+
+            body = new Vue({
+                el: ".body",
+                data: {
+                    param_item_data: [
+                     { index: 0, labeltext: "存货编码：", type: "text", value: "", datalist: "s_PurchasedBoxLabelPrintRecord_GoodsProductCode", name: "s_PurchasedBoxLabelPrintRecord_GoodsProductCode", disabled: false, keyup_fc: "body.f_changeCode()", blur_fc: "body.f_SelPurchasedBoxLabelSerialNumber()" },
+                     { index: 1, labeltext: "零件描述：", type: "text", value: "", datalist: "s_PurchasedBoxLabelPrintRecord_GoodsProductName", name: "s_PurchasedBoxLabelPrintRecord_GoodsProductName", disabled: false, keyup_fc: "", blur_fc: "" },
+                     { index: 2, labeltext: "订单号：", type: "text", value: "", datalist: "s_PurchasedBoxLabelPrintRecord_OrderNumber", name: "s_PurchasedBoxLabelPrintRecord_OrderNumber", disabled: false, keyup_fc: "", blur_fc: "" },
+                     { index: 3, labeltext: "收货日期：", type: "date", value: "@(ReceiveTime)", datalist: "d_PurchasedBoxLabelPrintRecord_ReceiveTime", name: "d_PurchasedBoxLabelPrintRecord_ReceiveTime", disabled: false, keyup_fc: "", blur_fc: "" },
+                     { index: 4, labeltext: "数量：", type: "text", value: "", datalist: "n_PurchasedBoxLabelPrintRecord_Amount", name: "n_PurchasedBoxLabelPrintRecord_Amount", disabled: false, keyup_fc: "body.f_changeCode()", blur_fc: "" },
+                     { index: 5, labeltext: "批号：", type: "text", value: "@(NowTime)", datalist: "s_PurchasedBoxLabelPrintRecord_BatchNumber", name: "s_PurchasedBoxLabelPrintRecord_BatchNumber", disabled: false, keyup_fc: "body.f_changeCode()", blur_fc: "" },
+                     { index: 6, labeltext: "供应商：", type: "text", value: "", datalist: "s_PurchasedBoxLabelPrintRecord_Supplier", name: "s_PurchasedBoxLabelPrintRecord_Supplier", disabled: false, keyup_fc: "", blur_fc: "" },
+                     { index: 7, labeltext: "AI号：", type: "text", value: "", datalist: "s_PurchasedBoxLabelPrintRecord_AI", name: "s_PurchasedBoxLabelPrintRecord_AI", disabled: false, keyup_fc: "body.f_changeCode()", blur_fc: "" }
+                    ],
+                    label_Obj: {
+                        s_PurchasedBoxLabelPrintRecord_GoodsBarCode: "",
+                        s_PurchasedBoxLabelPrintRecord_GoodsProductCode: "",
+                        s_PurchasedBoxLabelPrintRecord_GoodsProductName: "",
+                        s_PurchasedBoxLabelPrintRecord_ExternalCode: "",
+                        s_PurchasedBoxLabelPrintRecord_OrderNumber: "",
+                        d_PurchasedBoxLabelPrintRecord_ReceiveTime: "@(ReceiveTime)",
+                        n_PurchasedBoxLabelPrintRecord_Amount: "",
+                        s_PurchasedBoxLabelPrintRecord_BatchNumber: "@(NowTime)",
+                        s_PurchasedBoxLabelPrintRecord_Supplier: "",
+                        s_PurchasedBoxLabelPrintRecord_AI: "",
+                        s_PurchasedBoxLabelPrintRecord_Customer: "沈阳名华模塑科技有限公司",
+                        s_PurchasedBoxLabelPrintRecord_Address: "沈阳市大东区东跃一街",
+                        s_PurchasedBoxLabelPrintRecord_SerialNo: ""
+                    },
+                    label_barcode_option: {
+                        output: 'css',       //渲染方式 css/bmp/svg/canvas 
+                        color: 'black',   //条码颜色
+                        barWidth: 1.5,        //单条条码宽度 
+                        render: "table",
+                        barHeight: 40,     //单体条码高度 
+                        addQuietZone: false,  //是否添加空白区（内边距）
+                        fontSize: 12
+                    },
+                    label_JSbarcode_option: {
+                        format: "code128", //选择要使用的条形码类型
+                        width: 1.5, //设置条之间的宽度
+                        height: 40, //高度
+                        displayValue: true, //是否在条形码下方显示文字
+                        font: "Microsoft YaHei", //设置文本的字体
+                        textMargin: 1, //设置条形码和文本之间的间距
+                        fontSize: 15, //设置文本的大小
+                        lineColor: "#000"//设置条和文本的颜色。
+                        // margin: 2//设置条形码周围的空白边距
+                    },
+                    Bom_Info: new Array()
+                },
+                methods: {
+                    //加载页面
+                    f_loadPage: function () {
+
+                        body.f_loadbarCode();
+
+                        //加载打印事件
+                        $(".printBt").live("click", function () {
+                            body.f_InsertPurchasedBoxLabelPrintRecord();
+                        })
+                        //刷新事件
+                        $(".reloadBt").live("click", function () {
+                            location.reload();
+                        })
+                    },
+                    //形成一维码
+                    f_loadbarCode: function () {
+
+                        //一维码
+                        $(".s_PurchasedBoxLabelPrintRecord_GoodsBarCode").barcode(body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsBarCode, "code128", body.label_barcode_option);
+                        //一维码
+                        $(".s_PurchasedBoxLabelPrintRecord_GoodsProductCode").barcode(body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductCode, "code128", body.label_barcode_option);
+                        //一维码
+                        $(".n_PurchasedBoxLabelPrintRecord_Amount").barcode(body.label_Obj.n_PurchasedBoxLabelPrintRecord_Amount, "code128", body.label_barcode_option);
+                        //一维码
+                        $(".s_PurchasedBoxLabelPrintRecord_BatchNumber").barcode(body.label_Obj.s_PurchasedBoxLabelPrintRecord_BatchNumber, "code128", body.label_barcode_option);
+
+                        //样式调整
+                        $(".s_PurchasedBoxLabelPrintRecord_GoodsBarCode").css({ "width": "200px", "text-align": "center" });
+                        $(".s_PurchasedBoxLabelPrintRecord_GoodsProductCode").css({ "text-align": "center" });
+                        $(".n_PurchasedBoxLabelPrintRecord_Amount").css({ "text-align": "center" });
+                        $(".s_PurchasedBoxLabelPrintRecord_BatchNumber").css({ "text-align": "center" }); 
+
+                        body.f_SelPurchasedBoxLabelPrintInfo();
+
+                        //打印后触发事件
+                        window.onafterprint = function () {
+                            location.reload()
+
+                        }
+
+                    },
+                    //条码改值
+                    f_changeCode: function () {
+                        var name = $(event.target).attr("name");
+
+                        body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsBarCode =
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductCode +
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_BatchNumber +
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_SerialNo;
+                        $(".s_PurchasedBoxLabelPrintRecord_GoodsBarCode").barcode(body.label_Obj["s_PurchasedBoxLabelPrintRecord_GoodsBarCode"], "code128", body.label_barcode_option);
+                        //样式调整 
+                        $(".s_PurchasedBoxLabelPrintRecord_GoodsBarCode").css({ "text-align": "center" });
+
+                        var width = 0;
+                        $(".s_PurchasedBoxLabelPrintRecord_GoodsBarCode").find("div").each(function (index, value) {
+                            if (index != $(".s_PurchasedBoxLabelPrintRecord_GoodsBarCode").find("div").length - 1) {
+                                var w = $(value).css("width").replace("px", "");
+                                if (w == 0) {
+                                    w = $(value).css("border-left").replace("px solid black", "");
+                                }
+
+                                width += parseFloat(w);
+                            }
+                        })
+
+                        $(".s_PurchasedBoxLabelPrintRecord_GoodsBarCode").css("width", width);
+
+
+                        if (name == "s_PurchasedBoxLabelPrintRecord_GoodsProductCode" || name == "s_PurchasedBoxLabelPrintRecord_AI") {
+
+
+                            $(".s_PurchasedBoxLabelPrintRecord_GoodsProductCode").barcode(body.label_Obj["s_PurchasedBoxLabelPrintRecord_GoodsProductCode"] + "-" + body.label_Obj["s_PurchasedBoxLabelPrintRecord_AI"], "code128", body.label_barcode_option);
+                            //填写对应的产品编码，则带出对应的产品名称
+                            if (name == "s_PurchasedBoxLabelPrintRecord_GoodsProductCode") {
+                                var obj = body.Bom_Info.filter(function (item) {
+                                    return item.s_PartDescription_Code == body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductCode
+                                });
+                                if (obj.length > 0) {
+                                    $("[name=s_PurchasedBoxLabelPrintRecord_GoodsProductName]").val(obj[0].s_PartDescription_Name);
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductName = obj[0].s_PartDescription_Name;
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_ExternalCode = obj[0].s_PartDescription_CustomFields1;
+                                }
+                            }
+                        } else {
+                            $("." + name).barcode(body.label_Obj[name], "code128", body.label_barcode_option);
+                        }
+                        $("." + name).css({ "text-align": "center" });
+
+                        //JsBarcode的条码生成
+                        var BarCode_option = $.extend(true, {}, body.label_JSbarcode_option);
+                        JsBarcode("#BarCode", body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsBarCode, BarCode_option);
+
+                        var GoodsProductCode_option = $.extend(true, {}, body.label_JSbarcode_option);
+                        GoodsProductCode_option.height = 30;
+                        JsBarcode("#GoodsProductCode", body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductCode + "-" + body.label_Obj.s_PurchasedBoxLabelPrintRecord_AI, GoodsProductCode_option);
+
+                        //                        var BatchNumber_option = $.extend(true, {}, body.label_JSbarcode_option);
+                        //                        BatchNumber_option.height = 20;
+                        //                        JsBarcode("#BatchNumber", body.label_Obj.s_PurchasedBoxLabelPrintRecord_BatchNumber, BatchNumber_option);
+
+                        //                        var Amount_option = $.extend(true, {}, body.label_JSbarcode_option);
+                        //                        Amount_option.height = 20;
+                        //                        JsBarcode("#Amount", body.label_Obj.n_PurchasedBoxLabelPrintRecord_Amount, Amount_option);
+
+                    },
+                    //构建打印区域 打印纸张设置 7cm*5cm
+                    f_bulidPrintArea: function () {
+                        var headstr = "<html><head><title></title></head><body>";
+                        var footstr = "</body>";
+                        var printData = $(".PrintLabel").parent().html(); // 获得 div 里的所有 html 数据
+                        var oldstr = document.body.innerHTML;
+                        if (oldstr.indexOf("</style>") != -1) {
+
+                            var sc = oldstr.substring(oldstr.indexOf("</style>") + 8, oldstr.length);
+                            var script = sc.substring(sc.indexOf("<script type="), sc.indexOf("<div class="));
+                            printData = "<html><head>" + oldstr.substring(0, oldstr.indexOf("</style>")) + "</style>" +
+                             "</head><body>" + printData + "</body></html>"
+                        }
+
+                        document.body.innerHTML = headstr + printData + footstr;
+                        window.print();
+                        document.body.innerHTML = oldstr;
+                    },
+                    //获取当前该产品最新的流水号
+                    f_SelPurchasedBoxLabelSerialNumber: function () {
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelPurchasedBoxLabelSerialNumber",
+                            data: { s_PurchasedBoxLabelPrintRecord_GoodsProductCode: body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductCode },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_SerialNo = result.Data[0][0].SerialNo
+
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsBarCode =
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductCode +
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_BatchNumber +
+                                    body.label_Obj.s_PurchasedBoxLabelPrintRecord_SerialNo;
+
+                                } else {
+                                    alert(result.Msgs[0])
+                                }
+                            }
+                        })
+                    },
+                    //新增对应的操作记录
+                    f_InsertPurchasedBoxLabelPrintRecord: function () {
+                        var obj = body.f_redisisnull();
+                        if (!obj.isOK) {
+                            if (obj.alert_str != "") {
+                                alert(obj.alert_str);
+                            }
+                            return;
+                        }
+                        //暂时不允许超过10位料号进行录入
+                        if (body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductCode.length > 10) {
+                            alert("存货编码的填写位数不能超过10位!")
+                            return;
+                        }
+
+                        //循环缓存到浏览器里 为取消打印刷新而列
+                        for (var obj in body.label_Obj) {
+                            localStorage.setItem("PurchasedBoxLabelPrintManager_" + obj, body.label_Obj[obj]);
+                        }
+
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/AjaxPost/InsertPurchasedBoxLabelPrintRecord",
+                            data: body.label_Obj,
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    body.f_bulidPrintArea();
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+                    },
+                    //验证是否为空
+                    f_redisisnull: function () {
+                        var isOK = true;
+                        var alert_str = "";
+
+                        var continue_str = "订单号：;"
+                        for (var index = 0; index < body.param_item_data.length; index++) {
+
+                            if (body.label_Obj[body.param_item_data[index]["name"]] == "" && continue_str.indexOf(body.param_item_data[index]["labeltext"]) == -1) {
+                                isOK = false;
+                                alert_str = body.param_item_data[index]["labeltext"].replace("：", "") + "不能为空,请输入!";
+                                break;
+                            }
+                        }
+                        var obj = { alert_str: alert_str, isOK: isOK };
+                        return obj;
+                    },
+                    //查询外购件箱单标签打印基础信息
+                    f_SelPurchasedBoxLabelPrintInfo: function () {
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelPurchasedBoxLabelPrintInfo",
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data[0].length > 0) {
+                                        body.Bom_Info = result.Data[0];
+                                        result.Data[1].forEach(function (value, index) {
+                                            $("[name=s_PurchasedBoxLabelPrintRecord_GoodsProductCode]").parent().find("datalist").append("<option>" + value.s_PartDescription_Code + "</option>");
+                                        })
+                                    }
+
+                                } else {
+                                    alert(result.Msgs[0])
+                                }
+                            }
+                        })
+                    }
+                }
+            })
+
+            body.f_loadPage();
+
+            Vue.nextTick(function () {
+                //循环加载到文本框中   为取消打印刷新而列
+                for (var obj in body.label_Obj) {
+                    if (localStorage.getItem("PurchasedBoxLabelPrintManager_" + obj) != undefined) {
+                        $("[name=" + obj + "]").val(localStorage.getItem("PurchasedBoxLabelPrintManager_" + obj));
+                        body.label_Obj[obj] = localStorage.getItem("PurchasedBoxLabelPrintManager_" + obj);
+                        localStorage.removeItem("PurchasedBoxLabelPrintManager_" + obj);
+                    }
+                }
+
+                body.f_loadbarCode();
+
+                //JsBarcode的条码生成
+                var BarCode_option = $.extend(true, {}, body.label_JSbarcode_option);
+                JsBarcode("#BarCode", body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsBarCode, BarCode_option);
+
+                var GoodsProductCode_option = $.extend(true, {}, body.label_JSbarcode_option);
+                GoodsProductCode_option.height = 30;
+                JsBarcode("#GoodsProductCode", body.label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductCode, GoodsProductCode_option);
+
+            })
+
+        })
+    </script>
+</head>
+<body>
+    <div class="body">
+        <div>
+            <div class="printBt">
+                打印
+            </div>
+            <div class="reloadBt">
+                刷新
+            </div>
+        </div>
+        <div class="ParamForm">
+            <param_item v-bind:item="param_item" v-for="param_item in param_item_data"></param_item>
+        </div>
+        <div class="PrintLabel_Tab">
+            <div class="PrintLabel" style="width: 480px; font-size: 15px; margin-top: 20px;">
+                <table cellpadding="0" cellspacing="0" style="width: 100%; text-align: center;">
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(1)*@供应商
+                        </td>
+                        <td colspan="2" style="border: 1px solid black; width: 39%;">
+                            {{ label_Obj.s_PurchasedBoxLabelPrintRecord_Supplier }}
+                        </td>
+                        <td colspan="3" rowspan="3" style="border: 1px solid black; width: 47%;">
+                            <div>
+                                @*(4)*@包装单号
+                            </div>
+                            @*<div class="s_PurchasedBoxLabelPrintRecord_GoodsBarCode" style="margin: 0px auto;
+                                width: 200px;">
+                            </div>*@
+                            <svg id="BarCode" style="width: 220px; margin: 0px auto;" />
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(2)*@客户
+                        </td>
+                        <td colspan="2" style="border: 1px solid black; width: 39%;">
+                            {{ label_Obj.s_PurchasedBoxLabelPrintRecord_Customer }}
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(3)*@地址
+                        </td>
+                        <td colspan="2" style="border: 1px solid black; width: 39%;">
+                            {{ label_Obj.s_PurchasedBoxLabelPrintRecord_Address }}
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(5)*@存货编码
+                        </td>
+                        <td colspan="3" style="border: 1px solid black; width: 50%;">
+                            @*<div class="s_PurchasedBoxLabelPrintRecord_GoodsProductCode" style="margin: 0px auto;
+                                width: 150px;">
+                            </div>*@
+                            <svg id="GoodsProductCode" style="width: 180px; margin: 0px auto;" />
+                        </td>
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(6)*@订单号
+                        </td>
+                        <td style="border: 1px solid black; width: 22%;">
+                            {{ label_Obj.s_PurchasedBoxLabelPrintRecord_OrderNumber }}
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(7)*@零件描述
+                        </td>
+                        <td colspan="3" style="border: 1px solid black; width: 50%;">
+                            {{ label_Obj.s_PurchasedBoxLabelPrintRecord_GoodsProductName }}
+                        </td>
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(8)*@批次
+                        </td>
+                        <td style="border: 1px solid black; width: 22%;">
+                            <div class="s_PurchasedBoxLabelPrintRecord_BatchNumber" style="margin: 0px auto;
+                                width: 150px;">
+                            </div>
+                            
+                            @*<svg id="BatchNumber" style="width: 150px; margin: 0px auto;" />*@
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(9)*@创建时间
+                        </td>
+                        <td style="border: 1px solid black; width: 33%;">
+                            @(BeginTime)
+                        </td>
+                        <td style="border: 1px solid black; width: 6%;">
+                            @*(10)*@AI
+                        </td>
+                        <td style="border: 1px solid black; width: 11%;">
+                            {{ label_Obj.s_PurchasedBoxLabelPrintRecord_AI }}
+                        </td>
+                        <td style="border: 1px solid black; width: 14%;">
+                            @*(11)*@数量
+                        </td>
+                        <td style="border: 1px solid black; width: 22%;">
+                            <div class="n_PurchasedBoxLabelPrintRecord_Amount" style="margin: 0px auto; width: 150px;">
+                            </div>
+                            @*<svg id="Amount" style="width: 150px; margin: 0px auto;" />*@
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

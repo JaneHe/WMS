@@ -1,0 +1,181 @@
+﻿@{
+    ViewBag.Title = "ShortCut";
+    Layout = "~/TopsLib/Views/Tools/_Layout.cshtml";
+    var data = Tops.FRM.Biz.GetBizList(Tops.FRM.BizType.Query);
+    System.Data.DataTable dtQuery=data.Tables[0];
+    var data2 = Tops.FRM.Biz.GetBizList(Tops.FRM.BizType.Business);
+    System.Data.DataTable dtObj = data2.Tables[0];
+}
+<style type="text/css">
+    td{color:Blue; border-color:Black}
+    input,select{color:#505050}
+</style>
+<h2>快速生成页面代码，●_● ！</h2>
+<p><input type="button" value="生成" class="auto_bt" id="run_bt" /><img id="loading" style="display:none" src="../.."/TopsLib/Content/loading_min.gif" /></p>
+<form id="mainform">
+<table width="99%" border=1 cellpadding=0 cellspacing=0>
+    <tr>
+        <th width="100px;">模块名称：</th>
+        <td><input type="text" value="模块名称" name="Title" style="width:300px;" /></td>
+    </tr>
+    <tr>
+        <th width="100px;">查询对象：</th>
+        <td>
+        <select name="QueryName">
+        @for (int i = 0; i < dtQuery.Rows.Count; i++)
+        { 
+            <option value="@(dtQuery.Rows[i]["BizName"])">@(dtQuery.Rows[i]["BizName"])</option>
+        }
+        </select>
+        </td>
+    </tr>
+    <tr>
+        <th>生成类型：</th>
+        <td><input type="radio" checked value="Query" name="CodeType" />资料查询&nbsp;<input type="radio" value="DataObject"  name="CodeType"/>数据对象</td>
+    </tr>
+    <tr class="query">
+        <th>维护页面URL：</th>
+        <td><input type="text" value="/module/modify" name="ModifyUrl" style="width:300px;" /><br/>必须设置了查询项的关键字才有效</td>
+    </tr>
+    <tr class="query">
+        <th>资料查询模版：</th>
+        <td>
+            <select name="Temp_QueryName">
+            <option value="TempQueryFor_Module" selected>TempQueryFor_Module</option>
+            </select>
+        </td>
+    </tr>
+    <tr class="object">
+        <th>数据对象模版：</th>
+        <td>
+            <select name="Temp_DataObjectName">
+            <option value="TempObjectFor_Module" selected>TempObjectFor_Module</option>
+            </select>
+        </td>
+    </tr>
+    <tr id="query_power">
+        <th>查询功能：</th>
+        <td>
+            <input type="checkbox"  name="IsSearch"/>查询(<a style="color:Red">★</a>)&nbsp;
+            <input type="checkbox" name="IsAdd" />添加(<a style="color:Red">★</a>)&nbsp;
+            <input type="checkbox" name="IsExport" />导出(<a style="color:Red">★</a>)&nbsp; 
+            <input type="checkbox" name="IsPrint" />打印&nbsp;
+            <input type="checkbox" name="IsSave"/>保存(<a style="color:Red">●</a>)&nbsp;
+            <input type="checkbox" name="IsEdit" />修改(<a style="color:Red">●</a>)&nbsp;
+            <input type="checkbox" name="IsCancel" />取消(<a style="color:Red">●</a>)&nbsp;
+            <input type="checkbox" name="IsDel" />删除(<a style="color:Red">●</a>)&nbsp;
+            <input type="checkbox" name="IsCheck" />审核(<a style="color:Red">●</a>)&nbsp;
+            <p style="color:Red">注意：'★'为资料查询特有，'●'为数据对象特有</p>
+        </td>
+    </tr>
+    <tr class="object">
+        <th width="100px;">相关业务：</th>
+        <td>
+            <p>
+                添加时：
+                <select name="BizAdd">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtObj.Rows.Count; i++)
+                { 
+                    <option value="@(dtObj.Rows[i]["BizName"])">@(dtObj.Rows[i]["BizName"])</option>
+                }
+                </select>
+            </p>
+            <p>
+                修改时：
+                <select name="BizModify">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtObj.Rows.Count; i++)
+                { 
+                    <option value="@(dtObj.Rows[i]["BizName"])">@(dtObj.Rows[i]["BizName"])</option>
+                }
+                </select>
+            </p>
+            <p>
+                删除时：
+                <select name="BizDel">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtObj.Rows.Count; i++)
+                { 
+                    <option value="@(dtObj.Rows[i]["BizName"])">@(dtObj.Rows[i]["BizName"])</option>
+                }
+                </select>
+            </p>
+            <p>
+                审核时：
+                <select name="BizCheck">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtObj.Rows.Count; i++)
+                { 
+                    <option value="@(dtObj.Rows[i]["BizName"])">@(dtObj.Rows[i]["BizName"])</option>
+                }
+                </select>
+            </p>
+        </td>
+    </tr>
+    <tr>
+    <td colspan=2>
+        <textarea id="viewText" rows="50" style="width:99%"></textarea>
+    </td>
+    </tr>
+</table>
+</form>
+<script type="text/javascript">
+    $(function () {
+        $("#mainform")[0].reset();
+        $("#run_bt").click(function () {
+            $(this).attr("disabled", "disabled");
+            $("#loading").show();
+            var d = {
+                QueryName: $("#mainform [name=QueryName]").val(),
+                CodeType: $("#mainform [name=CodeType]:checked").val(),
+                IsSearch: $("#mainform [name=IsSearch]").attr("checked"),
+                IsAdd: $("#mainform [name=IsAdd]").attr("checked"),
+                IsExport: $("#mainform [name=IsExport]").attr("checked"),
+                IsPrint: $("#mainform [name=IsPrint]").attr("checked"),
+                IsSave: $("#mainform [name=IsSave]").attr("checked"),
+                IsEdit: $("#mainform [name=IsEdit]").attr("checked"),
+                IsCancel: $("#mainform [name=IsCancel]").attr("checked"),
+                IsDel: $("#mainform [name=IsDel]").attr("checked"),
+                IsCheck: $("#mainform [name=IsCheck]").attr("checked"),
+                BizAdd: $("#mainform [name=BizAdd]").val(),
+                BizModify: $("#mainform [name=BizModify]").val(),
+                BizDel: $("#mainform [name=BizDel]").val(),
+                BizCheck: $("#mainform [name=BizCheck]").val(),
+                ModifyUrl: $("#mainform [name=ModifyUrl]").val(),
+                Title: $("#mainform [name=Title]").val()
+            }
+            var viewname = $("select[name=Temp_QueryName]").val();
+            if (d.CodeType == 'DataObject')
+                viewname = $("select[name=Temp_DataObjectName]").val();
+            $.ajax({
+                type: "POST",
+                url: "/Tools/GetCodeHtml?ViewName=" + viewname,
+                data: { data: $.toJSON(d) },
+                dataType: "text",
+                success: function (data) {
+                    $("#viewText").val(data);
+                    $("#loading").hide();
+                    $("#run_bt").removeAttr("disabled");
+                }
+            });
+        });
+        $("input[name=CodeType]").click(function () {
+            if ($(this).val() == 'Query') {
+                $(".query").show();
+                $(".object").hide();
+            } else {
+                $(".query").hide();
+                $(".object").show();
+            }
+        });
+        $("input[name=CodeType]").eq(0).click();
+        $("input").focus(function () {
+            $(this).select();
+        });
+        $("select[name=QueryName]").change(function () {
+            $("input[name=ModifyUrl]").val("/" + $(this).val().replace("Sel", "") + "/Modify");
+        });
+    });
+    
+</script>

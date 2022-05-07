@@ -1,0 +1,243 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "单据明细";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelIMEListStockInOutList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+
+
+    string QueryNameOne = "SelIMEListPutOnOffList";
+    Tops.FRM.Biz bizOne = Tops.FRM.Biz.GetBiz(QueryNameOne, Tops.FRM.BizType.Query);
+    var metasOne = Tops.FRM.TopsMeta.LoadMetas(QueryNameOne);
+
+
+    foreach (string key in metas[0].Keys)
+    {
+        metas[0][key].Type = "String";
+    }
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+
+    foreach (string key in metasOne[0].Keys)
+    {
+        metasOne[0][key].Type = "String";
+    }
+    var colsOne = ModuleConfig.GetColumns(metasOne[0], bizOne.Lookups, bizOne.Sqls[0], bizOne);
+
+    string n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"].ToString();
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+    <div id="hiddenlist">
+    </div>
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+            string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+            var fieldName = biz.Fields[i].FieldName;
+            var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+            <div class="param_item">
+                @if (lookupField != null && lookupField.ToList().Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                    <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                    </script>
+                }
+                else if (biz.Fields[i].DataList.Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <select name="@(fieldName)" fieldType="select" >
+                        @foreach (var item in biz.Fields[i].DataList)
+                        {
+                            <option value="@(item.Key)">@(item.Value)</option>
+                        }
+                    </select>
+                }
+                else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                }
+                else
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                }
+            </div>
+        }
+        <input type="hidden" name="n_BillStockInOut_Id" value="@(n_BillStockInOut_Id)" />
+        <div style="clear: both;">
+        </div>
+    </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    
+    //明细表格的全局变量
+    var gridList = new Array();
+    var grid = null;
+    var DetailID = 0;
+    $(function () {
+        $("#module_toolbar input").hide();
+        //,#addBt,#saveBt
+        $("#searchBt").show();
+        
+        $("#addBt").removeAttr("class").attr("class","save_bt");
+        $("#addBt").attr("value","提交明细单据");  
+        $("#saveBt").attr("value","撤销明细单据");  
+
+        $("#paramlist .param_item:eq(5)").empty();
+
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+         
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelIMEListStockInOutList',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            frozen: false,
+            checkbox:true,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                 
+            },
+            detail: { onShowDetail: showDetail, height: 'auto' }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+        });
+
+        //提交事件
+        $("#addBt").click(function () {
+            var rows = grid.getSelectedRows();
+           
+            if(rows.length == 0){
+               return;
+            }
+            
+            rows = rows.filter(function(item,index){ 
+                if(item.s_ListStockInOut_WhetherToSubmit  == "否"){
+                   return item;
+                }
+            })
+
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/AddSubmitListPutOnOffIME",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("提交成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        }); 
+
+        
+        //撤销提交事件
+        $("#saveBt").click(function(){
+            
+            var rows = grid.getSelectedRows();
+            
+            if(rows.length == 0){
+               return;
+            }
+
+            rows = rows.filter(function(item,index){ 
+                if(item.s_ListStockInOut_WhetherToSubmit  == "是"){
+                   return item;
+                }
+            })
+
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/AddSubmitListPutOnOffIME",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("撤销提交成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        })
+         
+        $("#searchBt").click();
+        
+    });
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+     
+    //展示明细
+    function showDetail(row, detailPanel, rollback) {
+        gird = document.createElement("div");
+        gird.id = "detailgrid" + DetailID;
+        $(detailPanel).append(gird);
+
+        //初始化表格
+        grid2 = $(gird).css('margin-left', 8).css('margin-top', 20).css('margin-bottom', 20).ligerGrid({
+             columns:@Html.Raw(colsOne.ToJson(true)), 
+             url: '/AjaxGridData/SelIMEListPutOnOffList?n_ListStockInOut_Id='+row.n_ListStockInOut_Id+"&s_ListPutOnOff_WhetherToSubmit="+ $("[name=s_ListStockInOut_WhetherToSubmit]").find("option:selected").attr("value") +"&n_ListPutOnOff_state="+$("[name=n_ListStockInOut_state]").find("option:selected").attr("value"),
+             method: 'get',
+             //delayLoad: true,
+             dataType: "local",
+             frozen: false,
+             usePager:false,
+             dataAction: 'server',
+             root: 'Data',                       //数据源字段名
+             record: 'Other1',                     //数据源记录数字段名
+             rownumbers: true,
+             data: [{ Row: [], Total: 0}],
+             showTitle: false, 
+             isScroll:false,
+             height: 'auto',
+             heightDiff: -10,
+             enabledSort:false,
+             onSelectRow:function (rowdata) {
+                 rows = rowdata;
+             },
+             onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+
+             } 
+       });
+       gridList.push(grid2);
+       DetailID++;
+    }
+    </script>
+}
+<div id="datagrid">
+</div>

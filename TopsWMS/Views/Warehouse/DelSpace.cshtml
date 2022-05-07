@@ -1,0 +1,145 @@
+﻿@{
+    Layout = null; 
+    string n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"].ToString();
+    string s_Warehouse_Name = Request.QueryString["s_Warehouse_Name"].ToString();
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>仓库储位停用</title>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        .param_item
+        {
+            margin: 2px 1px;
+            float: left;
+            min-width: 220px;
+            font-size: 12px;
+        }
+        
+        .param_item input[type=text]
+        {
+            margin-left:5px;
+            width:120px;
+        }
+        .param_item input[type=button]
+        {
+            margin-left:5px;
+            width:80px;
+        }
+    </style>
+    <script type="text/javascript">
+         
+        Vue.component("param_input", {
+            props: ["data"],
+            template: "<div class='param_item'><label>{{ data.labeltext }}</label><input v-bind:type='data.type' v-bind:name='data.name' v-bind:list='data.list' /></div>"
+        })
+
+        Vue.component("param_button", {
+            props: ["data"],
+            template: "<div class='param_item'><input v-bind:type='data.type' v-bind:name='data.name' v-bind:value='data.value' /></div>"
+        })
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    param_input_data: [
+                       { labeltext: "仓库名称:", type: "text", name: "WarehouseName", list: "WarehouseName" },
+                       { labeltext: "货架名称:", type: "text", name: "RackCode", list: "RackCode" }
+                    ],
+                    param_button_data: [
+                       { type: "button", name: "btnSearch", value: "查询" }
+                    ],
+                    content_data:new Array();
+                },
+                methods: {
+                    //初始化页面
+                    f_loadingPage: function () {
+                        //初始化
+                        $("[name=WarehouseName]").val("@(s_Warehouse_Name)").attr("disabled", "disabled");
+                        if($("[name=RackCode]").parent().find("option").length > 0){
+                           $("[name=RackCode]").val($("[name=RackCode]").parent().find("option:eq(0)").text());
+                        }
+
+                        vue.f_loadRackList();
+                    },
+                    //加载货架储位信息
+                    f_loadRackList: function () {
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelDelSpaceInfoList",
+                            data: { n_Warehouse_Id: "@(n_Warehouse_Id)" },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data[1].length > 0) {
+                                        var s = "<datalist id='RackCode'>";
+                                        result.Data[1].forEach(function (value, index) {
+                                            s += "<option index='" + value.n_Rack_Id + "'>" + value.s_Rack_Code + "</option>"
+                                        })
+                                        s += "</datalist>"
+                                        $(s).insertAfter($("[name=RackCode]"));
+                                    }
+                                    var RackCode = $("[name=RackCode]").val();
+                                    if(result.Data[0].length > 0 && RackCode != ""){ 
+                                        var col_obj = new Object();
+
+                                        var cou = result.Data[0].length;
+                                        col_obj["0"] = "层\节";
+                                        //第一行默认为节数字行
+                                        for(var index = 1;index <= cou;index++){ 
+                                            col_obj[index] = index;
+                                        }
+                                        content_data.push(col_obj);
+                                         
+                                        //筛选同一个货架编码的记录,筛选最高的层数
+                                        var n_Max_LayNumber = -1;
+                                        result.Data[0].forEach(function(value,index){
+                                            if(value.s_Rack_Code == RackCode && value.n_Space_LayNumber > n_Max_LayNumber){
+                                                n_Max_LayNumber = value.n_Space_BayNumber;
+                                            }
+                                        })
+                                        //后面的行第一个单元格为层数字
+                                        for(var index = 1;index <= n_Max_LayNumber;index++){ 
+                                            
+                                            //筛选同一个货架编码的记录
+                                            var res = result.Data[0].filter(function(item){
+                                                return item.s_Rack_Code == RackCode && 
+                                                item.n_Space_LayNumber == index;
+                                            })
+                                            var row_obj = new Object();
+                                            //row_obj
+                                        } 
+                                    }
+
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+                    }
+                }
+            })
+
+            vue.f_loadingPage();
+        })
+    </script>
+</head>
+<body>
+    <div class="body">
+        <div class="param_search">
+            <param_input v-bind:data="param_input" v-for="param_input in param_input_data"></param_input>
+            <param_button v-bind:data="param_button" v-for="param_button in param_button_data"></param_button>
+        </div>
+        <div class="content">
+            <table>
+                 <tr>
+                     <td></td>
+                 </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

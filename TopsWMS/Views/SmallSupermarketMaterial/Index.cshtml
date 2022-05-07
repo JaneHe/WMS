@@ -1,0 +1,518 @@
+﻿@{ 
+    ViewBag.Title = "小件超市物料基础信息管理";
+    ViewBag.ModuleName = "资料查询"; 
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>小件超市物料基础信息管理</title>
+    <link href="../../TopsLib/Content/Site.css" rel="stylesheet" type="text/css" />
+    <script src="../../Scripts/jquery-1.8.0.min.js?@DateTime.Now" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <style type="text/css">
+        .button_div
+        {
+            width: 98vw;
+            background: #EAEEF5;
+            border-bottom: 1px solid #BED5F3;
+            margin-bottom: 3px;
+            padding: 2px;
+        }
+        .param_button
+        {
+            display: inline-block;
+            margin: 5px 5px;
+        }
+        .param_item
+        {
+            width: 21vw;
+            display: inline-block;
+            margin: 5px 5px;
+        }
+        .param_item input
+        {
+            width: 10vw;
+        }
+        
+        .table_title 
+        {
+            width:96.5vw; 
+            margin: 5px 5px 0px 5px;
+        }
+        .table_content
+        {
+            width:98vw; 
+            margin: 0px 5px 5px 5px;
+            overflow-y:scroll;
+            height:80vh;
+        }
+        .table_title table,.table_content table
+        {
+            width:100%; 
+        }
+        
+        .table_title tr
+        {
+            background:#c1dbfa;
+            font-family: "微软雅黑", "宋体", Arial, sans-serif;
+            line-height: 5vh;
+            height: 5vh;
+            text-align:center;
+            cursor:pointer;
+        }
+        .table_content tr:nth-child(even)
+        {
+            background:#f5f5f5;
+            line-height: 5vh;
+            height: 5vh;
+        }
+        .table_content tr:nth-child(odd)
+        {
+            background:#ffffff;
+            line-height: 5vh;
+            height: 5vh;
+        }
+        
+        .table_title td,.table_content td
+        {
+            width:12%;
+            border: 1px solid #A3C0E8;
+        }
+        
+        .table_title td:nth-child(1),.table_content td:nth-child(1),
+        .table_title td:nth-child(3),.table_content td:nth-child(3)
+        {
+            width:10%;
+            border: 1px solid #A3C0E8;
+        }
+        .table_title td:nth-child(2),.table_content td:nth-child(2)
+        {
+            width:32%;
+            border: 1px solid #A3C0E8;
+        }
+        .table_title td:nth-child(4),.table_content td:nth-child(4),
+        .table_title td:nth-child(5),.table_content td:nth-child(5),
+        .table_title td:nth-child(6),.table_content td:nth-child(6),
+        .table_title td:nth-child(7),.table_content td:nth-child(7)
+        { 
+            width:8%;
+            border: 1px solid #A3C0E8;
+        }
+        
+        .table_content td input
+        {
+            width:80%; 
+            margin:auto 10%;
+        } 
+        
+        
+        .shadow {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 998;
+            background-color: #000;
+            opacity: 0.6;
+        }
+        
+        .check_line
+        {
+            background:#DCF8A8 !important;
+        }
+    </style>
+    <script type="text/javascript">
+        var body = null;
+
+        //全局变量
+        var config_obj = new Vue({
+            data: {
+                Materuel_input_obj: {
+                    s_SmallSupermarketMaterialInfo_GoodsProductCode: "",
+                    s_SmallSupermarketMaterialInfo_GoodsProductName: "",
+                    s_SmallSupermarketMaterialInfo_ExternalCode: ""
+                }
+            }
+        })
+
+        Vue.component("Materuel_button", {
+            props: ["button_array"],
+            template: "<div class='param_button' ><input type='button' v-bind:class='button_array.class' v-bind:value='button_array.value' v-bind:name='button_array.name' v-on:click='f_loadEvent(button_array.index)'></div>",
+            methods: {
+                f_loadEvent: function (index) {
+
+                    eval(body.Materuel_button_array[index].click_fc);
+                }
+            }
+        })
+
+        Vue.component("Materuel_input", {
+            props: ["input_array"],
+            template: "<div class='param_item'><label>{{ input_array.labeltext }}</label><input type='text' v-bind:name='input_array.name' v-bind:datalist='input_array.datalist' v-on:click='f_loadEvent(input_array.index)' v-model='input_array.value'></div>",
+            methods: {
+                f_loadEvent: function (index) {
+
+                    eval(body.Materuel_input_array[index].click_fc);
+                }
+            }
+        })
+
+        $(function () {
+            body = new Vue({
+                el: ".body",
+                data: {
+                    Materuel_button_array: [
+                     { index: 0, name: "Search", value: "查询", class: "serch_bt", click_fc: "body.f_loadData()" },
+                     { index: 1, name: "Add", value: "添加", class: "add_bt", click_fc: "body.f_addData()" },
+                     { index: 2, name: "Edit", value: "编辑", class: "check_bt", click_fc: "body.f_editData()" },
+                     { index: 3, name: "Del", value: "删除", class: "del_bt", click_fc: "body.f_delData()" },
+                     { index: 4, name: "Save", value: "保存", class: "save_bt", click_fc: "body.f_saveData()" }
+                    ],
+                    Materuel_input_array: [
+                     { index: 0, labeltext: "产品编码：", name: "s_SmallSupermarketMaterialInfo_GoodsProductCode", datalist: "s_SmallSupermarketMaterialInfo_GoodsProductCode", click_fc: "", value: config_obj.Materuel_input_obj.s_SmallSupermarketMaterialInfo_GoodsProductCode },
+                     { index: 1, labeltext: "产品名称：", name: "s_SmallSupermarketMaterialInfo_GoodsProductName", datalist: "s_SmallSupermarketMaterialInfo_GoodsProductName", click_fc: "", value: config_obj.Materuel_input_obj.s_SmallSupermarketMaterialInfo_GoodsProductName },
+                     { index: 2, labeltext: "U9产品编码：", name: "s_SmallSupermarketMaterialInfo_ExternalCode", datalist: "s_SmallSupermarketMaterialInfo_ExternalCode", click_fc: "", value: config_obj.Materuel_input_obj.s_SmallSupermarketMaterialInfo_ExternalCode }
+                    ],
+                    table_title_array: [
+                      { name: "产品编码", column: "s_SmallSupermarketMaterialInfo_GoodsProductCode", type: "" },
+                      { name: "产品名称", column: "s_SmallSupermarketMaterialInfo_GoodsProductName", type: "" },
+                      { name: "U9产品编码", column: "s_SmallSupermarketMaterialInfo_ExternalCode", type: "" },
+                      { name: "满储位包装数", column: "f_MaterialInfo_FullStoragePackageNumber", type: "" },
+                      { name: "单位包装件数", column: "f_MaterialInfo_PerUnitPackageNumber", type: "" },
+                      { name: "满储位工件数", column: "f_MaterialInfo_FullStorageWorkpiecesNumber", type: "" },
+                      { name: "预警储量%", column: "f_MaterialInfo_EarlyWarningReservesCou", type: "" }
+                    ],
+                    table_coontent_array: new Array(),
+                    table_product_array: new Array(),
+                    IsShadowShow: false
+                },
+                methods: {
+                    //加载数据
+                    f_loadData: function () {
+                        //取消编辑状态
+                        body.table_coontent_array.forEach(function (v, i) {
+                            v.n_SmallSupermarketMaterialInfo_isEdit = false;
+                        })
+
+                        body.IsShadowShow = true;
+
+                        config_obj.Materuel_input_obj = {
+                            s_SmallSupermarketMaterialInfo_GoodsProductCode: $("[name=s_SmallSupermarketMaterialInfo_GoodsProductCode]").val(),
+                            s_SmallSupermarketMaterialInfo_GoodsProductName: $("[name=s_SmallSupermarketMaterialInfo_GoodsProductName]").val(),
+                            s_SmallSupermarketMaterialInfo_ExternalCode: $("[name=s_SmallSupermarketMaterialInfo_ExternalCode]").val()
+                        }
+                       
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelSmallSupermarketMaterialList",
+                            data: config_obj.Materuel_input_obj,
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data[0].length > 0) {
+                                        body.table_coontent_array = new Array();
+                                        result.Data[0].forEach(function (value, index) {
+                                            value.n_SmallSupermarketMaterialInfo_isCheck = false;
+                                            value.n_SmallSupermarketMaterialInfo_isEdit = false;
+                                            body.table_coontent_array.push(value);
+                                        })
+                                    }
+
+                                    //默认优化其录入
+                                    if (result.Data[1].length > 0) {
+                                        body.table_product_array = result.Data[1];
+                                    }
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                                body.IsShadowShow = false;
+
+
+                            }
+                        })
+                    },
+                    //选择行事件
+                    f_checkline: function () {
+
+                        var index = $(event.target).attr("index");
+                        if (index == undefined) {
+                            index = $(event.target).parent().attr("index");
+                        }
+                        body.table_coontent_array.forEach(function (v, i) {
+                            v.n_SmallSupermarketMaterialInfo_isCheck = false;
+                            if (index == i) {
+                                v.n_SmallSupermarketMaterialInfo_isCheck = true;
+                            }
+                        })
+                    },
+                    //对数据进行排序
+                    f_sortData: function () {
+                        var type = $(event.target).attr("type");
+                        var column = $(event.target).attr("column");
+                        var column_varchar_str = "s_SmallSupermarketMaterialInfo_GoodsProductCode,s_SmallSupermarketMaterialInfo_GoodsProductName,s_SmallSupermarketMaterialInfo_ExternalCode";
+                        var column_float_str = "f_MaterialInfo_FullStoragePackageNumber,f_MaterialInfo_PerUnitPackageNumber,f_MaterialInfo_FullStorageWorkpiecesNumber,f_MaterialInfo_EarlyWarningReservesCou";
+
+                        if (type == "reverse" || type == "") {
+                            if (column_varchar_str.indexOf(column) > -1) {
+                                body.table_coontent_array.sort(function (a, b) {
+                                    return a[column].localeCompare(b[column]);
+                                });
+                            } else if (column_float_str.indexOf(column) > -1) {
+                                body.table_coontent_array.sort(function (a, b) {
+                                    return a[column] - b[column];
+                                });
+                            }
+                            $(event.target).attr("type", "sort");
+                        } else if (type == "sort") {
+                            if (column_varchar_str.indexOf(column) > -1) {
+                                body.table_coontent_array.sort(function (a, b) {
+                                    return b[column].localeCompare(a[column]);
+                                });
+                            } else if (column_float_str.indexOf(column) > -1) {
+                                body.table_coontent_array.sort(function (a, b) {
+                                    return b[column] - a[column];
+                                });
+                            }
+                            $(event.target).attr("type", "reverse");
+                        }
+                    },
+                    //编辑数据
+                    f_editData: function () {
+                        body.table_coontent_array.forEach(function (v, i) {
+                            v.n_SmallSupermarketMaterialInfo_isEdit = true;
+                        })
+
+                        if (body.table_product_array.length > 0) {
+                            $("datalist").empty();
+                            body.table_product_array.forEach(function (value, index) {
+                                $("#s_SmallSupermarketMaterialInfo_GoodsProductCode").append("<option value='" + value.s_PartDescription_Code + "'></option>");
+                                $("#s_SmallSupermarketMaterialInfo_GoodsProductName").append("<option key='" + value.s_PartDescription_Code + "' value='" + value.s_PartDescription_Name + "'></option>");
+                                $("#s_SmallSupermarketMaterialInfo_ExternalCode").append("<option key='" + value.s_PartDescription_Code + "' value='" + value.s_PartDescription_CustomFields1 + "'></option>");
+                            })
+                        }
+                    },
+                    //新增数据
+                    f_addData: function () {
+                        var param_data = new Array();
+                        $.extend(true, param_data, body.table_coontent_array);
+
+                        body.table_coontent_array = new Array();
+                        body.table_coontent_array.push({
+                            n_SmallSupermarketMaterialInfo_Id: "",
+                            s_SmallSupermarketMaterialInfo_GoodsProductCode: "",
+                            s_SmallSupermarketMaterialInfo_GoodsProductName: "",
+                            s_SmallSupermarketMaterialInfo_ExternalCode: "",
+                            f_MaterialInfo_FullStoragePackageNumber: "",
+                            f_MaterialInfo_PerUnitPackageNumber: "",
+                            f_MaterialInfo_FullStorageWorkpiecesNumber: "",
+                            f_MaterialInfo_EarlyWarningReservesCou: "",
+                            n_SmallSupermarketMaterialInfo_isCheck: false,
+                            n_SmallSupermarketMaterialInfo_isEdit: true
+                        })
+                        param_data.forEach(function (value, index) {
+                            body.table_coontent_array.push(value);
+                        })
+
+
+                    },
+                    //选择产品编码，默认选择对应的名称与U9产品编码
+                    f_chooseGoodsProductCode: function () {
+
+                        var code = $(event.target).val();
+                        var index = $(event.target).parent().parent().attr("index");
+                        var obj = body.table_product_array.filter(function (item) {
+                            return item.s_PartDescription_Code == code;
+                        })
+
+                        if (obj.length > 0) {
+                            body.table_coontent_array[index].s_SmallSupermarketMaterialInfo_GoodsProductName = obj[0].s_PartDescription_Name;
+                            body.table_coontent_array[index].s_SmallSupermarketMaterialInfo_ExternalCode = obj[0].s_PartDescription_CustomFields1;
+                            $(event.target).parent().parent().find("[name=s_SmallSupermarketMaterialInfo_GoodsProductName]").val(obj[0].s_PartDescription_Name);
+                            $(event.target).parent().parent().find("[name=s_SmallSupermarketMaterialInfo_ExternalCode]").val(obj[0].s_PartDescription_CustomFields1);
+                        }
+                    },
+                    //产品编码焦点事件
+                    f_focusGoodsProductCode: function () {
+                        if (body.table_product_array.length > 0) {
+                            $("datalist").empty();
+                            body.table_product_array.forEach(function (value, index) {
+                                $("#s_SmallSupermarketMaterialInfo_GoodsProductCode").append("<option value='" + value.s_PartDescription_Code + "'></option>");
+                                $("#s_SmallSupermarketMaterialInfo_GoodsProductName").append("<option key='" + value.s_PartDescription_Code + "' value='" + value.s_PartDescription_Name + "'></option>");
+                                $("#s_SmallSupermarketMaterialInfo_ExternalCode").append("<option key='" + value.s_PartDescription_Code + "' value='" + value.s_PartDescription_CustomFields1 + "'></option>");
+                            })
+                        }
+                    },
+                    //根据满储位包装数*单位包装件数=满储位工件数帮其自动计算其结果
+                    f_calculation: function () {
+                        var name = $(event.target).attr("name");
+                        var index = $(event.target).parent().parent().attr("index");
+                        //获取数字
+                        var f_MaterialInfo_FullStoragePackageNumber = body.table_coontent_array[index]["f_MaterialInfo_FullStoragePackageNumber"];
+                        var f_MaterialInfo_PerUnitPackageNumber = body.table_coontent_array[index]["f_MaterialInfo_PerUnitPackageNumber"];
+                        var f_MaterialInfo_FullStorageWorkpiecesNumber = body.table_coontent_array[index]["f_MaterialInfo_FullStorageWorkpiecesNumber"];
+                        if (name == "f_MaterialInfo_FullStoragePackageNumber") {
+                            if (f_MaterialInfo_PerUnitPackageNumber != "") {
+                                body.table_coontent_array[index]["f_MaterialInfo_FullStorageWorkpiecesNumber"] = parseFloat(f_MaterialInfo_FullStoragePackageNumber) * parseFloat(f_MaterialInfo_PerUnitPackageNumber)
+                            } else {
+                                body.table_coontent_array[index]["f_MaterialInfo_FullStorageWorkpiecesNumber"] = "0"
+                            }
+                        } else if (name == "f_MaterialInfo_PerUnitPackageNumber") {
+                            if (f_MaterialInfo_FullStoragePackageNumber != "") {
+                                body.table_coontent_array[index]["f_MaterialInfo_FullStorageWorkpiecesNumber"] = parseFloat(f_MaterialInfo_FullStoragePackageNumber) * parseFloat(f_MaterialInfo_PerUnitPackageNumber)
+                            } else {
+                                body.table_coontent_array[index]["f_MaterialInfo_FullStorageWorkpiecesNumber"] = "0"
+                            }
+                        }
+
+                    },
+                    //删除数据
+                    f_delData: function () {
+
+                        if (!confirm("请确认是否真的要删除?")) {
+                            return;
+                        }
+
+                        var param_data = new Array();
+                        param_data = body.table_coontent_array.filter(function (item) {
+                            return item.n_SmallSupermarketMaterialInfo_isCheck;
+                        })
+                        if (param_data.length == 0) {
+                            alert("请选择需要删除的行记录!");
+                            return
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/AjaxPost/DelSmallSupermarketMaterial",
+                            data: { Dictionarys: param_data },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    alert("删除成功!");
+                                    location.reload();
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+
+                                body.IsShadowShow = false;
+                            }
+                        })
+                    },
+                    //保存数据
+                    f_saveData: function () {
+                        body.IsShadowShow = true;
+
+                        var param_data = new Array();
+                        param_data = body.table_coontent_array.filter(function (item) {
+                            return item.n_SmallSupermarketMaterialInfo_isEdit;
+                        })
+
+                        if (param_data.length == 0) {
+                            return
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/AjaxPost/UpdateSmallSupermarketMaterial",
+                            data: { Dictionarys: param_data },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    alert("保存成功!");
+                                    location.reload();
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+
+                                body.IsShadowShow = false;
+                            }
+                        })
+                    }
+                }
+            })
+
+
+            body.f_loadData();
+
+        })
+    </script>
+</head>
+<body>
+    <div class="body">
+        @*<input type="button" id="zhanban"  value="zhanban"/>*@
+        <div class="button_div">
+            <materuel_button v-bind:button_array="Materuel_button" v-for="Materuel_button in Materuel_button_array"></materuel_button>
+        </div>
+        <div class="Search_div">
+            <materuel_input v-bind:input_array="Materuel_input" v-for="Materuel_input in Materuel_input_array"></materuel_input>
+        </div>
+        <div class="table_title">
+            <table cellspacing="0">
+                <tr>
+                    <td v-for="(item,i) in table_title_array" index="i" :column="item.column" v-on:click="f_sortData" :type="item.type">
+                        {{ item.name }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="table_content">
+            <table cellspacing="0">
+                
+                <tr type="tr_edit" v-for="(item,i) in table_coontent_array" :index="i" :n_SmallSupermarketMaterialInfo_Id="item.n_SmallSupermarketMaterialInfo_Id" :class="[ item.n_SmallSupermarketMaterialInfo_isCheck?'check_line':'' ]" v-on:click="f_checkline" v-show="item.n_SmallSupermarketMaterialInfo_isEdit === true">
+                    <td>
+                        <input type="text" name="s_SmallSupermarketMaterialInfo_GoodsProductCode" list="s_SmallSupermarketMaterialInfo_GoodsProductCode" v-model="item.s_SmallSupermarketMaterialInfo_GoodsProductCode" v-on:change="f_chooseGoodsProductCode" v-on:focus="f_focusGoodsProductCode" /> 
+                        <datalist id="s_SmallSupermarketMaterialInfo_GoodsProductCode"></datalist>
+                    </td>
+                    <td>
+                        <input type="text" name="s_SmallSupermarketMaterialInfo_GoodsProductName" list="s_SmallSupermarketMaterialInfo_GoodsProductName" v-model="item.s_SmallSupermarketMaterialInfo_GoodsProductName" /> 
+                        <datalist id="s_SmallSupermarketMaterialInfo_GoodsProductName"></datalist>
+                    </td>
+                    <td>
+                        <input type="text" name="s_SmallSupermarketMaterialInfo_ExternalCode" list="s_SmallSupermarketMaterialInfo_ExternalCode" v-model="item.s_SmallSupermarketMaterialInfo_ExternalCode" /> 
+                        <datalist id="s_SmallSupermarketMaterialInfo_ExternalCode"></datalist>
+                    </td>
+                    <td>
+                        <input type="text" name="f_MaterialInfo_FullStoragePackageNumber" v-model="item.f_MaterialInfo_FullStoragePackageNumber" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" v-on:change="f_calculation"/> 
+                    </td>
+                    <td>
+                        <input type="text" name="f_MaterialInfo_PerUnitPackageNumber" v-model="item.f_MaterialInfo_PerUnitPackageNumber" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" v-on:change="f_calculation"/> 
+                    </td>
+                    <td>
+                        <input type="text" name="f_MaterialInfo_FullStorageWorkpiecesNumber" v-model="item.f_MaterialInfo_FullStorageWorkpiecesNumber" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')" readonly="true" disabled="disabled"/>  
+                    </td>
+                    <td>
+                        <input type="text" name="f_MaterialInfo_EarlyWarningReservesCou" v-model="item.f_MaterialInfo_EarlyWarningReservesCou" onkeyup="if(isNaN(value))execCommand('undo')" onafterpaste="if(isNaN(value))execCommand('undo')"/>  
+                    </td>
+                </tr>
+                <tr type="tr_load" v-for="(item,i) in table_coontent_array" :index="i" :n_SmallSupermarketMaterialInfo_Id="item.n_SmallSupermarketMaterialInfo_Id" :class="[ item.n_SmallSupermarketMaterialInfo_isCheck?'check_line':'' ]" v-on:click="f_checkline" v-show="item.n_SmallSupermarketMaterialInfo_isEdit === false">
+                    <td>
+                        {{ item.s_SmallSupermarketMaterialInfo_GoodsProductCode }}
+                    </td>
+                    <td>
+                        {{ item.s_SmallSupermarketMaterialInfo_GoodsProductName }}
+                    </td>
+                    <td>
+                        {{ item.s_SmallSupermarketMaterialInfo_ExternalCode }}
+                    </td>
+                    <td>
+                        {{ item.f_MaterialInfo_FullStoragePackageNumber }}
+                    </td>
+                    <td>
+                        {{ item.f_MaterialInfo_PerUnitPackageNumber }}
+                    </td>
+                    <td>
+                        {{ item.f_MaterialInfo_FullStorageWorkpiecesNumber }}
+                    </td>
+                    <td>
+                        {{ item.f_MaterialInfo_EarlyWarningReservesCou }}
+                    </td>
+                </tr> 
+            </table>
+        </div>
+        
+        <!--遮罩层-->
+        <div class="shadow" v-show="IsShadowShow === true">
+        </div>
+    </div>
+</html>

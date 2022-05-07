@@ -1,0 +1,45 @@
+*
+{margin:0;padding:0;
+}
+.main_table{border:1px solid Gray; border-width:1px 0 0 1px;}
+.main_table_head
+{
+    background-color: #FF9933;
+}
+.main_table_td{border:1px solid Gray; border-width:0 1px 1px 0;}
+
+.add_bt{background-image: url('icon/01/003.gif'); background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+.del_bt{background-image: url('icon/01/178.gif');background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+.save_bt{background-image: url('icon/02/017.gif'); background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+.cxl_bt{background-image: url('icon/02/015.gif');background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+.serch_bt{background-image: url('icon/02/225.gif');background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+.auto_bt{background-image: url('icon/01/241.gif');background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+.print_bt{background-image: url('icon/03/089.gif');background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+.export_bt{background-image: url('icon/02/116.gif');background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+.check_bt{background-image: url('icon/02/294.gif');background-position:4px center; background-repeat:no-repeat; padding-left:20px; margin:2px;border-color:#f6f6f6;}
+
+.auto_bt_min{  width:21px;height:21px;background-image: url('icon/01/241.gif');  margin:1px;border-color:#f6f6f6;}
+.add_bt_min{  width:21px;height:21px;background-image: url('icon/01/003.gif');  margin:1px;border-color:#f6f6f6;}
+.del_bt_min{width:21px;height:21px;background-image: url('icon/01/178.gif'); margin:1px;border-color:#f6f6f6;}
+.save_bt_min{width:21px;height:21px;background-image: url('icon/02/017.gif'); margin:1px;border-color:#f6f6f6;}
+.flush_bt_min{width:21px;height:21px;background-image: url('icon/01/051.gif'); margin:1px;border-color:#f6f6f6;}
+.export_bt_min{width:21px;height:21px;background-image: url('icon/02/116.gif'); margin:1px;border-color:#f6f6f6;}
+.tool_error{ color:Red}
+
+.open_img{background-image: url('icon/01/060.gif'); width:16px;height:16px;cursor:pointer;}
+.close_img{background-image: url('icon/01/043.gif'); }
+.input_bg
+{ 
+filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#efefef,endcolorstr=White,gradientType=0);
+-ms-filter:alpha(opacity=100 finishopacity=50 style=1 startx=0,starty=0,finishx=0,finishy=150) progid:DXImageTransform.Microsoft.gradient(startcolorstr=#efefef,endcolorstr=White,gradientType=0);/*IE8*/
+background:#efefef; /* 一些不支持背景渐变的浏览器 rgba(0, 0, 255, 0.5)*/
+background:-moz-linear-gradient(top, #efefef, #fff);
+background:-webkit-gradient(linear, 0 0, 0 bottom, from(#efefef), to(#fff));
+}
+.uploader
+{
+     position:absolute;
+}
+.error_border
+{ border-color:red;
+}

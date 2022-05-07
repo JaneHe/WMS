@@ -1,0 +1,56 @@
+﻿@{
+    string UserName = Request.QueryString["ArrayUserName"];//员工名称
+    string BanCi = Request.QueryString["ArrayBanCi"];//部门
+    string JobNumber = Request.QueryString["ArrayJobNumber"];//工号
+    string ArrayDepartment = Request.QueryString["ArrayDepartment"];//工序
+    string ArrayUserNO = Request.QueryString["ArrayUserNO"];
+    string ArrayQRCode = Request.QueryString["ArrayQRCode"];
+    }
+<html>
+    <head>
+        <title>打印工牌二维码</title>
+        <script src="../../Scripts/QRCodeJs/barcode.js" type="text/javascript"></script>
+        <script src="../../Scripts/QRCodeJs/jquery-1.4.4.min.js" type="text/javascript"></script>
+        <style>
+            .Print {width:186px;height:50px;font-size:23px;background-color:#bab4b4;font-weight:bold; margin-left:8.5%;}
+            .div2 { float:left;font-size:22px;font-weight:bold;margin-left:1%;}
+        </style>
+        <script type="text/javascript">
+            $(function () {
+                var ArrayUserNO="@(ArrayUserNO)";
+                var len = ArrayUserNO.split(",").length;
+                for (var i = 0; i < len; i++) {
+                    $("#PrintDiv2").append('<div class="PrintDiv" style="width:800px;height:250px;">'
+                                    + '<div class="qrcode" style="display:inline-block;float:left;margin-top:2%;width:150px;height:150px;margin-left:20%;"></div>'
+                                    + '<div class="div2" style=" float:left;font-size:17px;font-weight:bold;margin-left:2%;">'
+                                    + '<p>姓名：<font class="value">'+"@(UserName)".split(",")[i]+'</font></p>'
+                                    + '<p>工号：<font class="value">'+"@(JobNumber)".split(",")[i]+'</font></p>'
+                                    + '<p>班次：<font class="value">' + "@(BanCi)".split(",")[i] + '</font></p>'
+                                    + '<p>部门：<font class="value">' + "@(ArrayDepartment)".split(",")[i] + '</font></p></div></div>')
+                    $('.qrcode:eq('+i+')').html('');
+                    var qrcode = new QRCode(document.getElementsByClassName("qrcode")[i], { width: 150, height: 150 });
+                    //var str = "@(UserName)".split(",")[i] + "*" + "@(JobNumber)".split(",")[i] + "*" + "@(BanCi)".split(",")[i] + "*" + "@(ArrayDepartment)".split(",")[i];
+                    var str = "@(ArrayQRCode)".split(",")[i];
+                    qrcode.makeCode(str);
+                }
+            })
+
+
+            //构建打印区域
+            function bulidPrintArea() {
+                var headstr = "<html><head><title></title></head><body>";
+                var footstr = "</body>";
+                var printData = document.getElementById("PrintDiv2").innerHTML;// 获得 div 里的所有 html 数据
+                var oldstr = document.body.innerHTML;
+                document.body.innerHTML = headstr + printData + footstr;
+                window.print();
+                document.body.innerHTML = oldstr;
+            }
+        </script>
+    </head>
+    <body>
+         <div><button class="Print" onclick="bulidPrintArea()">打印</button></div>
+       <div id="PrintDiv2"></div>
+    </body>
+    
+</html>

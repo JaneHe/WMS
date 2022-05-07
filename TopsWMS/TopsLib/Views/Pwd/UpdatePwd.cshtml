@@ -1,0 +1,79 @@
+﻿@{
+    ViewBag.Title = "修改密码";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    var UserNO=Request.QueryString["UserNO"] + "";
+    UserNO = string.IsNullOrEmpty(UserNO) ? "User_Add" : UserNO;
+}
+@section Params{
+<form id="UserForm">
+    <table border="0">
+        <tr>
+            <th width="80px">用户名:</th>
+            <td><input type="text" class="l-text" name="UserNO" value="@(Tops.FRM.TopsUser.UserNO)" /></td>
+        </tr>
+        <tr>
+            <th>旧密码:</th>
+            <td><input type="password" class="l-text" name="OldPwd" /></td>
+        </tr>
+        <tr>
+            <th>新密码:</th>
+            <td><input type="password" class="l-text" name="NewPwd" /></td>
+        </tr>
+        <tr>
+            <th>重复新密码:</th>
+            <td><input type="password" class="l-text" id="rePwd" /></td>
+        </tr>
+
+    </table>
+    <input type="reset" id="resetBt" style="display:none;" />
+</form>
+    }
+@section Script{
+<script type="text/javascript">
+    var tabid = '@(UserNO)';
+    
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#saveBt").show();
+        $("#saveBt").click(function () {
+            $.topsAjax({
+                type: "POST",
+                url: "/Account/UpdatePwd",
+                data: $("form#UserForm").serialize(),
+                dealError: false,
+                before:function(settings){
+                    if ($.trim($("[name=UserNO]").val()) == '') {
+                        alert("用户名不能为空");
+                        return false;
+                    }
+                    if ($.trim($("[name=OldPwd]").val()) == '') {
+                        alert("旧密码不能为空");
+                        return false;
+                    }
+                        if ($.trim($("[name=NewPwd]").val()) == '') {
+                            alert("新密码不能为空");
+                            return false;
+                        }
+                        if ($("[name=NewPwd]").val() != $("#rePwd").val()) {
+                            alert("两次输入新密码不一致");
+                            return false;
+                        }
+                },
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功");
+                        $("#resetbt").click();
+                    } else {
+                        alert("保存失败，" + data.Msgs[0]);
+                    }
+                }
+            });
+        });
+        $("#closebt").click(function () {
+            //关闭当前标签
+            window.parent.f_closeTab(tabid);
+        });
+    });
+
+    </script>
+    }

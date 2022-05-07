@@ -1,0 +1,58 @@
+
+**************************************************************************************************************------>2022/3/23 9:49:14
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"null"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2022/3/23 9:49:15
+类型：Query 查询对象：SelSessionState 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select top 1 LoginState = 
+(case when 
+DATEDIFF(MINUTE,tSessionStateRecord.d_LoginTime,GETDATE())
+< tSessionStateRecord.n_HoldingTime then 0 else 1 end),
+UserNO = tSessionStateRecord.s_UserNO,
+UserName = tUser.s_UserName
+ from tSessionStateRecord tSessionStateRecord with(nolock)
+ left join tUser tUser with(nolock) on tSessionStateRecord.s_UserNO = tUser.s_UserNO
+where tSessionStateRecord.s_IPAddress = @IPAddress 
+and tSessionStateRecord.s_UserAgent = @UserAgent
+and tSessionStateRecord.s_UserNO <> ''
+and tUser.n_state = 1
+order by tSessionStateRecord.d_LoginTime desc
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"::1"
+（1）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

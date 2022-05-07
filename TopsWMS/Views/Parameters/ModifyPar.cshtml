@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "修改参数";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    var ParID = Request.QueryString["ParID"].Trim();
+}
+@section Params{
+<style>
+    #ParameterForm p {
+        line-height:40px;
+        clear:both;
+    }
+    #ParameterForm span {
+        width:210px;
+        display:block;
+        float:left;
+        text-align:right;
+        line-height:30px;
+    }
+    #ParameterForm input {
+        margin-left:5px;
+        margin-right:15px;
+        width:100px;
+        float:right;
+    }
+</style>
+<form id="ParameterForm">
+        <p>
+            <span>参数名：<input type="text"  name="s_SysParameter_Name"/></span>
+            <span>单位：<input type="text" name="s_SysParameter_Unit" /></span>
+        </p>
+        <p>
+            <span>值1：<input type="text" name="s_SysParameter_value1" /></span>
+            <span>值2：<input type="text" name="s_SysParameter_value2" /></span>
+            <span>值3：<input type="text" name="s_SysParameter_value3" /></span>
+            <span>值4：<input type="text" name="s_SysParameter_value4" /></span>
+            <span>值5：<input type="text" name="s_SysParameter_value5" /></span>
+        </p>
+        <p>
+            <span>自定义字段1：<input type="text" name="s_SysParameter_CustomFields1" /></span>
+            <span>自定义字段2：<input type="text" name="s_SysParameter_CustomFields2" /></span>
+            <span>自定义字段3：<input type="text" name="s_SysParameter_CustomFields3" /></span>
+            <span>自定义字段4：<input type="text" name="s_SysParameter_CustomFields4" /></span>
+            <span>自定义字段5：<input type="text" name="s_SysParameter_CustomFields5" /></span>
+        </p>
+        <p>
+            <span>自定义字段6：<input type="text" name="s_SysParameter_CustomFields6" /></span>
+            <span>自定义字段7：<input type="text" name="s_SysParameter_CustomFields7" /></span>
+            <span>自定义字段8：<input type="text" name="s_SysParameter_CustomFields8" /></span>
+            <span>自定义字段9：<input type="text" name="s_SysParameter_CustomFields9" /></span>
+            <span>自定义字段10：<input type="text" name="s_SysParameter_CustomFields10" /></span>
+        </p>
+      
+        <p style="float:left"><input type="button" id="btn_save" value="保存" /></p>
+</form>
+
+    }
+@section Script{
+    <script>
+        var UpdateFlag = "";
+        $(function(){
+            var ParID = "@(ParID)";
+            UpdateFlag = ParID.length > 2 ? "modify" : "Add"
+            if (UpdateFlag === "modify") {
+                $.get("/AjaxGridData/SelParameter", { ParaId: ParID }, function (data) {
+                    console.log(data.Data);
+                    //$.setForm("#ParameterForm",data.Data[0]);
+                    $('input[name=s_SysParameter_Name]').val(data.Data[0].s_SysParameter_Name);
+                    $('input[name=s_SysParameter_Unit]').val(data.Data[0].s_SysParameter_Unit);
+                    $('input[name=s_SysParameter_CustomFields1]').val(data.Data[0].s_SysParameter_CustomFields1);
+                    $('input[name=s_SysParameter_CustomFields2]').val(data.Data[0].s_SysParameter_CustomFields2);
+                    $('input[name=s_SysParameter_CustomFields3]').val(data.Data[0].s_SysParameter_CustomFields3);
+                    $('input[name=s_SysParameter_CustomFields4]').val(data.Data[0].s_SysParameter_CustomFields4);
+                    $('input[name=s_SysParameter_CustomFields5]').val(data.Data[0].s_SysParameter_CustomFields5);
+                    $('input[name=s_SysParameter_CustomFields6]').val(data.Data[0].s_SysParameter_CustomFields6);
+                    $('input[name=s_SysParameter_CustomFields7]').val(data.Data[0].s_SysParameter_CustomFields7);
+                    $('input[name=s_SysParameter_CustomFields8]').val(data.Data[0].s_SysParameter_CustomFields8);
+                    $('input[name=s_SysParameter_CustomFields9]').val(data.Data[0].s_SysParameter_CustomFields9);
+                    $('input[name=s_SysParameter_CustomFields10]').val(data.Data[0].s_SysParameter_CustomFields10);
+                    $('input[name=s_SysParameter_value1]').val(data.Data[0].s_SysParameter_value1);
+                    $('input[name=s_SysParameter_value2]').val(data.Data[0].s_SysParameter_value2);
+                    $('input[name=s_SysParameter_value3]').val(data.Data[0].s_SysParameter_value3);
+                    $('input[name=s_SysParameter_value4]').val(data.Data[0].s_SysParameter_value4);
+                    $('input[name=s_SysParameter_value5]').val(data.Data[0].s_SysParameter_value5);
+                }, "json");
+            }
+            $('#btn_save').click(function (){
+                var submit = $('#ParameterForm').serializeArray();
+                if (submit.s_SysParameter_Name=== ''){
+                    alert("参数名不可留空!");
+                    $('input[name=s_SysParameter_Name]').focus();
+                    return;
+                }
+                if (UpdateFlag === "modify"||UpdateFlag === "delete") submit.push({ name:'s_SysParameter_Id', value: ParID });
+                submit.push({ name: 'UpdateFlag', value: UpdateFlag });
+                submit.push({ name:'updator',value:'@(Tops.FRM.TopsUser.UserNO)'});
+                $.post("/AjaxPost/SaveParameter", submit, function (data) {
+                    var result = JSON.parse(data);
+                    if (result.IsSuccess) {
+                        //window.parent.f_closeTab(ParID);
+                        alert('已保存!');
+                        top.tab.removeTabItem(ParID);
+                    } else {
+                        alert('保存异常!');
+                    }
+                })
+
+
+            });
+        });
+    </script>
+}

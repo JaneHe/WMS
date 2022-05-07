@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CompanyInfo>
+  <Company Id="1" Name="1025757547@qq.com">
+    <Email>2418279142@qq.com</Email>
+    <SmtpClient>smtp.qiye.163.com</SmtpClient>
+    <Port>25</Port>
+  </Company>
+
+</CompanyInfo>
+<!--收件人信息-->

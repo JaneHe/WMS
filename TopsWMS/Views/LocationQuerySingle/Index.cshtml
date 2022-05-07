@@ -1,0 +1,246 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+}
+@section Body{
+    <div class="body">
+        <div>
+            <input type="text" name="s_ReportInventoryCurrent_GoodsBarCode" placeholder="请输入条码" v-on:keyup.enter="f_loadDataList"  />
+        </div> 
+        <div>
+            <input type="text" name="s_ReportInventoryCurrent_Code" placeholder="请输入储位二维码" v-on:keyup.enter="f_loadDataList()" />
+        </div>
+        <div class="TitleTab">
+            <table>
+                <tr>
+                    <th>
+                        储位码<br />
+                        批次号<br />
+                        器具码
+                    </th>
+                    <th>
+                        产品编码<br />
+                        产品名称
+                    </th>
+                    <th>
+                        可用状态<br />
+                        在储位数量
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div class="InfoTab">
+            <table>
+                <tr v-for="(item,i) in ReportInventoryCurrent_List" :index="i" :class="[ item.n_ReportInventoryCurrent_isCheck?'morechecked':'' ]" v-on:click="f_checkline($event)">
+                    <td>
+                    {{ item.s_ReportInventoryCurrent_Code }}/<br />
+                    {{ item.s_ReportInventoryCurrent_BatchNumber }}/<br />
+                    {{ item.s_Bin_Code }}
+                    </td>
+                    <td>
+                    {{ item.s_ReportInventoryCurrent_GoodsProductCode }}/<br />
+                    {{ item.s_ReportInventoryCurrent_GoodsProductName }}
+                    </td>
+                    <td>
+                    {{ item.n_ReportInventoryCurrent_QCQualityStatus }}/<br />
+                    {{ item.n_ReportInventoryCurrent_Number }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="btndiv">
+            <div v-on:click="f_clear">清空</div> 
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .TitleTab
+        {
+            width: calc(90%);
+            height: 90px;
+            margin: calc(3%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        .TitleTab table, .InfoTab table
+        {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .TitleTab th
+        {
+            width: 23%;
+            border: 1px solid #a5e0a5;
+            background: rgb(200 220 232);
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        } 
+        .TitleTab th:nth-child(2)
+        {
+            width: 34%;
+            border: 1px solid #a5e0a5;
+            background: rgb(200 220 232);
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        } 
+        
+        .InfoTab
+        {
+            width: calc(90%);
+            height: 182px;
+            margin: calc(0%) calc(5%);
+            text-align:center; 
+            overflow-y:scroll;
+        }
+        .InfoTab td{
+            width: 23%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }  
+        .InfoTab td:nth-child(2){
+            width: 34%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }  
+         
+        
+        .btndiv div
+        {
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(2%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 14px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        
+        [name=s_ReportInventoryCurrent_GoodsBarCode],[name=s_ReportInventoryCurrent_Code]
+        { 
+            width: calc(90%);
+            margin: calc(3%) calc(5%) calc(0%) calc(5%);
+            border: 1px solid lightblue;
+            height: 22px;
+            text-align: center;
+        }
+        
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax POST对象
+        var ajaxobjSecond = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    ReportInventoryCurrent_List: new Array() //储位查询结果表格数据
+                },
+                methods: {
+                    //加载库位查询信息
+                    f_loadDataList: function () {
+
+                        //对象名 查询指定库位的货物信息
+                        var objectName = "SelLocationQuerySingleList";
+                        //参数
+                        var param = {
+                            s_ReportInventoryCurrent_GoodsBarCode:$("[name=s_ReportInventoryCurrent_GoodsBarCode]").val(),
+                            s_ReportInventoryCurrent_Code: $("[name=s_ReportInventoryCurrent_Code]").val() 
+                        };
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            //填充储位查询结果表格数据
+                            vue.ReportInventoryCurrent_List = new Array();
+                            if (result.Data[0].length > 0) {
+                                result.Data[0].forEach(function (value, index) {
+                                    value.n_ReportInventoryCurrent_isCheck = false;
+                                    vue.ReportInventoryCurrent_List.push(value);
+                                })
+                            }
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("WMS-库位查询");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+                        //加载库位查询信息
+                        vue.f_loadDataList();
+                    },
+                    //验证所填是否是数字,不是则清空
+                    checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    },
+                    //选择行
+                    f_checkline: function (event) {
+                        var index = -1;
+                        if ($(event.target).attr("index") == undefined) {
+                            index = $(event.target).parent().attr("index");
+                        } else {
+                            index = $(event.target).attr("index");
+                        }
+
+                        vue.ReportInventoryCurrent_List.forEach(function (value, index) {
+                            value["n_ReportInventoryCurrent_isCheck"] = false;
+                        })
+                        vue.ReportInventoryCurrent_List[index].n_ReportInventoryCurrent_isCheck = true;
+                    },
+                    //清空筛选框
+                    f_clear: function () {
+                        $("[name=s_ReportInventoryCurrent_GoodsBarCode]").focus().val("");
+                        $("[name=s_ReportInventoryCurrent_Code]").focus().val("");
+                        vue.f_loadDataList();
+                    }
+                }
+            })
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+ 
+    </script>
+}

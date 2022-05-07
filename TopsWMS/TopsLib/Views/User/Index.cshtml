@@ -1,0 +1,131 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "用户管理";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelUsers";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+    ViewBag.Biz = biz;
+    var username = TopsUser.UserNO;
+}
+@section Params{
+    <form id="paramForm" method="POST" action="/ExcelHelp/DownLoad" >
+     <div id="hiddenlist"> 
+            <input type="hidden" name="exportdata" value="SelUserRoleDownloadInfo" />
+            <input type="hidden" name="exportcolumn" value="SelUserRoleDownloadInfo_Column" />
+            <input type="hidden" name="exportsheetname" value="用户角色权限" /> 
+            <input type="hidden" name="exportcondition" value="" />
+    </div>
+    <div id="search_title">
+        查询条件：</div>
+    <div id="paramlist">
+        @Html.Partial("QueryParamList")
+    </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+    var topsRender=null;
+    var grid=null;
+    
+    //当前时间
+    var nowDate = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1 < 10 ? "0" + (new Date().getMonth() + 1) : (new Date().getMonth() + 1).toString())
+        + "-" + (new Date().getDate() < 10 ? "0" + new Date().getDate() : new Date().getDate().toString()) + " " +
+        (new Date().getHours() < 10 ? "0" + new Date().getHours() : new Date().getHours().toString()) + ":" +
+        (new Date().getMinutes() < 10 ? "0" + new Date().getMinutes() : new Date().getMinutes().toString()) + ":" +
+        (new Date().getSeconds() < 10 ? "0" + new Date().getSeconds() : new Date().getSeconds().toString());
+
+
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#addBt,#searchBt,#delBt,#exportBt").show();
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelUsers',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            serverTotal: 'Other2',                     //输出统计数据
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            checkbox: true,
+            checkboxAll: true,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+                f_addTab(rowdata["用户账号"], "维护[" + rowdata["用户账号"] + "]", "/User/Modify?"+"ctrl=edit&UserNO=" +rowdata["用户账号"]+ "&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.options.parms.push({name:"r"+new Date().getMilliseconds(),value:Math.random()});
+            grid.loadServerData(grid.options.parms);
+        });
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/User/Modify?"+"ctrl=add&" + Math.random());
+        });
+        //删除用户
+        $("#delBt").click(function(){
+            var rows = grid.getSelectedRows();
+            var data = new Array();
+            rows.forEach(function(value,index){
+                 data.push({UserNO:value["用户账号"]});
+            })
+            if(confirm("您确定是否删除该用户")){
+               $.ajax({
+                   type:"POST",
+                   url:"/AjaxPost/DelUser",
+                   data:{Dictionarys:data},
+                   success:function(result){
+                       result = JSON.parse(result);
+                       if(result.IsSuccess){
+                          alert("删除成功!");
+                       }else{
+                          alert(result.Msgs[0]);
+                       }
+                   }
+               })
+            }
+        })
+
+        
+        $("#exportBt").click(function(){
+            
+            grid.options.parms = $("form#paramForm").serializeArray();
+
+            var str = "[下载时间:" + nowDate + "] "
+        + " 用户账号:" + $("[name=UserNO]").val() + "; 用户名称:" + $("[name=UserName]").val();
+
+            $("[name=exportcondition]").val(str); 
+            $("#paramForm").submit();
+        })
+
+        $("#searchBt").click();
+    });
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+    </script>
+}
+<div id="datagrid">
+</div>

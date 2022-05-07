@@ -1,0 +1,54 @@
+﻿@{
+    ViewBag.Title = "ShortCut";
+    Layout = "~/TopsLib/Views/Tools/_Layout.cshtml";
+    var data = Model.LoadQuery("Tool_GetAllTable").Data;
+    System.Data.DataTable dt=data[0];
+}
+
+<h2>快速生成Sql语句，o(∩_∩)o ！</h2>
+<p><input type="button" value="生成" class="auto_bt" id="run_bt" /></p>
+<table width="99%" border=1 cellpadding=0 cellspacing=0>
+    <tr>
+        <td width="40px;">表：</td>
+        <td><select id="tableName">
+        @for (int i = 0; i < dt.Rows.Count; i++)
+        { 
+            <option value="@(dt.Rows[i]["TableName"])">@(dt.Rows[i]["TableName"])</option>
+        }
+        </select></td>
+    <tr>
+    </tr>
+        <td>类型：</td>
+        <td><select id="DML_Type">
+            <option value="1">Select</option>
+            <option value="2">Insert</option>
+            <option value="3">Update</option>
+        </select></td>
+    </tr>
+    <tr>
+    <td colspan=2>
+        <textarea id="viewText" rows="50" style="width:99%"></textarea>
+    </td>
+    </tr>
+</table>
+<script type="text/javascript">
+    $(function () {
+        $("#run_bt").click(function () {
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/GetDML",
+                data: { TableName: $("#tableName").val(), Type: $("#DML_Type").val() },
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess && data.Data != null) {
+                        var m = data.Data
+                        $("#viewText").val(data.Data);
+                    } else {
+                        alert("生成Sql语句失败：" + data.Msgs[0]);
+                    }
+                }
+            });
+        });
+    });
+    
+</script>

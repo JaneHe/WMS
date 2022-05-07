@@ -1,0 +1,150 @@
+﻿@{ 
+    ViewBag.Title = "标签打印";
+    ViewBag.ModuleName = "资料查询";
+
+    string Ids = Request.QueryString["Id"];
+    Ids = Ids.Substring(0, Ids.Length - 1); 
+     
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>标签打印</title>
+    <style type="text/css">
+        .print
+        {
+            width: calc(20%);
+            margin: calc(2.5%) calc(40%) calc(2.5%) calc(40%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 16px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+
+        .temp
+        {
+            display: none;
+        }
+    </style>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <script src="../../TopsLib/Scripts/QRCodeJs/jquery-barcode-2.0.2.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                },
+                methods: {
+                    //加载打印信息
+                    f_loadPrintData: function () {
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelLabelPrintRecord",
+                            data: { n_BillStockInOutDetail_Id: $("[name=Id]").val() },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+
+                                    if (result.Data[0].length > 0) {
+                                        var Ids = "@(Ids)";
+                                        var Idarr = Ids.split(",");
+                                        result.Data[0].forEach(function (value, index) {
+                                            Idarr.forEach(function (v, i) {
+
+                                                if (v == value.n_BillStockInOutDetail_Id) {
+                                                    $label = $(".temp .label").clone();
+
+                                                    $label.find(".labelbarCode").barcode(value.s_PartDescription_SerialNumber, "code128", {
+                                                        output: 'css',        //渲染方式 css/bmp/svg/canvas 
+                                                        color: 'black',       //条码颜色
+                                                        barWidth: 2,          //单条条码宽度
+                                                        barHeight: 70,        //单体条码高度
+                                                        fontSize: 24,         //条码字体大小
+                                                        marginHRI: 5,         //条码字体距条码中心的高度 
+                                                        addQuietZone: false   //是否添加空白区（内边距）
+                                                    });
+
+                                                    $label.find("tr:eq(0)").find("td:eq(1)").text(value.s_PartDescription_Code); //存货编码
+                                                    $label.find("tr:eq(0)").find("td:eq(3)").text(value.s_ListPutOnOff_BatchNumber); //批次
+                                                    $label.find("tr:eq(1)").find("td:eq(1)").text(value.s_PartDescription_Name); //规格型号
+                                                    $label.find("tr:eq(1)").find("td:eq(3)").text(value.s_PartDescription_Color); //颜色
+                                                    $label.find("tr:eq(2)").find("td:eq(1)").text(value.s_PartDescription_Name); //存货名称
+                                                    $label.find("tr:eq(3)").find("td:eq(1)").text(value.s_PartDescription_Model); //车型
+
+                                                    $(".printlabel").append($label);
+                                                }
+                                            })
+                                        })
+                                    }
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+                    },
+                    //打印事件
+                    f_printbin: function () {
+
+                        var allhtml = $("body").html();
+                        var html = $(".printlabel").html();
+                        window.document.body.innerHTML = html; //把需要打印的指定内容赋给body.innerHTML
+                        window.print();
+                        window.document.body.innerHTML = allhtml;
+                    }
+                }
+            })
+
+            vue.f_loadPrintData();
+        })
+    </script>
+</head>
+<body>
+    <div class="body">
+        <input type="hidden" name="Id" value="@(Ids)" />
+        <div class="print" v-on:click="f_printbin">
+            标签打印
+        </div>
+        <!--startprint-->
+        <div class="printlabel"></div>
+        <!--endprint-->
+        <div class="temp">
+            <div class="label" style="margin: 0px auto; width: 580px;">
+                <table style="font-size: 26px; line-height: 40px; text-align: center; margin-bottom: 310px;">
+                    <tr>
+                        <td style="width: 120px;">存货编码:</td>
+                        <td style="width: 240px;"></td>
+                        <td style="width: 80px;">批次:</td>
+                        <td style="width: 120px;"></td>
+                    </tr>
+                    <tr>
+                        <td>规格型号:</td>
+                        <td></td>
+                        <td>颜色:</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td>存货名称:</td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr>
+                        <td>车型:</td>
+                        <td colspan="3"></td>
+                    </tr>
+                    <tr rowspan="2">
+                        <td colspan="4">
+                            <div class="labelbarCode" style="margin: 0px auto;"></div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

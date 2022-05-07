@@ -1,0 +1,172 @@
+﻿@{
+    Layout = null;
+    string n_Space_Id = Request.QueryString["n_Space_Id"];
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>货架储位打印</title>
+    <script src="../../Scripts/QRCodeJs/jquery-1.4.4.min.js" type="text/javascript"></script>
+@*    <script src="../../Scripts/QRCodeJs/barcode.js" type="text/javascript"></script>*@ 
+    <script src="../../TopsLib/Scripts/QRCodeJs/jquery-barcode-2.0.2.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        .QrCode
+        {
+            display: inline-block;
+            width: 150px;
+            height: 150px;
+            margin-left: 5%;
+        }
+        .PrintDiv
+        {
+           @* width: 550px;
+            height: 150px;
+            width: 1180px;
+            height: 885px;*@
+            width: 631px;
+            height:280px;
+            margin: 80px 20%;
+        }
+        .QrCodeInfo
+        {
+            display: inline-block;
+            height: 150px;
+            font-family: 微软雅黑;
+            font-weight: bold;
+            margin-left: 15px;
+        }
+        .QrCodeInfo table
+        {
+            height: 100%;
+        }
+        .copymodel
+        {
+            display: none;
+        }
+        
+        .printBt
+        {
+            font-family: 微软雅黑;
+            font-size: 20px;
+            width: 180px;
+            line-height: 58px;
+            font-weight: bold;
+            background: #00b7ee;
+            border-radius: 25px;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+        }
+    </style>
+    <script type="text/javascript">
+        //客户要求打印100mm*75mm的标签 
+        //A4物理大小是210mm×297mm 分辨率是300像素/英寸时，A4纸的尺寸的图像的像素是2480×3508
+        //得知对应客户需要的标签像素值为1181*885  210mm*85mm   [1180*415] 561*366 400*33
+
+        //打印机驱动ZDesigner ZM400 200驱动 纸张大小 宽度100mm*150mm
+        $(function () {
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGet/SelSpacePrintList",
+                data: { n_Space_Id: $("[name=n_Space_Id]").val() },
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result.IsSuccess) {
+                        f_setQRCode(result.Data[0]);
+                        //加粗
+                        $(".PrintDiv").find("div:last").css("font-weight", "bold");
+
+                    } else {
+                        alert(result.Msgs[0]);
+                    }
+                }
+            })
+
+            //打印事件
+            $(".printBt").click(function () {
+                f_bulidPrintArea();
+            })
+        })
+
+        //组成展示在界面观看的二维码
+        function f_setQRCode(data) {
+            //            for (var index = 0; index < data.length; index++) {
+            //                var $PrintDiv = $(".copymodel").find(".PrintDiv").clone(true);
+            //                $PrintDiv.find(".QrCode").removeAttr("id").attr("id", "QrCode_" + index);
+            //                $PrintDiv.removeAttr("id").attr("id", "PrintDiv_" + index);
+            //                $(".showPrintDiv").append($PrintDiv);
+            //                //二维码
+            //                var qrcode = new QRCode("QrCode_" + index, { width: 240, height: 240 });
+            //                qrcode.makeCode(data[index].s_Space_BarCode);
+            //                //信息显示
+            //                $("#PrintDiv_" + index).find(".QrCodeInfo").find("label:eq(0)").text(data[index].s_Warehouse_Name);
+            //                $("#PrintDiv_" + index).find(".QrCodeInfo").find("label:eq(1)").text(data[index].s_Space_BarCode); 
+            //            }
+            for (var index = 0; index < data.length; index++) {
+
+                var $PrintDiv = $(".copymodel").find(".PrintDiv").clone(true);
+                $PrintDiv.removeAttr("id").attr("id", "PrintDiv_" + index);
+                //一维码
+                $PrintDiv.barcode(data[index].s_Space_BarCode, "code128", {
+                    output: 'css',       //渲染方式 css/bmp/svg/canvas 
+                    color: 'black',   //条码颜色
+                    barWidth: 3.5,        //单条条码宽度
+                    barHeight: 170,     //单体条码高度 
+                    addQuietZone: false,  //是否添加空白区（内边距）
+                    fontSize: 56
+                });
+                $(".showPrintDiv").append($PrintDiv);
+            }
+        }
+
+        //构建打印区域
+        function f_bulidPrintArea() {
+
+            var headstr = "<html><head><title></title></head><body>";
+            var footstr = "</body>";
+            var printData = $(".showPrintDiv").html(); // 获得 div 里的所有 html 数据
+            var oldstr = document.body.innerHTML;
+            document.body.innerHTML = headstr + printData + footstr;
+            window.print();
+            document.body.innerHTML = oldstr;
+
+        }
+
+    </script>
+</head>
+<body>
+    <input type="hidden" name="n_Space_Id" value="@(n_Space_Id)" />
+    <div class="printBt">
+        打印
+    </div>
+    <div class="showPrintDiv"> 
+    </div>
+    <div class="copymodel">
+        @*<div id="PrintDiv" class="PrintDiv" style="width: 561px; height: 366px; margin: 0px calc(20%) 0px calc(20%);">
+            <div id="QrCode" class="QrCode" style="display: inline-block; width: 240px; height: 240px;
+                margin-left: 5%;">
+            </div>
+            <div class="QrCodeInfo" style="display: inline-block; height: 240px; font-family: 微软雅黑;
+                font-weight: bold;margin-left: 5px;font-size: 25px;">
+                <table style="height: 100%;">
+                    <tr>
+                        <td> 
+                            <label>
+                            </label>
+                        </td> 
+                    </tr> 
+                    <tr> 
+                        <td rowspan="2">
+                            <label style="font-size:40px;">
+                            </label>
+                        </td>
+                    </tr> 
+                </table>
+            </div>
+        </div>*@
+        <div id="PrintDiv" class="PrintDiv" style="  margin: 0px calc(15%) 20px calc(15%);">
+             
+        </div>
+    </div>
+</body>
+</html>

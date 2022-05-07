@@ -1,0 +1,80 @@
+﻿@using Tops.FRM;
+@{
+    Module module = (Module)Model;
+    ViewBag.Title = module.text;
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName=module.ComQueryName;
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas=Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+    ViewBag.Biz = biz;
+    var username = TopsUser.UserNO;
+}
+
+@section Params{
+    <form id="paramForm">
+    <div id="search_title">查询条件：</div>
+    <div id="paramlist">
+        @Html.Partial("QueryParamList")
+    </div>
+    </form>
+    
+}
+@section Script{
+<script type="text/javascript">
+    var moduleID='@(module.id)';
+    var topsRender=null;
+    var grid=null;
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#addBt,#searchBt").show();
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelUsers',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+                f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/d/"+moduleID+"?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.options.parms.push({name:"r"+new Date().getMilliseconds(),value:Math.random()});
+            grid.loadServerData(grid.options.parms);
+        });
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/d/"+moduleID+"?"+"ctrl=add&" + Math.random());
+        });
+    });
+        function f_flushGrid()
+        {
+            grid.loadData();
+        }
+</script>
+}
+<div id="datagrid"></div>
+
+

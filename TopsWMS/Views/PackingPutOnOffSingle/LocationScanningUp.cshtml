@@ -1,0 +1,602 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("ParentIds"))
+    {
+        ParentIds = Request.QueryString["ParentIds"];
+    }
+    //货物编码
+    string GoodsCode = Request.QueryString["GoodsCode"];
+    if (Request.QueryString.AllKeys.Contains("GoodsCode"))
+    {
+        GoodsCode = Request.QueryString["GoodsCode"];
+    }
+
+    //批次
+    string Batch = Request.QueryString["Batch"];
+    if (Request.QueryString.AllKeys.Contains("Batch"))
+    {
+        Batch = Request.QueryString["Batch"];
+    }
+    
+    //货物标识编码
+    string GoodsBarCode = Request.QueryString["GoodsBarCode"];
+    if (Request.QueryString.AllKeys.Contains("GoodsBarCode"))
+    {
+        GoodsBarCode = Request.QueryString["GoodsBarCode"];
+    }
+    
+    //数量
+    string GoodsWorkQuantity = Request.QueryString["GoodsWorkQuantity"];
+    int SumGoodsWorkQuantity = 0;
+    
+    if (Request.QueryString.AllKeys.Contains("GoodsWorkQuantity"))
+    {
+        GoodsWorkQuantity = Request.QueryString["GoodsWorkQuantity"];
+        
+        if(!string.IsNullOrEmpty(GoodsWorkQuantity)){
+
+            if (GoodsWorkQuantity.Substring(GoodsWorkQuantity.Length - 1, 1).Equals(","))
+            {
+                GoodsWorkQuantity = GoodsWorkQuantity.Substring(0, GoodsWorkQuantity.Length - 1);
+            }
+
+            string[] arr = GoodsWorkQuantity.Split(','); 
+            for (int index = 0; index < arr.Length; index++) 
+            {
+                SumGoodsWorkQuantity += int.Parse(arr[index]);
+            }
+        }
+    }
+    
+    //仓库外键ID
+    string n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+    if (Request.QueryString.AllKeys.Contains("n_Warehouse_Id"))
+    {
+        n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+    } 
+
+    //上架单据外键ID
+    string n_BillStockInOut_Id = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("n_BillStockInOut_Id"))
+    {
+        n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"];
+    }
+
+    //器具条码
+    string s_Bin_Code = string.Empty; 
+    if (Request.QueryString.AllKeys.Contains("s_Bin_Code"))
+    {
+        s_Bin_Code = Request.QueryString["s_Bin_Code"];
+
+        if (!string.IsNullOrEmpty(s_Bin_Code) && s_Bin_Code.Substring(s_Bin_Code.Length - 1,1).Equals(","))
+        {
+            s_Bin_Code = s_Bin_Code.Substring(0, s_Bin_Code.Length - 1);
+        }
+    } 
+    
+    //器具ID
+    string s_BinId = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("s_BinId"))
+    {
+        s_BinId = Request.QueryString["s_BinId"];
+    }
+
+    if (!string.IsNullOrEmpty(s_Bin_Code))
+    {
+        string[] arr = s_Bin_Code.Split(',');
+        string str = string.Empty;
+        
+        var Biz = Tops.FRM.Biz.Execute("SelBinInfoByBarCodes", new System.Data.SqlClient.SqlParameter[] { 
+            new System.Data.SqlClient.SqlParameter { ParameterName = "s_Bin_Code", Value = s_Bin_Code } 
+        }, Tops.FRM.BizType.Query);
+
+        List<System.Data.DataTable> list = Biz.Data as List<System.Data.DataTable>;
+
+        if (list[0].Rows.Count > 0)
+        {
+            for (int index = 0; index < list[0].Rows.Count;index++ ){
+
+                s_BinId += list[0].Rows[index]["n_Bin_Id"] + ","; 
+            } 
+        } 
+         
+    }
+
+    //单据的录入方式 批量录入[2]，单个录入[1];
+    string s_Warehouse_ShelfForm = "2";
+    if (Request.QueryString.AllKeys.Contains("s_Warehouse_ShelfForm"))
+    {
+        s_Warehouse_ShelfForm = Request.QueryString["s_Warehouse_ShelfForm"];
+    }
+}
+@section Body{ 
+    <input type="hidden" name="GoodsCode" value="@(GoodsCode)" />
+    <input type="hidden" name="GoodsBarCode" value="@(GoodsBarCode)" />
+    <input type="hidden" name="GoodsWorkQuantity" value="@(GoodsWorkQuantity)" />
+    <input type="hidden" name="s_Bin_Code" value="@(s_Bin_Code)" /> 
+    <input type="hidden" name="s_BinId" value="@(s_BinId)" />
+    <div class="body">
+        <div v-bind:class="RadioTab_Showed">
+            <input type="radio" id="radio1" checked="true" name="radio" value="系统分配" v-on:click="f_radio" /><label for="radio1">系统分配</label>
+            <input type="radio" id="radio2" name="radio" value="手工指定" v-on:click="f_radio" /><label for="radio2">手工指定</label>
+        </div>
+        <div v-bind:class="TitleTab_Showed">
+            <table cellspacing="0">
+                <tr>
+                    <th>
+                        库位/<br />
+                        器具码
+                    </th>
+                    <th>
+                        上架数
+                    </th>
+                    <th>
+                        剩余数
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table cellspacing="0">
+                <tr v-for="(item,i) in DataList" :s_ReportInventoryCurrent_Code="item.s_ReportInventoryCurrent_Code" 
+                :s_ReportInventoryCurrent_SurplusNumber="item.s_ReportInventoryCurrent_SurplusNumber" :class="{ 'morechecked':item.s_ReportInventoryCurrent_isCheck }">
+                   <td>{{ item.s_ReportInventoryCurrent_Code }} /<br />
+                   {{ item.s_ReportInventoryCurrent_BinCode }}</td>
+                   <td>{{ item.s_ReportInventoryCurrent_UpNumber }}</td>
+                   <td>{{ item.s_ReportInventoryCurrent_SurplusNumber > 100000000 ? "---" : item.s_ReportInventoryCurrent_SurplusNumber }}</td>
+                </tr>
+            </table>
+        </div> 
+        <div>
+            <input type="text" v-bind:class="GoodsWorkQuantity_Showed" name="GoodsWorkQuantity"
+                value="@(SumGoodsWorkQuantity)" placeholder="上架总数" disabled="disabled" readonly="true" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="SpaceBarCode_Showed" name="SpaceBarCode" placeholder="请输入库位码" v-on:keyup.enter="f_reSureSpaceCode" />
+        </div>
+        
+        <div v-bind:class="button_Div_Showed">
+            <div v-on:click="f_SaveBillStockInOut">
+                确认上架</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .TitleTab
+        {
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+            line-height: 22px;
+        }
+        .TitleTab table
+        {
+            width: 100%;
+            height: 100%;
+        }
+        .TitleTab th
+        {
+            width: 33%;
+            border: 1px solid #a5e0a5;
+            line-height: 22px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+            background: rgb(200 220 232);
+        }
+        
+        .InfoTab
+        {
+            width: calc(90%);
+            max-height: 132px;
+            min-height: 132px;
+            margin: calc(0%) calc(5%);
+            text-align: center;
+            line-height: 22px;
+            overflow-y: scroll;
+        }
+        .InfoTab table
+        {
+            width: 100%;
+            height: 100%;
+        }
+        .InfoTab td
+        {
+            width: 33%;
+            border: 1px solid #a5e0a5;
+            height: 22px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        
+        .GoodsWorkQuantity
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+         
+        .SpaceBarCode
+        {
+            width: calc(90%);
+            margin: calc(0%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        
+        
+        .button_Div div
+        {
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(2%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        .RadioTab
+        { 
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Post请求
+        var ajaxFirst = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    RadioTab_Showed: "RadioTab", //单选框样式
+                    TitleTab_Showed: "TitleTab", //结果标题表格样式
+                    InfoTab_Showed: "InfoTab",   //结果表格样式
+                    GoodsWorkQuantity_Showed: "GoodsWorkQuantity",   //数量样式
+                    SpaceBarCode_Showed: "SpaceBarCode",   //库位码样式
+                    button_Div_Showed: "button_Div", //按钮样式 
+                    DataList: [] //结果表格数据
+                },
+                methods: {
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("条码扫描");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../PackingPutOnOffSingle/AddBillStockInOutDetail?ParentIds=" + "@ParentIds" + "&GoodsCode=" + $("[name=GoodsCode]").val()
+                            + "&GoodsWorkQuantity=" + "@GoodsWorkQuantity" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)"
+                            + "&GoodsBarCode=" + "@(GoodsBarCode)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)" + "&s_BinBarCode=" + "@(s_Bin_Code)" + "&s_BinId=" + "" + "&s_Warehouse_ShelfForm=" + "@(s_Warehouse_ShelfForm)");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../PackingPutOnOffSingle/AddBillStockInOutDetail?ParentIds=" + "@ParentIds" + "&GoodsCode=" + $("[name=GoodsCode]").val()
+                            + "&GoodsWorkQuantity=" + "@GoodsWorkQuantity" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)"
+                            + "&GoodsBarCode=" + "@(GoodsBarCode)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)" + "&s_BinBarCode=" + "@(s_Bin_Code)" + "&s_BinId=" + "" + "&s_Warehouse_ShelfForm=" + "@(s_Warehouse_ShelfForm)";
+                            })
+                        }
+
+                        //库位码焦点
+                        $(".SpaceBarCode").focus().select();
+
+                        //初始化该货物的库位分配信息
+                        vue.f_SelPutOnOffSingleReportInventoryCurrent();
+                    },
+                    //初始化该货物的库位分配信息
+                    f_SelPutOnOffSingleReportInventoryCurrent: function () {
+
+                        //对象名 根据货物编码匹配出对应的库存信息
+                        var objectName = "SelPackingPutOnOffSingleReportInventoryCurrent";
+                        //传递参数
+                        var param = { s_ReportInventoryCurrent_GoodsProductCode: $("[name=GoodsCode]").val()
+                        , n_Warehouse_Id: "@(n_Warehouse_Id)", s_ReportInventoryCurrent_QualityStatus: 1, Batch: "@(Batch)"
+                        , s_Bin_Code: $("[name=s_Bin_Code]").val()
+                        };
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            if (result.IsSuccess) {
+                                if (result.Data[0].length > 0) {
+
+                                    //获取显示行的集合
+                                    var arr = new Array();
+                                    //清空
+                                    vue.DataList = [];
+
+                                    //获取数量与器具编码信息,器具ID信息
+                                    var GoodsWorkQuantity = $("[name=GoodsWorkQuantity]").val();
+                                    var s_Bin_Code = $("[name=s_Bin_Code]").val();
+                                    var s_BinId = $("[name=s_BinId]").val();
+
+                                    //数量数组
+                                    var GoodsWorkQuantity_arr = new Array();
+                                    //器具编码数组
+                                    var s_Bin_Code_arr = new Array();
+                                    //器具ID数组
+                                    var s_BinId_arr = new Array();
+
+                                    //得到数量与器具,器具ID数组
+                                    if (GoodsWorkQuantity.indexOf(",") != -1) {
+                                        GoodsWorkQuantity_arr = GoodsWorkQuantity.split(",");
+                                    } else if (GoodsWorkQuantity != "") {
+                                        GoodsWorkQuantity_arr.push(GoodsWorkQuantity);
+                                    }
+
+                                    if (s_Bin_Code.indexOf(",") != -1) {
+                                        s_Bin_Code_arr = s_Bin_Code.split(",");
+                                    } else if (s_Bin_Code != "") {
+                                        s_Bin_Code_arr.push(s_Bin_Code);
+                                    }
+
+                                    if (s_BinId.indexOf(",") != -1) {
+                                        s_BinId_arr = s_BinId.split(",");
+                                    } else if (s_BinId != "") {
+                                        s_BinId_arr.push(s_BinId);
+                                    }
+
+                                    var arrindex = 0;
+                                    var msg = "";
+
+
+                                    //遍历已经在储位的器具是否可以使用原来的储位进行上架，有记录则说明可以，无记录则需要进行对应的提示。
+                                    if (result.Data[1].length > 0) {
+                                        result.Data[1].forEach(function (v, i) {
+                                            var check_arr = result.Data[0].filter(function (item) {
+                                                return item.s_Bin_Code == v.s_Bin_Code;
+                                            })
+                                            debugger;
+                                            if (check_arr.length > 0) {
+                                                var push_index = -1;
+                                                s_Bin_Code_arr.forEach(function (value, index) {
+                                                    if (value == check_arr[0]["s_Bin_Code"]) {
+                                                        push_index = index;
+                                                        return false;
+                                                    }
+                                                })
+
+                                                if (check_arr[0].s_ReportInventoryCurrent_SurplusNumber == "---") {
+                                                    arr.push({
+                                                        s_ReportInventoryCurrent_Code: check_arr[0].s_ReportInventoryCurrent_Code,
+                                                        s_ReportInventoryCurrent_UpNumber: GoodsWorkQuantity_arr[push_index],
+                                                        s_ReportInventoryCurrent_SurplusNumber: "---",
+                                                        s_ReportInventoryCurrent_isCheck: false,
+                                                        s_ReportInventoryCurrent_GoodsProductCode: $("[name=GoodsCode]").val(),
+                                                        s_ListStockInOut_QualityStatus: 1,
+                                                        s_ReportInventoryCurrent_GoodsBarCode: "@(GoodsBarCode)",
+                                                        s_Warehouse_ShelfForm: "@(s_Warehouse_ShelfForm)",
+                                                        n_BillStockInOut_Id: "@(n_BillStockInOut_Id)",
+                                                        s_Bin_Id: s_BinId_arr[arrindex],
+                                                        s_ReportInventoryCurrent_BinCode: push_index > s_Bin_Code_arr.length ? "" : s_Bin_Code_arr[push_index] //赋值器具条码
+                                                    })
+                                                } else {
+                                                    if (check_arr[0].s_ReportInventoryCurrent_SurplusNumber - GoodsWorkQuantity_arr[push_index] >= 0) {
+                                                        //如果当前库位剩余数无法满足当前上架数量，则继续遍历下一个库位进行分配
+                                                        arr.push({
+                                                            s_ReportInventoryCurrent_Code: check_arr[0].s_ReportInventoryCurrent_Code,
+                                                            s_ReportInventoryCurrent_UpNumber: GoodsWorkQuantity_arr[push_index],
+                                                            s_ReportInventoryCurrent_SurplusNumber: check_arr[0].s_ReportInventoryCurrent_SurplusNumber - GoodsWorkQuantity_arr[arrindex],
+                                                            s_ReportInventoryCurrent_isCheck: false,
+                                                            s_ReportInventoryCurrent_GoodsProductCode: $("[name=GoodsCode]").val(),
+                                                            s_ListStockInOut_QualityStatus: 1,
+                                                            s_ReportInventoryCurrent_GoodsBarCode: "@(GoodsBarCode)",
+                                                            s_Warehouse_ShelfForm: "@(s_Warehouse_ShelfForm)",
+                                                            n_BillStockInOut_Id: "@(n_BillStockInOut_Id)",
+                                                            s_Bin_Id: s_BinId_arr[arrindex],
+                                                            s_ReportInventoryCurrent_BinCode: push_index > s_Bin_Code_arr.length ? "" : s_Bin_Code_arr[push_index] //赋值器具条码
+                                                        })
+                                                    } else {
+
+                                                        msg = "器具码为" + v.s_Bin_Code + "所存在的储位已不够库存进行存放，请重新输入器具码";
+                                                        return false;
+                                                    }
+                                                }
+                                            } else {
+                                                msg = "器具码为" + v.s_Bin_Code + "所存在的储位已不够库存进行存放，请重新输入器具码";
+                                                return false;
+                                            }
+                                        })
+
+                                        //提示错误
+                                        if (msg != "") {
+                                            f_commonShowMsg(msg);
+                                            return;
+                                        }
+                                    }
+
+
+                                    $.each(result.Data[0], function (index, value) {
+                                        //超出个数则跳出
+                                        if (arrindex == s_Bin_Code_arr.length) {
+                                            return false;
+                                        }
+
+                                        debugger;
+                                        if (value.s_ReportInventoryCurrent_SurplusNumber == "---") {
+                                            //验证是否已经存在该器具信息,存在则跳到下一个
+                                            var isExists = arr.filter(function (item) {
+                                                return item.s_ReportInventoryCurrent_BinCode == s_Bin_Code_arr[arrindex];
+                                            }).length;
+
+                                            if (isExist == 0) {
+                                                arr.push({
+                                                    s_ReportInventoryCurrent_Code: value.s_ReportInventoryCurrent_Code,
+                                                    s_ReportInventoryCurrent_UpNumber: GoodsWorkQuantity_arr[arrindex],
+                                                    s_ReportInventoryCurrent_SurplusNumber: "---",
+                                                    s_ReportInventoryCurrent_isCheck: false,
+                                                    s_ReportInventoryCurrent_GoodsProductCode: $("[name=GoodsCode]").val(),
+                                                    s_ListStockInOut_QualityStatus: 1,
+                                                    s_ReportInventoryCurrent_GoodsBarCode: "@(GoodsBarCode)",
+                                                    s_Warehouse_ShelfForm: "@(s_Warehouse_ShelfForm)",
+                                                    n_BillStockInOut_Id: "@(n_BillStockInOut_Id)",
+                                                    s_Bin_Id: s_BinId_arr[arrindex],
+                                                    s_ReportInventoryCurrent_BinCode: arrindex > s_Bin_Code_arr.length ? "" : s_Bin_Code_arr[arrindex] //赋值器具条码
+                                                })
+                                            }
+                                            arrindex++;
+                                        } else {
+                                            if (value.s_ReportInventoryCurrent_SurplusNumber - GoodsWorkQuantity_arr[arrindex] >= 0) {
+                                                //验证是否已经存在该器具信息,存在则跳到下一个
+                                                var isExists = arr.filter(function (item) {
+                                                    return item.s_ReportInventoryCurrent_BinCode == s_Bin_Code_arr[arrindex];
+                                                }).length;
+
+                                                if (isExists == 0) {
+                                                    //如果当前库位剩余数无法满足当前上架数量，则继续遍历下一个库位进行分配
+                                                    arr.push({
+                                                        s_ReportInventoryCurrent_Code: value.s_ReportInventoryCurrent_Code,
+                                                        s_ReportInventoryCurrent_UpNumber: GoodsWorkQuantity_arr[arrindex],
+                                                        s_ReportInventoryCurrent_SurplusNumber: value.s_ReportInventoryCurrent_SurplusNumber - GoodsWorkQuantity_arr[arrindex],
+                                                        s_ReportInventoryCurrent_isCheck: false,
+                                                        s_ReportInventoryCurrent_GoodsProductCode: $("[name=GoodsCode]").val(),
+                                                        s_ListStockInOut_QualityStatus: 1,
+                                                        s_ReportInventoryCurrent_GoodsBarCode: "@(GoodsBarCode)",
+                                                        s_Warehouse_ShelfForm: "@(s_Warehouse_ShelfForm)",
+                                                        n_BillStockInOut_Id: "@(n_BillStockInOut_Id)",
+                                                        s_Bin_Id: s_BinId_arr[arrindex],
+                                                        s_ReportInventoryCurrent_BinCode: arrindex > s_Bin_Code_arr.length ? "" : s_Bin_Code_arr[arrindex] //赋值器具条码
+                                                    })
+                                                }
+                                                arrindex++;
+
+                                            } else {
+
+                                            }
+                                        }
+
+                                    })
+
+                                    vue.DataList = arr;
+                                }
+
+                            }
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+                    },
+                    //进行上架确认
+                    f_SaveBillStockInOut: function () {
+
+                        var obj = event.target;
+                        if ($(obj).is("[disabled]")) {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxFirst != null) {
+                            ajaxFirst.abort();
+                            ajaxFirst = null;
+                            return;
+                        }
+
+                        $(obj).attr("disabled", "disabled");
+
+                        //自动触发确认库位文本框的回车事件
+                        vue.f_reSureSpaceCode();
+
+                        //获取未进行确认库位的记录，并判定是否全部已经确认库位
+                        var arr = vue.DataList.filter(function (result) {
+                            return result.s_ReportInventoryCurrent_isCheck == false;
+                        });
+
+                        if (arr.length > 0) {
+                            f_commonShowMsg("当前还有未进行库位确认的记录，请全部库位确认完毕再点击下架!");
+                            //重新焦点
+                            $(".SpaceBarCode").val("").focus();
+
+                            $(obj).removeAttr("disabled");
+                            return;
+                        }
+
+
+
+                        //对象名 新增货物入库记录以及上架记录
+                        var objectName = "InsertPackingPutOnOffSingleListStockInOut";
+
+                        var param = { Dictionary: vue.DataList };
+
+                        ajaxFirst = ajaxhelper.ajax_Post(objectName, param, function (result) {
+
+                            f_commonShowMsg("上架成功!");
+
+                            //跳转到条码扫描界面
+                            setTimeout('location.href = "/PackingPutOnOffSingle/AddBillStockInOutDetail?ParentIds=" + "@ParentIds" + "&GoodsCode=" + "&GoodsWorkQuantity=" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&GoodsBarCode=" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)" + "&s_BinBarCode=" + "&s_BinId="', 3000);
+
+                            ajaxFirst = null;
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxFirst = null;
+
+                            $(obj).removeAttr("disabled");
+                        })
+                    },
+                    //确认库位
+                    f_reSureSpaceCode: function () {
+                        //获取库位编码
+                        var SpaceBarCode = $("[name=SpaceBarCode]").val();
+
+                        $.each(vue.DataList, function (index, value) {
+                            if (value.s_ReportInventoryCurrent_Code == SpaceBarCode) {
+                                value.s_ReportInventoryCurrent_isCheck = true;
+                                return false;
+                            }
+                        })
+                        //清空
+                        $("[name=SpaceBarCode]").val("").focus();
+                    },
+                    //选中库位匹配方式
+                    f_radio: function (event) {
+                        if ($(event.target).attr("value") == "手工指定") {
+
+                            //跳转至手工库位扫描界面 
+                            location.href = "LocationScanningManualUp?ParentIds=" + "@ParentIds" + "&GoodsCode=" + "@(GoodsCode)" + "&Batch=" + "@(Batch)" + "&GoodsBarCode=" + $("[name=GoodsBarCode]").val()
+                        + "&GoodsWorkQuantity=" + $("[name=GoodsWorkQuantity]").val() + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)"
+                        + "&s_BinId=" + "" + "&s_Bin_Code=" + $("[name=s_Bin_Code]").val() + "&s_Warehouse_ShelfForm=" + "@(s_Warehouse_ShelfForm)"
+
+                        }
+                    },
+                    //验证所填是否是数字,不是则清空
+                    checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    }
+                }
+            })
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+    </script>
+}

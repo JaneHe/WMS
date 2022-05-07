@@ -1,0 +1,225 @@
+﻿@{
+    Layout = null;
+
+    //获取统计日期
+    string datetime = DateTime.Now.AddDays(-1).ToString("yyyy-MM-dd"); 
+     
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>喷涂缓存区库存看板</title>
+    <script src="../../TopsLib/Scripts/jquery-1.8.0.js" type="text/javascript"></script>
+    <script src="../../Scripts/Highcharts/code/highcharts.js" type="text/javascript"></script>
+    <style type="text/css">
+        #container
+        {
+            min-width: calc(100%);
+            height: 600px;
+            font-weight: bold;
+        }
+        [name=date]
+        {
+            border: 1px solid lightblue;
+        }
+        .search
+        {  
+            margin: calc(1%) calc(0%) calc(1%) calc(2%);
+        }
+    </style>
+    <script type="text/javascript">
+        var chart = null;
+        $(function () {
+            Highcharts.setOptions({
+                colors: ['rgb(149, 206, 255)', '#c796c1', 'rgb(169, 255, 150)']
+            });
+
+            //初始化看板
+            chart = Highcharts.chart('container', {
+                chart: {
+                    type: 'bar'
+                },
+                title: {
+                    text: "喷涂缓存区进出存看板  [数据统计日期:" + $("[name=datetime]").val() + "]"
+                },
+                xAxis: {
+                    categories: []
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: '产品合格数'
+                    }
+                },
+                subtitle: {
+                    text: "说明:入库数据来源于喷涂上线RFID合格件数据，出库数据来源于喷涂下线QA数据",
+                    align: 'right',
+                    x: -10,
+                    style: {
+                        color: "red"
+                    }
+                },
+                legend: {
+                    /* 图例显示顺序反转
+                    * 这是因为堆叠的顺序默认是反转的，可以设置 
+                    * yAxis.reversedStacks = false 来达到类似的效果 
+                    */
+                    reversed: true
+                },
+                credits: {
+                    enabled: false//不显示highCharts版权信息
+                },
+                plotOptions: { 
+                    bar: {
+                        dataLabels: {
+                            enabled: true,
+                            allowOverlap: true, // 允许数据标签重叠
+                            color: 'Black'
+                        }
+                    }
+                },
+                series: [{ "name": "入库数", "data": [] },
+                { "name": "出库数", "data": [] },
+                { "name": "库存数", "data": []}]
+            });
+
+            //加载数据
+            f_loadData();
+
+            //加载事件
+            f_loadEvent();
+
+            //自动加载日期
+            $("[name=date]").val($("[name=datetime]").val())
+        })
+
+        //加载事件
+        function f_loadEvent() {
+            $("[name=date]").change(function () {
+                $("[name=datetime]").val($(this).val());
+                f_loadData();
+            })
+        }
+
+        //加载数据
+        function f_loadData() {
+
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGet/SelSprayWarehousingCacheData_One",
+                data: { Date: $("[name=datetime]").val() },
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result.IsSuccess) {
+                        var xAxisData = new Array();
+
+                        //数据列
+                        var WarehousingQuantity = new Array();
+                        var WarehouseOutOKQuantity = new Array();
+                        var SurplusQuantity = new Array();
+
+                        //加载数据
+                        if (result.Data[0].length > 0) {
+
+                            result.Data[0].forEach(function (value, index) {
+                                WarehousingQuantity.push(value.f_BillStockInOut_WarehousingWorkOrderQuantity);
+                                WarehouseOutOKQuantity.push(value.f_BillStockInOut_WarehouseOutWorkOrderQuantity);
+                                SurplusQuantity.push(value.f_BillStockInOut_SurplusWorkOrderQuantity);
+                                xAxisData.push(value.s_BillStockInOut_ExternalName);
+                            })
+
+                        } else {
+
+                        }
+
+                        chart.update({
+                            yAxis: {
+                                min: 0,
+                                title: {
+                                    text: '产品合格数'
+                                },
+                                tickPositioner: function () {
+                                    //库存数量
+                                    var f_BillStockInOut_SurplusWorkOrderQuantity = 0;
+                                    //入库数与出库数最大值之和
+                                    var f_BillStockInOut_SumWorkOrderQuantity = 0;
+
+                                    result.Data[0].forEach(function (value, index) {
+                                        if (value.f_BillStockInOut_SurplusWorkOrderQuantity < 0 && f_BillStockInOut_SurplusWorkOrderQuantity > value.f_BillStockInOut_SurplusWorkOrderQuantity) {
+                                            f_BillStockInOut_SurplusWorkOrderQuantity = value.f_BillStockInOut_SurplusWorkOrderQuantity;
+                                        }
+                                        if (f_BillStockInOut_SumWorkOrderQuantity < value.f_BillStockInOut_WarehouseOutWorkOrderQuantity + value.f_BillStockInOut_SurplusWorkOrderQuantity + value.f_BillStockInOut_WarehousingWorkOrderQuantity) {
+                                            f_BillStockInOut_SumWorkOrderQuantity = value.f_BillStockInOut_WarehouseOutWorkOrderQuantity + value.f_BillStockInOut_SurplusWorkOrderQuantity + value.f_BillStockInOut_WarehousingWorkOrderQuantity
+                                        }
+                                    })
+
+                                    var arr = new Array();
+
+                                    //库存数量是负数,那么需要最先累加
+                                    if (f_BillStockInOut_SurplusWorkOrderQuantity < 0) {
+                                        //初始数量
+                                        var f_BillStockInOut_TempSurplusWorkOrderQuantity = -Math.ceil(-f_BillStockInOut_SurplusWorkOrderQuantity / 10) * 10;
+                                        arr.push(f_BillStockInOut_TempSurplusWorkOrderQuantity);
+
+                                        //末尾数量
+                                        var f_BillStockInOut_TempSumWorkOrderQuantity = Math.ceil(f_BillStockInOut_SumWorkOrderQuantity / 10) * 10;
+
+                                        //差值
+                                        var Difference = Math.ceil((f_BillStockInOut_TempSumWorkOrderQuantity - f_BillStockInOut_TempSurplusWorkOrderQuantity) / 10 / 6) * 10;
+
+                                        for (var i = 1; i <= 6; i++) {
+                                            arr.push(f_BillStockInOut_TempSurplusWorkOrderQuantity + Difference * i)
+                                        }
+
+                                    } else {
+
+                                        //初始数量
+                                        var f_BillStockInOut_TempSurplusWorkOrderQuantity = Math.ceil(f_BillStockInOut_SurplusWorkOrderQuantity / 10) * 10;
+                                        arr.push(f_BillStockInOut_TempSurplusWorkOrderQuantity);
+
+                                        //末尾数量
+                                        var f_BillStockInOut_TempSumWorkOrderQuantity = Math.ceil(f_BillStockInOut_SumWorkOrderQuantity / 10) * 10;
+
+                                        //差值
+                                        var Difference = Math.ceil((f_BillStockInOut_TempSumWorkOrderQuantity - f_BillStockInOut_TempSurplusWorkOrderQuantity) / 10 / 6) * 10;
+
+                                        for (var i = 1; i <= 6; i++) {
+                                            arr.push(f_BillStockInOut_TempSurplusWorkOrderQuantity + Difference * i)
+                                        }
+                                    }
+
+                                    return arr;
+                                }
+                            }
+
+                        })
+
+                        chart.series[0].setData(WarehousingQuantity, true, true, true);
+                        chart.series[1].setData(WarehouseOutOKQuantity, true, true, true);
+                        chart.series[2].setData(SurplusQuantity, true, true, true);
+                        chart.xAxis[0].setCategories(xAxisData);
+                        chart.title.update({ text: "喷涂缓存区进出存看板  [数据统计日期:" + $("[name=datetime]").val() + "]" });
+
+                    } else {
+                        alert(result.Msgs[0])
+                    }
+                }
+            })
+        }
+
+    </script>
+</head>
+<body>
+    <input type="hidden" name="datetime" value="@(datetime)" />
+    <div>
+        <div class="search">
+            <span>统计日期:</span>
+            <input type="date" name="date" />
+        </div>
+    </div>
+    <div>
+        <div id="container">
+        </div>
+    </div>
+</body>
+</html>

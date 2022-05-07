@@ -1,0 +1,437 @@
+﻿@{ 
+    string BeginTime = DateTime.Now.ToString("yyyy-MM-dd hh:mm:ss").Substring(0, 16);
+    string NowTime = DateTime.Now.ToString("yyyyMMdd").Substring(2, 6);
+
+    string ReceiveTime = DateTime.Now.ToString("yyyy-MM-dd");
+
+    string s_PurchasedBoxLabelPrintRecord_BeginPrintNumber = Request.QueryString["BeginNO"];
+    string s_PurchasedBoxLabelPrintRecord_EndPrintNumber = Request.QueryString["EndNO"];
+    string s_PurchasedBoxLabelPrintRecord_PrintNumber = Request.QueryString["PrintNumber"];
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>补打标签</title>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <script src="../../TopsLib/Scripts/QRCodeJs/jquery-barcode-2.0.2.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/js/JsBarcode.all.min.js" type="text/javascript"></script>
+    <style type="text/css">
+        .PrintLabel_Tab
+        {
+            margin: 10px 0px;
+        }
+        .PrintLabel
+        { 
+            font-size: 15px;
+        }
+        .PrintLabel_Tab table
+        {
+            width: 100%;
+            text-align: center;
+        }
+        .PrintLabel_Tab td
+        {
+            border: 1px solid black;
+            line-height: 30px;
+        }
+        .PrintLabel_Tab td:nth-child(1)
+        {
+            width: 78px;
+        }
+        .PrintLabel_Tab td:nth-child(2)
+        {
+            width: 182px;
+        }
+        .PrintLabel_Tab td:nth-child(3)
+        {
+            width: 33px;
+        }
+        .PrintLabel_Tab td:nth-child(4)
+        {
+            width: 60px;
+        }
+        .PrintLabel_Tab td:nth-child(5)
+        {
+            width: 77px;
+        }
+        .PrintLabel_Tab td:nth-child(6)
+        {
+            width: 121px;
+        }
+        .PrintLabel_Tab td div 
+        {
+            margin: 0px auto;
+            width: 150px;
+        }
+        
+        .ParamForm
+        {
+            margin: 10px 0px;
+        }
+        
+        .printBt
+        {
+            font-family: 微软雅黑;
+            font-size: 16px;
+            width: 120px;
+            line-height: 35px;
+            font-weight: bold;
+            background: #00b7ee;
+            border-radius: 25px;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            margin: 5px 0px;
+        }
+        .reloadBt
+        {
+            font-family: 微软雅黑;
+            font-size: 16px;
+            width: 120px;
+            line-height: 35px;
+            font-weight: bold;
+            background: #00b7ee;
+            border-radius: 25px;
+            display: inline-block;
+            text-align: center;
+            cursor: pointer;
+            margin: 5px 0px;
+        }
+        
+        
+        .param_item
+        {
+            width: 21vw;
+            display: inline-block;
+            margin: 5px 5px;
+        }
+        .param_item input
+        {
+            width: 12vw;
+        }
+    </style>
+    <script type="text/javascript">
+        var vue = null;
+
+        $(function () {
+            vue = new Vue({
+                el: ".body",
+                data: {
+                    label_Array: new Array(),  //标签打印显示数据
+                    label_Obj: {
+                        s_PurchasedBoxLabelPrintRecord_GoodsBarCode: "",
+                        s_PurchasedBoxLabelPrintRecord_GoodsProductCode: "",
+                        s_PurchasedBoxLabelPrintRecord_GoodsProductName: "",
+                        s_PurchasedBoxLabelPrintRecord_ExternalCode: "",
+                        s_PurchasedBoxLabelPrintRecord_OrderNumber: "",
+                        d_PurchasedBoxLabelPrintRecord_ReceiveTime: "@(ReceiveTime)",
+                        n_PurchasedBoxLabelPrintRecord_Amount: "",
+                        s_PurchasedBoxLabelPrintRecord_BatchNumber: "@(NowTime)",
+                        s_PurchasedBoxLabelPrintRecord_Supplier: "",
+                        s_PurchasedBoxLabelPrintRecord_AI: "",
+                        s_PurchasedBoxLabelPrintRecord_Customer: "沈阳名华模塑科技有限公司",
+                        s_PurchasedBoxLabelPrintRecord_Address: "沈阳市大东区东跃一街",
+                        s_PurchasedBoxLabelPrintRecord_SerialNo: "",
+                        s_PurchasedBoxLabelPrintRecord_PrintNumber: "@(s_PurchasedBoxLabelPrintRecord_PrintNumber)",
+                        s_PurchasedBoxLabelPrintRecord_BeginPrintNumber: "@(s_PurchasedBoxLabelPrintRecord_BeginPrintNumber)",
+                        s_PurchasedBoxLabelPrintRecord_EndPrintNumber: "@(s_PurchasedBoxLabelPrintRecord_EndPrintNumber)"
+                    },
+                    label_barcode_option: {
+                        output: 'css',       //渲染方式 css/bmp/svg/canvas 
+                        color: 'black',   //条码颜色
+                        barWidth: 1.6,        //单条条码宽度 
+                        render: "table",
+                        barHeight: 40,     //单体条码高度 
+                        addQuietZone: false,  //是否添加空白区（内边距）
+                        fontSize: 12
+                    },
+                    label_barcode_option2: {
+                        output: 'css',        //渲染方式 css/bmp/svg/canvas 
+                        color: 'black',       //条码颜色
+                        barWidth: 1.2,          //单条条码宽度
+                        barHeight: 30,        //单体条码高度
+                        fontSize: 10          //条码字体大小 
+                    },
+                    label_JSbarcode_option: {
+                        format: "code128", //选择要使用的条形码类型
+                        width: 1.5, //设置条之间的宽度
+                        height: 40, //高度
+                        displayValue: true, //是否在条形码下方显示文字
+                        font: "Microsoft YaHei", //设置文本的字体
+                        textMargin: 1, //设置条形码和文本之间的间距
+                        fontSize: 15, //设置文本的大小
+                        lineColor: "#000"//设置条和文本的颜色。
+                        // margin: 2//设置条形码周围的空白边距
+                    }
+                },
+                methods: {
+                    //加载数据
+                    f_loadData: function () {
+                        var PrintNumber = 0;
+                        //获取对应的打印数量
+                        if (localStorage.getItem("PurchasedBoxLabelPrintManager_MakeUp_s_PurchasedBoxLabelPrintRecord_PrintNumber") != undefined) {
+
+                            PrintNumber = parseInt(localStorage.getItem("PurchasedBoxLabelPrintManager_MakeUp_s_PurchasedBoxLabelPrintRecord_PrintNumber"));
+                        } 
+
+                        //获取缓存中的打印数据
+                        var label_Obj = new Object();
+                        for (var obj in vue.label_Obj) {
+                            if (localStorage.getItem("PurchasedBoxLabelPrintManager_MakeUp_" + obj) != undefined) {
+
+                                label_Obj[obj] = localStorage.getItem("PurchasedBoxLabelPrintManager_MakeUp_" + obj);
+                                localStorage.removeItem("PurchasedBoxLabelPrintManager_MakeUp_" + obj);
+                            }
+                        }
+                         
+                        //循环加载到到数组中
+                        for (var index = 0; index < PrintNumber; index++) {
+                            var label = $.extend(true, {}, label_Obj);
+                            label["s_PurchasedBoxLabelPrintRecord_PrintNumber"] = label_Obj["s_PurchasedBoxLabelPrintRecord_PrintNumber"];
+                            //根据打印数量重新编制后续标签的流水号
+                            var s_PurchasedBoxLabelPrintRecord_SerialNo = parseInt(label_Obj["s_PurchasedBoxLabelPrintRecord_BeginPrintNumber"]);
+                            s_PurchasedBoxLabelPrintRecord_SerialNo =
+                            s_PurchasedBoxLabelPrintRecord_SerialNo + index >= 10 ? (
+                            s_PurchasedBoxLabelPrintRecord_SerialNo + index >= 100 ? (
+                            s_PurchasedBoxLabelPrintRecord_SerialNo + index >= 1000 ? (
+                            s_PurchasedBoxLabelPrintRecord_SerialNo
+                            ) : "0" + (s_PurchasedBoxLabelPrintRecord_SerialNo + index)
+                            ) : "00" + (s_PurchasedBoxLabelPrintRecord_SerialNo + index)
+                            ) : "000" + (s_PurchasedBoxLabelPrintRecord_SerialNo + index);
+                            label["s_PurchasedBoxLabelPrintRecord_SerialNo"] = s_PurchasedBoxLabelPrintRecord_SerialNo;
+                            //重新组成唯一的包装单号
+                            label["s_PurchasedBoxLabelPrintRecord_GoodsBarCode"] = label["s_PurchasedBoxLabelPrintRecord_GoodsProductCode"]
+                            + label["s_PurchasedBoxLabelPrintRecord_BatchNumber"] + label["s_PurchasedBoxLabelPrintRecord_SerialNo"];
+
+                            vue.label_Array.push(label);
+                        } 
+
+                        //数据加载完毕之后执行
+                        Vue.nextTick(function () {
+                            //加载一维码
+                            if (PrintNumber > 0) {
+                                vue.f_loadbarCode();
+                            }
+
+                            //设置尺寸
+                            //$(".PrintLabel").css({ "width": vue.mmToPx(146), "height": vue.mmToPx(89), "margin-bottom": vue.mmToPx(10) });
+                            $(".PrintLabel").css({ "width": vue.mmToPx(146), "height": vue.mmToPx(89), "margin-bottom": vue.mmToPx(10) });
+
+                            //自动打印
+                            vue.f_InsertPurchasedBoxLabelPrintRecord();
+                        })
+
+                        //打印后触发事件
+                        window.onafterprint = function () {
+                            window.close();
+
+                        }
+                    },
+                    //构建打印区域 打印纸张设置 7cm*5cm
+                    f_bulidPrintArea: function () {
+                        var headstr = "<html><head><title></title></head><body>";
+                        var footstr = "</body>";
+                        var printData = $(".PrintLabel").parent().html(); // 获得 div 里的所有 html 数据
+                        var oldstr = document.body.innerHTML;
+                        if (oldstr.indexOf("</style>") != -1) {
+
+                            var sc = oldstr.substring(oldstr.indexOf("</style>") + 8, oldstr.length);
+                            var script = sc.substring(sc.indexOf("<script type="), sc.indexOf("<div class="));
+                            printData = "<html><head>" + oldstr.substring(0, oldstr.indexOf("</style>")) + "</style>" +
+                             "</head><body>" + printData + "</body></html>"
+                        }
+
+                        document.body.innerHTML = headstr + printData + footstr;
+                        window.print();
+                        document.body.innerHTML = oldstr;
+                    },
+                    //新增对应的操作记录
+                    f_InsertPurchasedBoxLabelPrintRecord: function () {
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/AjaxPost/InsertPurchasedBoxLabelPrintRecords",
+                            data: { Dictionarys: vue.label_Array },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    vue.f_bulidPrintArea();
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+                    },
+                    //形成一维码
+                    f_loadbarCode: function () {
+                        vue.label_Array.forEach(function (value, index) {
+
+                            //一维码
+                            $(".PrintLabel:eq(" + index + ") .s_PurchasedBoxLabelPrintRecord_GoodsBarCode").barcode(value.s_PurchasedBoxLabelPrintRecord_GoodsBarCode, "code128", vue.label_barcode_option2);
+                            //一维码
+                            $(".PrintLabel:eq(" + index + ") .s_PurchasedBoxLabelPrintRecord_GoodsProductCode").barcode(value.s_PurchasedBoxLabelPrintRecord_GoodsProductCode, "code128", vue.label_barcode_option);
+                            //一维码
+                            $(".PrintLabel:eq(" + index + ") .n_PurchasedBoxLabelPrintRecord_Amount").barcode(value.n_PurchasedBoxLabelPrintRecord_Amount, "code128", vue.label_barcode_option);
+                            //一维码
+                            $(".PrintLabel:eq(" + index + ") .s_PurchasedBoxLabelPrintRecord_BatchNumber").barcode(value.s_PurchasedBoxLabelPrintRecord_BatchNumber, "code128", vue.label_barcode_option);
+
+                            //样式调整
+                            $(".PrintLabel:eq(" + index + ") .s_PurchasedBoxLabelPrintRecord_GoodsBarCode").css({ "text-align": "center" }); // "width": "200px",
+                            $(".PrintLabel:eq(" + index + ") .s_PurchasedBoxLabelPrintRecord_GoodsProductCode").css({ "text-align": "center" });
+                            $(".PrintLabel:eq(" + index + ") .n_PurchasedBoxLabelPrintRecord_Amount").css({ "text-align": "center" });
+                            $(".PrintLabel:eq(" + index + ") .s_PurchasedBoxLabelPrintRecord_BatchNumber").css({ "text-align": "center" });
+
+                            //JsBarcode的条码生成
+                            var BarCode_option = $.extend(true, {}, vue.label_JSbarcode_option);
+                            JsBarcode("#BarCode_" + index, value.s_PurchasedBoxLabelPrintRecord_GoodsBarCode, BarCode_option);
+
+                            //var GoodsProductCode_option = $.extend(true, {}, vue.label_JSbarcode_option);
+                            //GoodsProductCode_option.height = 30;
+                            //JsBarcode("#GoodsProductCode_" + index, value.s_PurchasedBoxLabelPrintRecord_GoodsProductCode + "-" + value.s_PurchasedBoxLabelPrintRecord_AI, GoodsProductCode_option);
+
+                        })
+                    },
+                    //获取DPI，图像每英寸长度内的像素点数
+                    getDPI: function () {
+                        var arrDPI = new Array;
+                        if (window.screen.deviceXDPI) {
+                            arrDPI[0] = window.screen.deviceXDPI;
+                            arrDPI[1] = window.screen.deviceYDPI;
+                        } else {
+                            var tmpNode = document.createElement("DIV");
+                            tmpNode.style.cssText = "width:1in;height:1in;position:absolute;left:0px;top:0px;z-index:99;visibility:hidden";
+                            document.body.appendChild(tmpNode);
+                            arrDPI[0] = parseInt(tmpNode.offsetWidth);
+                            arrDPI[1] = parseInt(tmpNode.offsetHeight);
+                            tmpNode.parentNode.removeChild(tmpNode);
+                        }
+                        return arrDPI;
+                    },
+                    //px转毫米
+                    pxTiMm: function (value) {
+                        var inch = value / vue.getDPI()[0];
+                        var c_value = inch * 25.4;
+                        return c_value;
+                    },
+                    //毫米转px
+                    mmToPx: function (value) {
+                        var inch = value / 25.4;
+                        var c_value = inch * vue.getDPI()[0];
+                        return c_value;
+                    }
+                }
+            })
+
+            vue.f_loadData();
+
+        })
+
+    </script>
+</head>
+<body>
+    <div class="body">
+    
+        <div>
+            <div class="printBt" v-on:click="f_InsertPurchasedBoxLabelPrintRecord">
+                打印
+            </div> 
+        </div>
+
+        <div class="PrintLabel_Tab">
+            <div class="PrintLabel" v-for="(option,index) in label_Array" :index="index" >
+
+                <table cellpadding="0" cellspacing="0" style="width: 100%; text-align: center;">
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 78px;">
+                            @*(1)*@供应商
+                        </td>
+                        <td colspan="2" style="border: 1px solid black; width: 215px;">
+                            {{ option.s_PurchasedBoxLabelPrintRecord_Supplier }}
+                        </td>
+                        <td colspan="3" rowspan="3" style="border: 1px solid black; width: 358px;">
+                          
+                            @*<div class="s_PurchasedBoxLabelPrintRecord_GoodsBarCode" style="margin: 0px auto;
+                                width: 200px;" barcode>
+                            </div>*@
+                            <svg :id="'BarCode_'+ index" style="width: 220px; margin: 0px auto;" />
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 78px;">
+                            @*(2)*@客户
+                        </td>
+                        <td colspan="2" style="border: 1px solid black; width: 215px;">
+                            {{ label_Obj.s_PurchasedBoxLabelPrintRecord_Customer }}
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 78px;">
+                            @*(3)*@地址
+                        </td>
+                        <td colspan="2" style="border: 1px solid black; width: 215px;">
+                            {{ option.s_PurchasedBoxLabelPrintRecord_Address }}
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 78px;">
+                            @*(5)*@存货编码
+                        </td>
+                        <td colspan="3" style="border: 1px solid black; width: 264px;">
+                            <div class="s_PurchasedBoxLabelPrintRecord_GoodsProductCode" style="margin: 0px auto;
+                                width: 150px;" barcode>
+                            </div>
+                            @*<svg :id="'GoodsProductCode_'+ index" style="width: 180px; margin: 0px auto;" />*@
+                        </td>
+                        <td style="border: 1px solid black; width: 63px;">
+                            @*(6)*@订单号
+                        </td>
+                        <td style="border: 1px solid black; width: 146px;">
+                            {{ option.s_PurchasedBoxLabelPrintRecord_OrderNumber }}
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 78px;">
+                            @*(7)*@零件描述
+                        </td>
+                        <td colspan="3" style="border: 1px solid black; width: 264px;">
+                            {{ option.s_PurchasedBoxLabelPrintRecord_GoodsProductName }}
+                        </td>
+                        <td style="border: 1px solid black; width: 63px;">
+                            @*(8)*@批次
+                        </td>
+                        <td style="border: 1px solid black; width: 146px;">
+                            <div class="s_PurchasedBoxLabelPrintRecord_BatchNumber" style="margin: 0px auto;
+                                width: 150px;" barcode>
+                            </div>
+                            @*<svg id="BatchNumber" style="width: 150px; margin: 0px auto;" />*@
+                        </td>
+                    </tr>
+                    <tr style="line-height: 30px;">
+                        <td style="border: 1px solid black; width: 78px;">
+                            @*(9)*@创建时间
+                        </td>
+                        <td style="border: 1px solid black; width: 181px;">
+                            @(BeginTime)
+                        </td>
+                        <td style="border: 1px solid black; width: 34px;">
+                            @*(10)*@AI
+                        </td>
+                        <td style="border: 1px solid black; width: 49px;">
+                            {{ option.s_PurchasedBoxLabelPrintRecord_AI }}
+                        </td>
+                        <td style="border: 1px solid black; width: 63px;">
+                            @*(11)*@数量
+                        </td>
+                        <td style="border: 1px solid black; width: 146px;">
+                            <div class="n_PurchasedBoxLabelPrintRecord_Amount" style="margin: 0px auto; width: 150px;" barcode>
+                            </div>
+                            @*<svg id="Amount" style="width: 150px; margin: 0px auto;" />*@
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

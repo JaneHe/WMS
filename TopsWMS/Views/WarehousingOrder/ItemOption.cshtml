@@ -1,0 +1,74 @@
+﻿@{  
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+}
+@section Body{
+    <div class="optionGroup">
+        <div v-bind:class="option_item" v-on:click="f_loadOperationPage" url="/WarehousingOrder/Index?ParentIds=@ParentIds">
+            入库单申请</div>
+        <div v-bind:class="option_item" v-on:click="f_loadOperationPage" url="/WarehousingOrder/Info?ParentIds=@ParentIds">
+            未经确认的入库单申请</div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .option
+        {
+            width: calc(60%);
+            margin: 15px auto;
+            line-height: 52px;
+            border: 1px solid gray;
+            box-shadow: 0 0 5px 1px gray;
+            background-color: #B5C7E7;
+            cursor: pointer;
+            font-family: 微软雅黑; 
+            text-align: center;
+            font-size: 20px;
+        }
+    </style>
+    <script type="text/javascript">
+        
+        $(function () {
+
+            //选项容器
+            var vue = new Vue({
+                el: ".optionGroup",
+                data: {
+                    option_item: {  //选项卡的样式
+                        option: true
+                    },
+                    //选择项底色
+                    codeList:["#A7E1B9", "#FFAA74", "#d299ea", "#F8A9CC", "#63A7EF", "#B89FC6", "#9A9788", "#B82FCC", "#4E6548", "#F8A9CC", "#D0B2CC", "ffd800", "C2B0CC", "90ee90"]
+
+                },
+                methods: {
+                    //打开操作页方法
+                    f_loadOperationPage: function (event) { 
+                       window.location = $(event.target).attr("url");
+                    },
+                    //加载初始化页面
+                    f_loadPage: function () {
+
+                       //循环选项添加背景色
+                       $(".optionGroup .option").each(function (index, value) {
+
+                           var i = index % vue.codeList.length;
+                           $(this).css("background-color", vue.codeList[i]);
+                       })
+
+                       //加载返回事件
+                       f_loadEvent("../../../../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + "@ParentIds");
+                         
+                       //给标题
+                       window.parent.$(".top").find("label").text("入库单管理");
+                    }
+
+                }
+            })
+            
+            //先执行初始化
+            vue.f_loadPage();
+        })
+    </script>
+}

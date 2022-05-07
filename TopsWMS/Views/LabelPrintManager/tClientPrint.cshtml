@@ -1,0 +1,222 @@
+﻿@{ 
+    ViewBag.Title = "标签打印";
+    ViewBag.ModuleName = "资料查询"; 
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>标签打印</title>
+    <style type="text/css">
+        .print
+        {
+            width: 180px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 30px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+
+        .print1
+        {
+            width: 200px;
+            margin: 20px auto;
+            padding: 20px;
+            background: rgb(251,167,80);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 30px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+
+        .temp
+        {
+            display: none;
+        }
+    </style>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <script src="../../TopsLib/Scripts/QRCodeJs/jquery-barcode-2.0.2.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                },
+                methods: {
+                    //加载打印信息
+                    f_loadPrintData: function () {
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SeltHouPackingBox",
+                            data: {},
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data[0].length > 0) {
+                                        var tr = "";
+                                        result.Data[0].forEach(function (value, index) {
+                                            tr += " <option value='" + value.No + "'>" + value.No + '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' + value.Name + "</option>"
+
+                                        })
+                                        $("#clientSelect").append(tr);
+                                    }
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+                    },
+                    f_LoadNum: function (value) {
+                        var n = /^[0-9]*$/;
+                        var re = new RegExp(n);
+                        if (re.test(value)) {
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }
+                    },
+                    //打印事件
+                    f_printbin: function () {
+                        var Num = $("#clientNum").val();
+                        var Serial = $("#clientSelect").val();
+
+                        if (Num.length == 0) {
+                            alert("请输入打印数量！");
+                            $("#clientNum").focus().val("");
+                            return;
+                        }
+                        if (Serial.length == 0) {
+                            alert("请选择客户零件号！");
+                            return;
+                        }
+                        if (!vue.f_LoadNum(Num)) {
+                            alert("打印数量必须是纯数字！");
+                            $("#clientNum").val("");
+                            $("#clientNum").focus().val("");
+                            return
+                        }
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelIstHouPackingBox",
+                            data: { Serial: Serial },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data[0][0].Num > 0) {
+                                        //打印
+                                        window.open("../LabelPrintManager/tFronPrint?Serial=" + Serial + "&SerialNum=" + Num);
+                                    } else {
+                                        alert("该客户零件号,标准装箱数为0,不能进行打印！！");
+                                        return;
+                                    }
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+                    },
+                    f_printbin1: function () {
+                        var a = confirm("是否打印尾数标签！！");
+                        if (a == false) {
+                            return;
+                        }
+
+                        var Num = $("#clientNum").val();
+                        var Serial = $("#clientSelect").val();
+
+                        if (Num.length == 0) {
+                            alert("请输入打印数量！");
+                            $("#clientNum").focus().val("");
+                            return;
+                        }
+                        if (Serial.length == 0) {
+                            alert("请选择客户零件号！");
+                            return;
+                        }
+                        if (!vue.f_LoadNum(Num)) {
+                            alert("打印数量必须是纯数字！");
+                            $("#clientNum").val("");
+                            $("#clientNum").focus().val("");
+                            return
+                        }
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelIstHouPackingBox1",
+                            data: { Serial: Serial },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data[1][0].Num > 0) {
+                                        //打印
+                                        window.open("../LabelPrintManager/tFronPrint1?Serial=" + Serial + "&SerialNum=" + Num);
+                                    } else {
+                                        alert("该客户零件号,尾数装箱数为0,不能进行打印！！");
+                                        return;
+                                    }
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+                    }
+                }
+            })
+
+            vue.f_loadPrintData();
+        })
+    </script>
+</head>
+<body>
+    <div class="body">
+        <table style="margin: 0px auto; width: 800px;">
+            <thead>
+                <tr>
+                    <th style="font-size: 35px; font-weight: bold; padding: 40px 0px 40px 0px;" colspan="2">后箱装箱单打印标签</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="height: 100px;">
+                    <td style="width: 100px; font-size: 25px; font-weight: bold;">客户零件号:</td>
+                    <td style="width: 300px;">
+                        <select style="padding: 10px; font-size: 25px; width: 90%" id="clientSelect">
+                        </select>
+                    </td>
+
+                </tr>
+                <tr style="height: 100px;">
+                    <td style="width: 100px; font-size: 25px; font-weight: bold;">打印数量:</td>
+                    <td style="width: 300px;">
+                        <input style="padding: 10px; font-size: 25px; width: 84%" id="clientNum" />
+                    </td>
+                </tr>
+                <tr rowspan="2">
+                    <td colspan="1" style="text-align: center;">
+                        <div class="print" v-on:click="f_printbin">
+                            打印标签
+                        </div>
+                    </td>
+                    <td colspan="1" style="text-align: center;">
+                        <div class="print1" v-on:click="f_printbin1">
+                            打印尾数标签
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

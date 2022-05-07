@@ -1,0 +1,577 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>小件超市补料看板_2</title>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <script src="../../Scripts/js/JsBarcode.all.min.js" type="text/javascript"></script>
+    <script src="../../TopsLib/Scripts/QRCodeJs/jquery-barcode-2.0.2.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/Jane/Common.js" type="text/javascript"></script>
+    <style type="text/css">
+        .title
+        {
+            border: 1px solid blue; 
+            font-family:微软雅黑;
+            text-align:center;
+            width:98vw;
+            height:5vh;
+            font-size:14px;
+        }
+        .content
+        {
+            border: 1px solid blue; 
+            background:#eaf2fe;
+            font-family:微软雅黑;
+            text-align:center;
+            width:98vw;
+            height:91vh;
+            font-size:13px;
+        }
+        .title table,.content table
+        {
+            width:100%;
+        }
+        .title tr
+        {
+            background:#eaf2fe;    
+        }
+        .content tr:nth-child(odd)
+        {
+            background: #eef4fb;    
+        }
+        .content tr:nth-child(even)
+        {
+            background: #dde9f7;    
+        }
+        
+        .title td 
+        {    
+            width:calc(14%);
+            line-height:5vh;
+            font-weight:bold; 
+            height:5vh;
+        }
+        .content td
+        {    
+            width:calc(14%); 
+            line-height:5vh;
+            font-weight:bold; 
+            height:5vh;
+        }
+        .title td:nth-child(1),
+        .title td:nth-child(3), 
+        .title td:nth-child(6), 
+        .title td:nth-child(5), 
+        .title td:nth-child(7), 
+        .content td:nth-child(1),
+        .content td:nth-child(3), 
+        .content td:nth-child(6), 
+        .content td:nth-child(5), 
+        .content td:nth-child(7)  
+        {
+            width:calc(11%);  
+        } 
+        
+        .title td:nth-child(2),  
+        .content td:nth-child(2) 
+        {
+            width:calc(33%)    
+        }
+        
+        
+        .title td:nth-child(4), 
+        .content td:nth-child(4)
+        {
+            width:calc(12%);  
+        }
+        
+        .content tr:last-child td:nth-child(1) div
+        {
+            display:inline-block;
+            background:#dbc7c2;
+            margin:0px 1vw;
+            width:6vw;
+            cursor:pointer;
+        }  
+        .content tr:last-child td:nth-child(1) div[name=submit]
+        { 
+            display:inline-block;
+            background:#dbc7c2;
+            margin:0px 1vw;
+            width:6vw;
+            cursor:pointer;
+            float:right;
+        }
+        
+        .content tr:last-child div:active
+        {
+            display:inline-block;
+            background:lightgreen;
+            margin:0px 1vw;
+            width:6vw;
+            cursor:pointer;
+        }
+        .content tr:last-child td:nth-child(1) label
+        {
+            margin-right 1vw; 
+        }
+        .content tr:last-child td:nth-child(1) span
+        {
+            color:blue;  
+        }
+         
+        [name=spacebarcode]
+        {
+            width:calc(90%);    
+        }
+        
+        .shadow {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 998;
+            background-color: #000;
+            opacity: 0.6;
+        }
+        
+        .transform_class
+        {
+            -webkit-transform: rotateX(-90deg);
+            -ms-transform: rotateX(-90deg);
+            transform: rotateX(-90deg); 
+            animation: notransform 2s infinite;
+            animation-delay: 2s;
+            -webkit-animation: notransform 2s infinite;
+            -webkit-animation-delay: 2s;  
+        }
+
+        @@-webkit-keyframes notransform {
+            100% {transform: none;}
+        }
+        @@keyframes notransform {
+            100% {transform: none;}
+        }
+        
+        @@-webkit-keyframes twinkling{    /*透明度由0到1*/
+            0%{
+               opacity:0; /*透明度为0*/
+            }
+            100%{
+               opacity:1; /*透明度为1*/
+            }
+        }
+    </style>
+    <script type="text/javascript">
+        var timer = null; //计时器
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    InspectionApplicationBoardData: new Array(), //看板数据源 
+                    PageIndex: 1, //当前展示数据的页数
+                    NextPageIndex: 1, //下一次使用的页数
+                    InspectionApplication_Cou: 1, //总页数
+                    IsShadowShow: false, //控制遮罩
+                    showRecordCou: 15, //一页显示条数
+                    transform_class: false, //显示刷新动画
+                    label_JSbarcode_option: {
+                        format: "code128", //选择要使用的条形码类型
+                        width: 1.5, //设置条之间的宽度
+                        height: 50, //高度
+                        displayValue: false, //是否在条形码下方显示文字
+                        font: "Microsoft YaHei", //设置文本的字体
+                        textMargin: 1, //设置条形码和文本之间的间距
+                        fontSize: 15, //设置文本的大小
+                        lineColor: "#000"//设置条和文本的颜色。
+                        // margin: 2//设置条形码周围的空白边距
+                    },
+                    label_barcode_option: {
+                        output: 'css',       //渲染方式 css/bmp/svg/canvas 
+                        color: 'black',   //条码颜色
+                        barWidth: 1.5,        //单条条码宽度 
+                        render: "table",
+                        barHeight: 20,     //单体条码高度 
+                        addQuietZone: false,  //是否添加空白区（内边距）
+                        fontSize: 12,
+                        showHRI: false //不显示条码文字
+                    },
+                    submit_param: {
+                        SumNumber: 0,
+                        grid1: new Array()
+                    } //需提交的数据
+                },
+                methods: {
+                    //加载看板信息
+                    f_loadBoardData: function () {
+                        //vue.IsShadowShow = true; 
+
+                        //alert(vue.PageIndex + "==" + vue.NextPageIndex + "==" + vue.InspectionApplication_Cou);
+                        f_preventKeyBoard();
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelSmallSupermarketMaterialBoardList_2",
+                            data: { PageIndex: vue.PageIndex },
+                            success: function (result) {
+                                //定时清空
+                                vue.InspectionApplicationBoardData = new Array();
+                                vue.submit_param = {
+                                    SumNumber: 0,
+                                    grid1: new Array()
+                                }
+
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data[0].length > 0) {
+                                        vue.InspectionApplicationBoardData = result.Data[0];
+                                    }
+                                    if (result.Data[0].length < vue.showRecordCou) {
+                                        var len = result.Data[0].length
+                                        for (var index = 1; index <= vue.showRecordCou - len; index++) {
+                                            var obj = $.extend(true, {}, result.Data[0][0]);
+                                            for (var column in obj) {
+                                                obj[column] = '';
+                                            }
+                                            obj["Result_RowId"] = "1";
+                                            vue.InspectionApplicationBoardData.push(obj);
+                                        }
+                                    }
+
+                                    //赋值给予颜色
+                                    if (result.Data[0].length > 0) {
+                                        result.Data[0].forEach(function (v, i) {
+                                            v.isWarmStatus = false;
+                                            if (v.储位利用率 != "---" && v.预警储量 != "") {
+                                                if (parseFloat(v.储位利用率.replace("%", "")) < parseFloat(v.预警储量.replace("%", ""))) {
+                                                    v.isWarmStatus = true;
+                                                }
+                                            }
+                                            //当前默认显示第一个分配储位，等第一个分配储位扫描完成后才能继续进行第二个分配储位的操作
+                                            if (v["Result_RowId"] == "1") {
+                                                v["isShow"] = true;
+                                            }
+
+                                            v.isOver = false;
+                                        })
+
+                                    }
+
+                                    //数据加载完之后触发
+                                    Vue.nextTick(function () {
+
+                                        if (vue.InspectionApplicationBoardData.length > 0) {
+                                            $.each(vue.InspectionApplicationBoardData, function (i, v) {
+                                                //JsBarcode("#spaceBarCode_" + i, v.应下架储位码, vue.GoodsProductCode_option);
+                                                //$("#spaceBarCode_" + i).barcode("BC010101", "code128", vue.label_barcode_option);
+                                            })
+                                            $("[name=spacebarcode]").eq(0).focus();
+
+
+                                            //设置背景色
+                                            $(".content").find("tr:visible").each(function (index, value) {
+                                                if (index % 2 == 0) {
+                                                    $(value).css("background", "#eef4fb");
+                                                } else {
+                                                    $(value).css("background", "#dde9f7");
+                                                }
+                                            })
+                                        }
+                                    })
+
+                                    //总页数赋值
+                                    vue.InspectionApplication_Cou = result.Data[1][0].InspectionApplication_Cou;
+
+                                    //页数更新
+                                    if (vue.PageIndex >= result.Data[1][0].InspectionApplication_Cou) {
+                                        vue.NextPageIndex = 1;
+                                    } else {
+                                        vue.NextPageIndex += 1;
+                                    }
+                                } else {
+                                }
+
+                                vue.transform_class = true;
+                                //延迟关闭
+                                setTimeout(function () {
+                                    vue.transform_class = false;
+                                }, 4000)
+
+                                //30s定时刷新数据
+                                timer = setTimeout(function () {
+
+                                    vue.PageIndex = vue.NextPageIndex;
+
+                                    vue.f_loadBoardData();
+                                }, 30000);
+                                //vue.IsShadowShow = false;
+                            }
+                        })
+                    },
+                    //使用websocket进行通信传输
+                    f_usewebsocket: function (RecordID, SpaceBarCode) {
+                        var device = "SmallSupermarket";
+
+                        //连接websocket
+                        var ws = new WebSocket("ws://10.50.10.104:8208");
+                        ws.onopen = function () {
+                            console.log("连接成功!")
+                        };
+                        ws.onmessage = function (result) {
+
+                            if (result.data.indexOf(device) != -1) {
+                                console.log("获取成功信息：" + result.data);
+                                alert("获取成功信息：" + result.data);
+                            }
+                        };
+                        ws.onerror = function (error) {
+                            console.log("获取错误信息：" + error.data)
+                        };
+                        ws.onclose = function () {
+                            console.log("连接关闭!")
+                        };
+                    },
+                    //文本框改值事件
+                    f_changeline: function () {
+
+                        var index = $(event.target).parent().parent().attr("index");
+                        if (vue.InspectionApplicationBoardData[index]["扫描储位码"] == vue.InspectionApplicationBoardData[index]["应下架储位码"]) {
+
+                            //数量叠加
+                            vue.submit_param.SumNumber += parseFloat(vue.InspectionApplicationBoardData[index]["建议补货包装数"]) * parseFloat(vue.InspectionApplicationBoardData[index]["单位包装件数"]);
+
+                            var param = new Object();
+                            param.GoodsProductCode = vue.InspectionApplicationBoardData[index]["产品编码"];
+                            param.RecordID = vue.InspectionApplicationBoardData[index]["RecordID"]
+                            param.DownNumber = parseFloat(vue.InspectionApplicationBoardData[index]["建议补货包装数"]) * parseFloat(vue.InspectionApplicationBoardData[index]["单位包装件数"]);
+                            param.n_ReportInventoryCurrent_Id = vue.InspectionApplicationBoardData[index]["n_ReportInventoryCurrent_Id"];
+                            param.InventoryAmount = vue.InspectionApplicationBoardData[index]["当前储位工件数"];
+                            param.UpdateFlag = "modify";
+                            param.BoardType = "2";
+
+                            vue.submit_param.grid1.push(param);
+
+                            $(".content tr:eq(" + index + ")").css({ "-webkit-animation": "twinkling 1s infinite ease-in-out" }); //在对象element中添加闪烁动画
+
+                            //延迟关闭闪烁效果
+                            setTimeout(function () {
+                                $(".content tr:eq(" + index + ")").css({ "-webkit-animation": "" });
+
+                                //变更颜色
+                                var obj = $.extend(true, {}, vue.InspectionApplicationBoardData);
+                                vue.InspectionApplicationBoardData = new Array();
+                                obj[index].isWarmStatus = false;
+                                obj[index].isOver = true;
+                                vue.InspectionApplicationBoardData = obj;
+
+                                //焦点放在下一个文本框中
+                                var focus_index = -1;
+                                $.each(vue.InspectionApplicationBoardData, function (i, v) {
+                                    if (v.应下架储位码 != "" && (v.扫描储位码 == "" || v.扫描储位码 == undefined)) {
+                                        focus_index = i;
+                                        return false;
+                                    }
+                                })
+                                if (focus_index != -1) {
+                                    $(".content tr:eq(" + focus_index + ")").find("[name=spacebarcode]").focus();
+                                }
+
+                            }, 4000)
+                        } else {
+                            alert("当前扫描储位码与应下架储位码不符,请重新输入!");
+                            $(event.target).val("").focus();
+                            return;
+                        }
+                    },
+                    //提交单据
+                    f_submitBillstockInOut: function () {
+
+                        if (!confirm("请确认是否进行补料操作,并进行外购件存储区下架,装配件超市区上架操作?")) {
+                            return;
+                        }
+
+                        if (vue.submit_param.SumNumber == 0) {
+                            alert("请确认先扫描储位码进行补料确认,再提交单据!");
+                            return;
+                        }
+
+                        var isOK = true;
+                        //筛选没有进行扫码的工件信息
+                        $.each(vue.InspectionApplicationBoardData, function (index, value) {
+
+                            $.each(vue.submit_param.grid1, function (i, v) {
+                                if (v.GoodsProductCode == value.产品编码) {
+                                    if (value.扫描储位码 != value.应下架储位码) {
+                                        isOK = false;
+                                    }
+                                }
+                            })
+                        })
+                        if (!isOK) {
+                            alert("请把已扫码补料的产品的对应其他未扫码记录进行扫码,再提交单据!");
+                            return;
+                        }
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/AjaxPost/InsertSmallSupermarketMaterialBoardRecord",
+                            data: vue.submit_param,
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    alert("提交保存成功!");
+                                    vue.f_reload();
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+
+                    },
+                    //根据页数读取数据
+                    f_loadDataByPage: function () {
+                        var name = $(event.target).attr("name");
+                        var pageindex_ing = -1;
+
+                        if (name == "first") {
+                            pageindex_ing = 1;
+                        } else if (name == "prev") {
+                            pageindex_ing = vue.PageIndex - 1 <= 1 ? 1 : vue.PageIndex - 1;
+                        } else if (name == "next") {
+                            pageindex_ing = vue.PageIndex + 1 > vue.InspectionApplication_Cou ? vue.InspectionApplication_Cou : vue.PageIndex + 1;
+                        } else if (name == "last") {
+                            pageindex_ing = vue.InspectionApplication_Cou;
+                        }
+                        clearTimeout(timer);
+
+                        vue.PageIndex = pageindex_ing;
+                        vue.NextPageIndex = pageindex_ing + 1 > vue.InspectionApplication_Cou ? 1 : pageindex_ing + 1;
+
+                        //alert(vue.PageIndex + "==" + vue.NextPageIndex + "==" + vue.InspectionApplication_Cou + "==Page");
+                        vue.f_loadBoardData();
+                    },
+                    //初始化页面
+                    f_loadPage: function () {
+
+                        vue.f_loadBoardData();
+
+                        //vue.f_usewebsocket();
+                    },
+                    //刷新页面
+                    f_reload: function () {
+
+                        vue.f_loadBoardData();
+                    }
+                }
+            })
+
+            //初始化页面
+            vue.f_loadPage();
+
+
+        })
+    </script>
+</head>
+<body>
+    <div class="body"> 
+        <div>
+            <div class="title">
+                <table> 
+                    <tr> 
+                        <td>
+                            产品编码
+                        </td>
+                        <td>
+                            产品名称
+                        </td>
+                        <td>
+                            超市库存数
+                        </td>
+                        @*<td>
+                            储位利用率
+                        </td>
+                        <td>
+                            预警储量
+                        </td> *@
+                        <td>
+                            建议补货包装数
+                        </td>
+                        <td>
+                            (补货)下架数量
+                        </td>
+                        <td>
+                            下架储位码
+                        </td>
+                        <td>
+                            扫描储位码
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="content">
+                <table>
+                    <tr :index="index" v-for="(option,index) in InspectionApplicationBoardData" v-bind:style="{ color:option.isWarmStatus ? 'red':(option.isOver ? 'green':'black') }" v-show="option.isShow === true" v-show="option.isShow === true">
+       
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.产品编码 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.产品名称 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.当前储位工件数 }}
+                        </td>
+                        @*<td :class="{ 'transform_class':transform_class }">
+                            {{ option.储位利用率 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.预警储量 }}
+                        </td>*@
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.建议补货包装数 == "0" ? "":option.建议补货包装数 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }"> 
+                            @*{{ option.建议补货包装数 != "" ? option.建议补货包装数 * option.单位包装件数 : "" }}*@
+                            {{ option.下架数量 == "0" ? "":option.下架数量 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.应下架储位码 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            @*<svg :id="'spaceBarCode_'+ index"  style="width:calc(95%);margin: 0px auto;" />
+                            <div :id="'spaceBarCode_'+ index" style="margin: 0px auto;
+                                width:calc(95%);">
+                            </div>*@
+                            
+                            <input type="text" name="spacebarcode" :index="index" v-on:keyup.enter="f_changeline" v-if="option.isOver === false" v-show="option.应下架储位码 != ''" v-model="option.扫描储位码" />
+                            <span v-if="option.isOver === true">准备开始补货</span>
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td colspan="9">
+                            <div name="first" v-on:click="f_loadDataByPage">首页</div>
+                            <div name="prev" v-on:click="f_loadDataByPage">上一页</div> 
+                            <label>当前页数:第<span>{{ PageIndex }}</span>页</label>
+                            <label>|</label>
+                            <label>总页数:<span>{{ InspectionApplication_Cou }}</span></label>
+                            <div name="next" v-on:click="f_loadDataByPage">下一页</div>
+                            <div name="last" v-on:click="f_loadDataByPage">最后一页</div>
+                            <div name="reload" v-on:click="f_reload">刷新页面</div>
+                            <div name="submit" v-on:click="f_submitBillstockInOut">提交单据</div>
+                        </td> 
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!--遮罩层-->
+        <div class="shadow" v-show="IsShadowShow === true">
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,659 @@
+﻿@using Tops.FRM;
+@{
+    Layout = "~/TopsLib/Views/Tools/_Layout.cshtml";
+    //new MvcHtmlString(Tops.FRM.Module.GetModulesByParentID("0").ToJson())
+    //string ToolsUserName = "---";
+
+    string ToolsUserName = System.Web.HttpContext.Current.Session["ToolsUserName"].ToString();
+     
+}
+
+    <script type="text/javascript">
+        var tab = null;
+        var accordion = null;
+        var tree = null;
+        var menu = null, menuBiz = null, menuQuery = null, menuObjCxl = null;
+        var addModuleDialog = null;
+        var module_biz_queryDialog = null;
+        var module_biz_exportDialog = null; 
+        $(document).ready(function () {
+            $("#layout1").ligerLayout({
+                leftWidth: 190,
+                height: '100%',
+                heightDiff: -4,
+                space: 4,
+                onHeightChanged: f_heightChanged,
+                onSuccess: function () {
+                    //alert(1);
+                }
+            });
+
+            var height = $(".l-layout-center").height();
+            //Tab
+            $("#framecenter").ligerTab({ height: height });
+            //面板
+            // $("#accordion_main").ligerAccordion({ height: height - 24, speed: null });
+            $(".l-link").hover(function () {
+                $(this).addClass("l-link-over");
+            }, function () {
+                $(this).removeClass("l-link-over");
+            });
+
+            tab = $("#framecenter").ligerGetTabManager();
+            accordion = $("#accordion_main").ligerGetAccordionManager();
+            heightChanged();
+            // tree = $("#tree1").ligerGetTreeManager();    l-layout-header        
+            $("#pageloading").hide();
+            function f_heightChanged(options) {
+                if (tab)
+                    tab.addHeight(options.diff);
+                if (accordion && options.middleHeight - 100 > 0)
+                    accordion.setHeight(options.middleHeight - 24);
+            }
+            function heightChanged() {
+                var $accordion = $("#accordion_main")
+                var $accordion_p = $accordion.parent();
+                $accordion.height($accordion_p.height() - $accordion_p.children(".l-layout-header").height());
+            }
+            $(window).resize(function () {
+                heightChanged();
+            });
+            heightChanged();
+            //模块右键菜单
+            menu = $.ligerMenu({
+                top: 100, left: 100, width: 120, items:
+                [
+                { text: '增加模块', click: t_AddModule, icon: 'add' },
+                { text: '编辑模块', click: t_EditModule, icon: 'edit' },
+                { text: '删除模块', click: t_DelModule, icon: 'del' },
+                { text: '刷新', click: flushTree, icon: 'flush' }
+                ]
+            });
+            //业务对象右键菜单
+            menuBiz = $.ligerMenu({
+                top: 100, left: 100, width: 160, items:
+                [
+                    { text: '添加模块业务对象关联', click: t_Module_BQ, icon: 'add', type: "biz" },
+                    { text: '添加模块查询对象关联', click: t_Module_BQ, icon: 'add', type: "query" },
+                    { text: '刷新', click: flushTree, icon: 'flush' }
+                ]
+            });
+            //查询对象右键菜单
+            //对象关联右键菜单
+            menuObjCxl = $.ligerMenu({
+                top: 100, left: 100, width: 160, items:
+                [
+                    { text: '取消关联', click: t_Module_Cxl, icon: '/TopsLib/Content/icon/01/178.gif', type: "biz" },
+                ]
+            });
+            //初始化树
+            flushTree();
+
+
+
+        });
+        //添加tab的方法
+        function f_addTab(tabid, text, url, Type) {
+            if (Type == "module_b_l") {
+                text = "业务-" + text;
+                url = '/tools/BizManagerCtx?id=' + tabid + "&" + Math.random()
+            }
+            else if (Type == "module_q_l") {
+                text = "查询-" + text;
+                url = '/tools/QueryManagerCtx?id=' + tabid + "&" + Math.random()
+            }
+            tab.addTabItem({ tabid: tabid, text: text, url: url });
+        }
+        //初始化树
+        function treeint(treedata) {
+            tree = $("#treemenu").ligerTree({
+                nodeWidth: 180,
+                checkbox: false,
+                data: treedata,
+                onClick: function (node) {
+                    if (node.data.children == undefined) {
+                        f_addTab(node.data.id, node.data.text, node.data.url, node.data.Type)
+                    }
+
+                }, onContextmenu: function (node, e) {
+                    var actionNodeID = node.data.id;
+                    if (actionNodeID != null && node.data.Type == ("module")) {
+                        menu.selNote = node;
+                        menu.show({ top: e.pageY, left: e.pageX });
+                        return false;
+                    } else if (node.data.Type == "module_b" || node.data.Type == "module_q") {
+                        menuBiz.selNote = node;
+                        menuBiz.show({ top: e.pageY, left: e.pageX });
+                        return false;
+
+                    } else if (node.data.Type == "module_b_l" || node.data.Type == "module_q_l") {
+                        menuObjCxl.selNote = node;
+                        menuObjCxl.show({ top: e.pageY, left: e.pageX });
+                        return false;
+
+                    }
+                }
+            });
+
+        }
+        //刷新树
+        function flushTree() {
+            if (tree != null) {
+                tree.clear();
+                tree.loading.show();
+            }
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/GetModules",
+                //data: {},
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        var treeData = [
+                        { id: 'c_1', text: '业务对象管理', url: '/tools/BizManager?', icon: '/TopsLib/Content/icon/03/081.gif' },
+                        { id: 'c_2', text: '查询对象管理', url: '/tools/QueryManager?', icon: '/TopsLib/Content/icon/03/103.gif' },
+                        { id: 'c_3', text: '权限管理', url: '/tools/PowerManager?', icon: '/TopsLib/Content/icon/03/322.gif' },
+                        { id: 'c_4', text: '数据字典', url: '/tools/DicManager?', icon: '/TopsLib/Content/icon/01/093.gif' },
+                        { id: 'c_5', text: '数据字典(新)', url: '/tools/NewDicManager?', icon: '/TopsLib/Content/icon/01/093.gif' },
+                        { id: '0',
+                            Type: 'module',
+                            text: '模块管理',
+                            isParent: true,
+                            isexpand: true,
+                            children: data.Data
+                        }];
+                        treeint(treeData);
+                        tree.loading.hide();
+                    } else {
+                        alert("获取数据失败：" + data.Msgs[0]);
+                    }
+                }
+            });
+        }
+        
+        
+    </script>
+
+    <div id="pageloading">
+    </div>
+    <div id="topmenu" class="l-topmenu" style="height:26px;">
+        <div class="l-topmenu-logo" style=" padding:2px 20px; font-size:22px; ">
+            U F O 
+        </div>
+        <div class="l-topmenu-welcome"> 
+            <span>当前用户</span><span style="margin-left:3px">:</span><span style="font-weight:bolder;margin-left:3px">@(ToolsUserName)</span>
+            <a href="javascript:void(0)" onclick="f_addTab('codeFactory', '★代码工厂', '/tools/codeFactory?')">★代码工厂</a>|
+            <a href="javascript:void(0)" onclick="f_addTab('sheetDesign', '★库表设计', '/tools/sheetDesign?')">●库表设计</a>|
+            <a href="javascript:void(0)" onclick="f_addTab('shortcut', '●快捷工具', '/tools/shortcut?')">●快捷工具</a>|<a href="/Account/ToolsLogout">退出</a>|<a href="/">项目首页</a>
+        </div>
+    </div>
+    <div id="layout1" style="width: 99.2%; margin: 0 auto; margin-top: 4px;">
+        <div position="left" title="工具菜单" id="accordion_main" style="overflow: auto">
+            <div id="treemenu">
+            </div>
+        </div>
+        <div position="center" id="framecenter">
+            <div tabid="home" title="主页" style="overflow:auto">
+                <pre>
+  【UFO 工具说明】: 请叫我UFO    <<<< 版本为1.3 >>>>
+  -项目首页：给客户使用
+  -开发：给程序员使用
+  -开发 快捷工具：快捷对应UFO生成sql语句
+  -开发 代码工厂：快捷生成页面代码        <<<< 版本为1.2 >>>>
+  -项目首页   跳转到项目
+  ==================================================================================
+ <span style="color:blue"> 
+   << 1.3 版本新增 自动排序，自动分页功能>> 
+  新版本集成了排序和分页的功能，分页功能用"--[Pagenation:]"实现；排序功能用”--[Columns]“实现
+  "--[Pagenation:]"，包括select，支持多个select，例如if,else if等；冒号后面的参数是初始默认排序参数，asc是正序，desc是反序；
+      (1)原来的RowNumber不再沿用。
+      (2)统计查询兼用原本的，也可不写(但必须是在查询语句中使用了"--[Pagenation:]")，若统计查询中写了，则用统计查询中的
+  "--[Columns]"，包括参数，实现排序功能
+                     
+  页面更改： enabledSort:true
+              
+  ●框架是会判断你有没有加以上的标识，加了的话 ，才会运行自动分页,两个标识标签要一起用的哦，不能只用其中一个.
+ </span>
+  ==================================================================================
+
+    【UFO功能详细说明】
+  -业务对象管理：‘增、删、改’操作
+        业务检查：(可使用快捷工具自动生成)执行业务过程之前，由单个或多个SQL语句组成的业务检查
+        业务过程：(可使用快捷工具自动生成)主要业务过程，由单个或多个SQL语句组成，多个则绑在同一事务中
+            -循环字段：多表操作的复合对象执行业务请求，标记某表中的单一循环插入字段(多个也只用标记最突出的一个字段)，用于判断循环次数
+        参数设置：(可使用下方‘自动生成参数按钮’自动生成)
+            -名称：对应字段的中文名称，用于页面搜索条件自动生成代码用的
+            -返：是否返回
+            -循：是否循环，只能标识在单体参数中
+                 单头的参数不能标循环，在每次调用业务的时候都可以访问
+                 比如 第二次循环 则：参数=单头+单体    （下标为1的参数为单头）
+                             --循环添加的时候，业务过程单体中“select 单体ID=@@IDENTITY”；单头ID标记为 “返”和“空”；
+                               循环更新的时候，单头ID标记为“循”
+            -空：是否为空
+            -类型：字段对应的类型
+            -查询：   《《《暂无用处》》》
+  -查询对象管理：‘查询’操作
+        配置：字段自动生成
+            -情景：对应数据字典使用。当字段名称一致，则根据不同的情景对应不同数据字段中的标题显示。
+            -是否隐藏；  
+            -添加时只读；
+            -编辑时只读	；
+            -非空字段；      
+        查询语句：(可使用快捷工具自动生成，where自己配置)
+              主要查询过程，由单个或多个SQL语句组成，多个则绑在同一事务中
+              多个业务时，第一个称之为‘单头’；其他为‘单体’，不同单体的参数可以对应配置里字段的下标
+              
+             -查询列表对象，关键字默认是作为idKey传递到modify页面的
+                           
+        统计语句：标记返回统计数据
+        参数设置：(可使用下方‘自动生成参数按钮’自动生成)
+            -名称：对应字段的中文名称，用于页面搜索条件自动生成代码用的
+            -类型：字段对应的类型
+            -查询：通常用于"select key=id,value=name from table" 或者"0=全部;1=正常" （列表则为查询条件）
+  -数据字典
+       sql：当外联表字段时，可用“select key=id,value=name from table”
+   
+  -- Jane扩展
+  -数据字典(新)   
+       原先数据字典功能
+       语言转译：引用Translate.js
+                 调用代码 $.Translate({ moduleText: 模块名称, language: 语言简写 });
+                 在对应进行转译的文字所在元素上添加languagetext属性即可
+  -权限管理
+       支持模块的查询对象和业务对象的批量导出
+       支持模块的数据字典(新)的批量导出(填写指定模块的数据)
+  
+  -代码工厂 
+       生成类型 资料查询  支持列表导出功能
+       需配置页面隐藏域中的值 exportcolumn(列表的列查询对象名称)
+                              exportdata(列表数据的查询对象名称[sql不可包含自动排序的特殊标示])
+                              exportsheetname(下载文档名称以及表格名称) 
+                              exportcondition(列表搜索条件[置于表格中首行])
+       列查询对象 数据形式: 列排序 - 列名称 - 文档列宽度(多少个字符长度,比如15,是指15个字符长度)
+       举例: select 1,'设备名称',15
+             union all 
+             select 2,'设备类型',15
+             union all 
+             select 3,'设备条码',30
+             union all 
+             select 4,'日期',20
+             union all 
+             select 5,'设备使用时长',25
+             union all 
+             select 6,'设备使用率(%)',15
+       
+ 
+  ==================================================================================
+  【模板说明】：
+  _Layout：基础模板
+  _Module: 列表模板 
+        section Script{    中间写js }
+        section Params{ 参数}
+        其他的就写在外面
+  ==================================================================================
+  -ligerUI 框架地址：<a href="http://www.ligerui.com/">http://www.ligerui.com/</a> 
+  -ligerUI API地址： <a href="http://api.ligerui.com/">http://api.ligerui.com/</a> 
+  ==================================================================================
+  【日志记录】
+  以TXT按日期记录执行的SQL，日志保存地址在Web.config中设置
+ 
+  ==================================================================================
+  【视图说明】
+  参数名称要对应
+  查询用GET，其他业务（增、删、改）用POST
+  统一用AJAX提交，
+  POST 常用 url: "/AjaxPOST/[业务对象名称]"， "Account/[业务对象名称]"为登录的时候用到，或者保存用户（需要密码）的要用到
+  GET  常用 url: "/AjaxGet/[查询对象名称]"          
+      -列表获取数据 常用 url: "/AjaxGridData/[查询对象名称]"     (用来获取ligerUI grid 专有格式的数据)
+
+  ==================================================================================
+
+                </pre>
+            </div>
+        </div>
+    </div>
+
+<div id="addModule_content">
+    <form id="moduleForm">
+        @{
+                var data = Tops.FRM.Biz.GetBizList(Tops.FRM.BizType.Query);
+                System.Data.DataTable dtQuery = data.Tables[0];
+                var data2 = Tops.FRM.Biz.GetBizList(Tops.FRM.BizType.Business);
+                System.Data.DataTable dtObj = data2.Tables[0];
+                }
+        <table width="99%" border=1 cellpadding=1 cellspacing=0>
+            <tr><td>父级模块：</td><td><input name="ParentID" type="text" /></td></tr>
+            <tr><td>模块ID：</td><td><input name="moduleID" /></td></tr>
+            <tr><td>模块名称：</td><td><input name="moduleName" /></td></tr>
+            <tr><td>序号：</td><td><input name="moduleNo" /></td></tr>
+            <tr><td>不可用：</td><td><input type="checkbox" value="1" name="moduleStatus" /></td></tr>
+            <tr><td>是否是叶子：</td><td><input type="checkbox"  value="true" name="moduleIsLeaf" /></td></tr>
+            <tr><td>通用模块：</td><td><input type="checkbox"  value="true" name="moduleIsCom" /></td></tr>
+             <tr class="isCom">
+                <td width="100px;">查询对象：</td>
+                <td>
+                <select name="ComQueryName">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtQuery.Rows.Count; i++)
+                { 
+                    <option value="@(dtQuery.Rows[i]["BizName"])">@(dtQuery.Rows[i]["BizName"])</option>
+                }
+                </select>
+                </td>
+            </tr>
+            <tr class="isCom">
+                <td width="100px;">查询对象：</td>
+                <td>
+            <select name="ComObjectName">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtQuery.Rows.Count; i++)
+                { 
+                    <option value="@(dtQuery.Rows[i]["BizName"])">@(dtQuery.Rows[i]["BizName"])</option>
+                }
+                </select>
+            </td>
+            </tr>
+             <tr class="object">
+        <th width="100px;">相关业务：</th>
+        <td>
+            <p>
+                添加：
+                <select name="ComAddBiz">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtObj.Rows.Count; i++)
+                { 
+                    <option value="@(dtObj.Rows[i]["BizName"])">@(dtObj.Rows[i]["BizName"])</option>
+                }
+                </select>
+            </p>
+            <p>
+                修改：
+                <select name="ComModifyBiz">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtObj.Rows.Count; i++)
+                { 
+                    <option value="@(dtObj.Rows[i]["BizName"])">@(dtObj.Rows[i]["BizName"])</option>
+                }
+                </select>
+            </p>
+            <p>
+                删除：
+                <select name="ComDelBiz">
+                    <option value="" selected>-未定义-</option>
+                @for (int i = 0; i < dtObj.Rows.Count; i++)
+                { 
+                    <option value="@(dtObj.Rows[i]["BizName"])">@(dtObj.Rows[i]["BizName"])</option>
+                }
+                </select>
+            </p>
+        </td>
+    </tr>
+            <tr><td>Url(为叶子时有效)：</td><td><input   value="" name="moduleUrl" style="width:250px;" /></td></tr>
+            <tr><td>iconUrl：</td><td><input   value="" name="moduleIconUrl" style="width:250px;" /></td></tr>
+            <tr><td colspan="2">帮助:</td></tr>
+            <tr><td colspan="2"><textarea name="moduleHelper" rows="5" style="width:99%"></textarea></td></tr>
+        </table>
+        <p><input id="AddModule_submit"  class="add_bt" type="button" value="保存" /></p>
+        <p id="AddModule_msg" class="tool_error"></p>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //初始化弹出框
+        addModuleDialog = $.ligerDialog({
+            show: false,
+            width: 450,
+            title: "模块维护",
+            content: $("#addModule_content")
+
+        });
+        addModuleDialog.hide();
+        $("#AddModule_submit").click(function () {
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/AjaxPost/Tool_AddModule",
+                data: $("form#moduleForm").serialize(),
+                dealError: false,
+                before: function (settings) {
+                    settings.url = "/Tools/AjaxPost/" + ($("form#moduleForm").data("UpdateFlag") == "I" ? "Tool_AddModule" : "Tool_EditModule");
+                },
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        flushTree();
+                        alert("保存成功");
+                        /*$("#formModuleForm").data("UpdateFlag", "U");*/
+
+                        $("#AddModule_msg").text("");
+                        addModuleDialog.hide();
+
+                    } else {
+                        $("#AddModule_msg").text("保存失败，" + data.Msgs[0]);
+                    }
+                }
+            });
+        });
+
+    });
+    //添加模块
+    function t_AddModule() {
+        var currentNote = menu.selNote
+        if (currentNote.data.IsLeaf == true) {
+            alert("叶子不能添加子节点");
+            return;
+        }
+        $(addModuleDialog.element).find(".l-dialog-title").text("添加模块");
+        $("#moduleForm")[0].reset();
+        $("#AddModule_msg").text("");
+        $("form#moduleForm input[name=ParentID]").val(currentNote.data.id);
+        $("#moduleForm input[name=moduleID],#moduleForm input[name=moduleName]").removeAttr("readonly");
+        $("form#moduleForm").data("UpdateFlag", "I");
+        addModuleDialog.show();
+    }
+    //编辑模块
+    function t_EditModule() {
+        var currentNote = menu.selNote
+        $(addModuleDialog.element).find(".l-dialog-title").text("维护模块");
+        $("#moduleForm")[0].reset();
+        $("#AddModule_msg").text("");
+        $.topsAjax({
+            type: "POST",
+            url: "/Tools/GetModule",
+            data: { ModuleID: currentNote.data.id },
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess && data.Data != null) {
+                    var m = data.Data
+                    $("form#moduleForm").data("UpdateFlag", "U");
+                    $("#moduleForm input[name=ParentID]").val(m.ParentID);
+                    $("#moduleForm input[name=moduleID]").val(m.id).attr("readonly", "readonly");
+                    $("#moduleForm input[name=moduleName]").val(m.text);
+                    if (m.id == "0")
+                        $("#moduleForm input[name=moduleName]").attr("readonly", "readonly");
+                    else
+                        $("#moduleForm input[name=moduleName]").removeAttr("readonly");
+                    $("#moduleForm input[name=moduleNo]").val(m.No);
+                    $("#moduleForm input[name=moduleUrl]").val(m.url);
+                    $("#moduleForm input[name=moduleIconUrl]").val(m.icon);
+                    $("#moduleForm input[name=moduleStatus]").attr("checked", m.Tag == 1 ? true : false);
+                    $("#moduleForm input[name=moduleIsCom]").attr("checked", m.IsCom == 1 ? true : false);
+                    $("#moduleForm input[name=moduleIsLeaf]").attr("checked", m.IsLeaf);
+                    $("#moduleForm select[name=ComQueryName]").val(m.ComQueryName);
+                    $("#moduleForm select[name=ComObjectName]").val(m.ComObjectName);
+                    $("#moduleForm select[name=ComAddBiz]").val(m.ComAddBiz);
+                    $("#moduleForm select[name=ComModifyBiz]").val(m.ComModifyBiz);
+                    $("#moduleForm select[name=ComDelBiz]").val(m.ComDelBiz);
+                    $("#moduleForm textarea[name=moduleHelper]").val(m.Helper);
+                    addModuleDialog.show();
+                } else {
+                    alert("获取模块对象失败：" + data.Msgs[0]);
+                }
+            }
+        });
+    }
+    //取消关联
+    function t_Module_Cxl() {
+        var currentNote = menuObjCxl.selNote;
+        if (currentNote.data.id == '0') {
+            alert("模块管理不能删除！");
+            return;
+        }
+        if (confirm("确认要取消：" + currentNote.data.text + " 对象与模块的关联？")) {
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/AjaxPost/ToolCxlModule0Biz",
+                data: { ModuleID: currentNote.data.ParentID, BizNameID: currentNote.data.id },
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("取消关联成功");
+                        flushTree();
+                    } else {
+                        alert("取消关联失败：" + data.Msgs[0]);
+                    }
+                }
+            });
+        }
+    }
+    //删除模块
+    function t_DelModule() {
+        var currentNote = menu.selNote;
+        if (confirm("确认要删除模块：" + currentNote.data.text + " 及其所有子模块？"))
+            if (confirm("再次确认要删除模块：" + currentNote.data.text + " 及其所有子模块？")) {
+                $.topsAjax({
+                    type: "POST",
+                    url: "/Tools/AjaxPost/DelModule",
+                    data: { ModuleID: currentNote.data.id },
+                    dealError: false,
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            alert("删除成功");
+                            flushTree();
+                        } else {
+                            alert("获取模块对象失败：" + data.Msgs[0]);
+                        }
+                    }
+                });
+            }
+    }
+</script>
+
+<div id="module_biz_query">
+    <form id="module_biz_queryForm">
+        <p >模块  ID：<input id="biz_queryModuleID" name="ModuleID"  readonly="readonly"/></p>
+       <p><label id="module_biz_type">对象：></label>
+                    <select id="biz_query_sel" name="SelBizName">
+                    
+                    </select>
+        </p>
+        <p><input id="biz_query_submit"  class="add_bt" type="button" value="确定" />
+        <input id="biz_queryName" name="QueryName" />
+        <input id="biz_queryType" name="QueryType" type="hidden" />
+        <input id="biz_query_search"  class="cxl_bt" type="button" value="查询" /></p>
+    </form>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //初始化弹出框
+        module_biz_queryDialog = $.ligerDialog({
+            show: false,
+            width: 450,
+            title: "模块-对象关联",
+            content: $("#module_biz_query")
+        });
+        module_biz_queryDialog.hide();
+
+        $("#biz_query_search").click(function () {
+            var pars = $("#module_biz_queryForm").serialize()
+            $("input,select").attr("disabled", "disabled");
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/GetBiz0Query",
+                data: pars,
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess && data.Data != null) {
+                        var m = data.Data
+                        var t = "";
+                        if (m != null && m.length > 0) {
+                            $.each(m, function () {
+                                t += "<option value='" + this + "'>" + this + "</option>"
+                            });
+                        }
+                        $("#biz_query_sel").html(t);
+
+                    }
+                    $("input,select").removeAttr("disabled");
+                }
+            });
+        });
+        $("#biz_query_submit").click(function () {
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/AjaxPost/Tool_AddModuleBiz",
+                data: $("form#module_biz_queryForm").serialize(),
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功");
+                        module_biz_queryDialog.hide();
+                    } else {
+                        alert("保存失败，" + data.Msgs[0]);
+                        $("#AddModule_msg").text(data.Msgs[0]);
+                    }
+                }
+            });
+        });
+    });
+    function t_Module_BQ(item) {
+        var cNote = menuBiz.selNote;
+        var moduleID = cNote.data.ParentID;
+        $("#biz_queryModuleID").val(moduleID);
+        if (item.type == 'biz') {
+            $(module_biz_queryDialog.element).find(".l-dialog-title").text("关联模块-业务对象");
+            $("#module_biz_type").text("业务对象:");
+            $("#biz_queryType").val(2);
+        } else {
+            $(module_biz_queryDialog.element).find(".l-dialog-title").text("关联模块-查询对象");
+            $("#module_biz_type").text("查询对象:");
+            $("#biz_queryType").val(1);
+        }
+        $("#biz_query_search").click();
+        module_biz_queryDialog.show();
+    }
+</script>
+
+<div id="module_biz_export">
+    <p >对象名称：<input id="exportBizName" name="ModuleID"  readonly="readonly" style="width:450px;"/></p>
+    <img id="exportLoading" src="/TopsLib"/TopsLib/Content/loading.gif" />
+    <textarea id="exportTextarea" rows="20" style=" width:99%"></textarea>
+</div>
+<script type="text/javascript">
+    $(function () {
+        //初始化弹出框
+        module_biz_exportDialog = $.ligerDialog({
+            show: false,
+            width: 550,
+            title: "对象导出",
+            content: $("#module_biz_export")
+        });
+        module_biz_exportDialog.hide();
+    });
+    function t_ExportBiz(bizNames) {
+        $("#exportTextarea").hide();
+        $("#exportLoading").show();
+        $("#exportBizName").val(bizNames);
+        module_biz_exportDialog.show();
+        $.topsAjax({
+            type: "Get",
+            url: "/Tools/Export",
+            data: { BizName: bizNames },
+            dataType: "text",
+            dealError: false,
+            success: function (data) {
+                $("#exportLoading").hide();
+                $("#exportTextarea").html(data).show();
+            }
+        });
+    }
+</script>
+

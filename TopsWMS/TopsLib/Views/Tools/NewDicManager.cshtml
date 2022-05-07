@@ -1,0 +1,154 @@
+﻿@{
+    ViewBag.Title = "DicManager";
+    Layout = "~/TopsLib/Views/Tools/_Layout.cshtml";
+}
+<script type="text/javascript">
+    var grid
+    $(function () {
+        //初始化表格
+        var LocationList = [
+            { "LocationID": "chs", "LocationName": "chs.简体中文" },
+            { "LocationID": "cht", "LocationName": "cht.繁体中文" },
+            { "LocationID": "eng", "LocationName": "eng.英语" },
+            { "LocationID": "es", "LocationName": "es.西班牙语" },
+            { "LocationID": "de", "LocationName": "de.德语" }
+            ];
+        grid = $("#datagrid").ligerGrid({
+            columns: [
+                { name: 'ID', hide: true },
+                { display: '字段', name: 'Field', align: 'left', editor: { type: 'text'} },
+                { display: '使用模块', name: 'ModuleName', align: 'left', editor: { type: 'text'} },
+                { display: '情景', name: 'Scene', align: 'left', editor: { type: 'text'} },
+                { display: '本地化', name: 'Location', align: 'left',
+                    editor: { type: 'select', data: LocationList, valueColumnName: 'LocationID', displayColumnName: 'LocationName' }, render: function (item) {
+                        for (var i = 0; i < LocationList.length; i++) {
+                            if (LocationList[i]['LocationID'] == item.Location)
+                                return LocationList[i]['LocationName']
+                        }
+                        return item.Location;
+                    }
+                },
+                { display: '标题', name: 'Caption', align: 'left', editor: { type: 'text'} },
+                { display: '类型', name: 'Type', align: 'left', editor: { type: 'text'} },
+                { display: '格式', name: 'Format', align: 'left', editor: { type: 'text'} },
+                { display: '显示宽度', name: 'Width', align: 'left', editor: { type: 'text'} },
+                { display: 'ComID', name: 'CommonID', align: 'left', editor: { type: 'text'} },
+                { display: 'Sql', name: 'Sql', align: 'left', width: 300, editor: { type: 'text'} }
+                ],
+            statusName: "UpdateFlag",
+            url: '/Tools/AjaxGridData/Tool_SelNewDictionarys',
+            parms: { name: '123', age: 1 },
+            method: 'get',
+            delayLoad: false,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -30,
+            enabledEdit: true, clickToEdit: false,
+            onSuccess: function (data, b) {
+                //$.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                this.endEdit();
+                var row = this.getSelectedRow();
+                if (!row) { alert('请选择行'); return; }
+                this.beginEdit(row);
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+            grid.reRender();
+        });
+        $("#saveBt").click(function () {
+            $("#saveBt").attr("disable", "disable");
+            //先保存在客户端
+            grid.endEdit();
+            //再保存到服务器
+            var data = grid.getData();
+            var newdata = new Array();
+            $.each(data, function () {
+                if (this.UpdateFlag != 'nochanged') {
+                    newdata.push(this);
+                }
+            });
+            var deleteData = grid.getDeleted();
+            if (deleteData != null && deleteData.length > 0)
+                $.each(deleteData, function () {
+                    newdata.push(this);
+                });
+            $.topsAjax({
+                type: "POST",
+                url: "/tools/AjaxPost/Tool_UpdateNewDictionary",
+                data: { Dictionarys: newdata },
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功");
+                        $("#searchBt").click();
+                    } else {
+                        alert("保存失败，" + data.Msgs[0]);
+                    }
+                    $("#saveBt").removeAttr("disable");
+                }
+            });
+        });
+        $("#addBt").click(function () {
+            grid.addEditRow();
+        });
+        $("#delBt").click(function () {
+
+            var row = grid.getSelectedRow();
+            if (!row) { alert('请选择行'); return; }
+            grid.deleteRow(row);
+        });
+    });
+</script>
+<div>
+    <p>
+        <input id="searchBt" type="button" value="搜索" class='serch_bt' />
+        <input id="saveBt" type="button" value="保存" class='save_bt' />
+        <input id="addBt" type="button" value="添加" class='add_bt' />
+        <input id="delBt" type="button" value="删除" class='del_bt' />
+    </p>
+    <form id="paramForm">
+    <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+            <th>
+                字段:
+            </th>
+            <td>
+                <input name="Field" />
+            </td>
+            <th>
+                标题:
+            </th>
+            <td>
+                <input name="Caption" />
+            </td>
+            <th>
+                本地化:
+            </th>
+            <td>
+                <select name="Location">
+                    <option value="chs">chs.简体中文</option>
+                    <option value="cht">cht.繁体中文</option>
+                    <option value="es">es.西班牙语</option>
+                    <option value="de">de.德语</option>
+                    <option value="eng">eng.英语</option>
+                    <option value="">全部</option>
+                </select>
+            </td>
+        </tr>
+    </table>
+    </form>
+</div>
+<div id="datagrid">
+</div>

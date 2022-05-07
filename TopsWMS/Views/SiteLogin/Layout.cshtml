@@ -1,0 +1,263 @@
+﻿@{
+    Layout = null;
+    string UserNO = Tops.FRM.TopsUser.UserNO;
+    string UserName = Tops.FRM.TopsUser.UserName;
+    string IsExistsSonModules = Request.QueryString["IsExistsSonModules"];
+    IsExistsSonModules = string.IsNullOrEmpty(IsExistsSonModules) ? "1" : IsExistsSonModules;
+    string ParentIds = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("ParentIds"))
+    {
+        ParentIds = Request.QueryString["ParentIds"];
+    }
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>主菜单</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="full-screen" content="yes">
+    <script src="../../Scripts/jquery-1.4.4.js" type="text/javascript"></script>
+    <script src="../../Scripts/Mask.js" type="text/javascript"></script>
+    <script src="../../Scripts/Translate.js" type="text/javascript"></script>
+    <style type="text/css">
+        body {
+            margin: 0px;
+        }
+
+        .top {
+            width: 100%;
+            background-color: rgb(6, 137, 213);
+            color: White;
+            font-family: 微软雅黑;
+            text-align: center; 
+            line-height: 40px;
+            font-size: 16px;
+            width: calc(100%);
+        }
+
+        .container {
+            width: calc(100%);
+            position: absolute;
+        }
+
+        .content {
+            position: relative;
+            top: calc(10%);
+            width: 100%;
+        }
+
+        .option {
+            width: calc(60%);
+            margin: 15px auto;
+            line-height: 40px;
+            border: 1px solid gray;
+            box-shadow: 0 0 5px 1px gray;
+            background-color: #B5C7E7;
+            cursor: pointer;
+            font-family: 微软雅黑; 
+            text-align: center;
+            font-size: 16px;
+        }
+
+
+        .left {
+            float: left;
+            color: white;
+            text-decoration: inherit;
+        }
+
+        .right {
+            float: right;
+            color: white;
+            text-decoration: inherit;
+        }
+
+        .Notice {
+            z-index: 1000;
+            box-shadow: 0 0 5px 1px grey;
+            background: green;
+            width: calc(60%);
+            font-family: 微软雅黑;
+            position: fixed;
+            top: calc(45%);
+            right: 0;
+            font-weight: bold;
+            text-align: center;
+            cursor: pointer;
+            line-height: 35px;
+            display: none;
+        }
+
+            .Notice span {
+                color: white;
+            }
+
+        .bottom {
+            width: 100%;
+            background-color: rgb(6, 137, 213);
+            color: White;
+            font-family: 微软雅黑;
+            text-align: center; 
+            line-height: 40px;
+            font-size: 16px;
+            width: calc(100%);
+            position: fixed;
+            bottom: 0px;
+            cursor: pointer;
+        }
+    </style>
+    <script>
+        var newList = new Array();
+        var flag = true;
+
+        var codeList = new Array("#A7E1B9", "#FFAA74", "#d299ea", "#F8A9CC", "#63A7EF", "#B89FC6", "#9A9788", "#B82FCC", "#4E6548", "#F8A9CC", "#D0B2CC", "ffd800", "C2B0CC", "90ee90");
+        //$.Translate({ moduleText: "现场跟单", language: "es" });
+
+        $(function () {
+            //返回
+            $("#btnBotton").click(function () {
+                location.href = "../SiteLogin/Layout";
+            })
+
+            if ("@IsExistsSonModules" == "0") {
+                document.getElementById("btnBotton").style.display = "";
+            } else {
+                document.getElementById("btnBotton").style.display = "none";
+            }
+
+            var referrer = document.referrer;
+            if (referrer.length != 0) {
+                var urlTest = window.location.host
+                var numText = ".." + referrer.substring(referrer.indexOf(urlTest) + urlTest.length);
+
+                $.ajax({
+                    type: "GET",
+                    url: "/AjaxGet/SelModuleFathers",
+                    data: { "Route": numText },
+                    async: false,
+                    success: function (result) {
+                        result = JSON.parse(result);
+                        if (result.IsSuccess) {
+                            if (result.Data[0].length > 0) {
+                                flag = false;
+                                location.href = "../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + result.Data[0][0].ParentId;
+                            }
+                        }
+                    }
+                });
+            }
+
+            if (flag) {
+                $.ajax({
+                    type: "GET",
+                    url: "/AjaxGet/SelModuleFather",
+                    data: { "IsExistsSonModules": "@IsExistsSonModules", "ParentIds": "@ParentIds" },
+                    async: false,
+                    success: function (result) {
+                        result = JSON.parse(result);
+                        if (result.IsSuccess) {
+                            if (result.Data[0].length > 0) {
+                                newList = result.Data[0];
+                                result.Data[0].forEach(function (value, index) {
+                                    if (codeList.length < index) {
+                                        var r = Math.floor(Math.random() * 256);
+                                        var g = Math.floor(Math.random() * 256);
+                                        var b = Math.floor(Math.random() * 256);
+                                        var alpha = Math.random();
+                                        if (result.Data[0].length == (index + 1)) {
+                                            $(".content").append("<div class='option' style='margin-bottom: 66px;background: rgb(" + r + "," + g + "," + b + "," + alpha + ");' languagetext='" + value.Name + "'>" + value.Name + "</div>");
+                                        } else {
+                                            $(".content").append("<div class='option' style='background: rgb(" + r + "," + g + "," + b + "," + alpha + ");' languagetext='" + value.Name + "'>" + value.Name + "</div>");
+                                        }
+                                    } else {
+                                        if (result.Data[0].length == (index + 1)) {
+                                            $(".content").append("<div class='option' style='margin-bottom: 66px;background: " + codeList[index] + ";' languagetext='" + value.Name + "'>" + value.Name + "</div>");
+                                        } else {
+                                            $(".content").append("<div class='option' style='background: " + codeList[index] + ";' languagetext='" + value.Name + "'>" + value.Name + "</div>");
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    }
+                });
+            }
+
+            //选项点击事件
+            $(".option").live("click", function () {
+                var url = "";
+                for (var i = 0; i < newList.length; i++) {
+                    if ($(this).text().trim() == newList[i].Name) {
+                        if (newList[i].IsExistsSonModule == 0) {
+                            url = newList[i].Route + ( newList[i].Route.indexOf("?") == -1 ? "?ParentIds=" + "@ParentIds" : "&ParentIds=" + "@ParentIds");
+                        } else {
+                            url = "../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + newList[i].Id ;
+                        }
+                    }
+                }
+
+                location.href = url;
+            })
+
+            //未读通知点击事件
+            $(".Notice").click(function () {
+                location.href = "/SiteLogin/Notice";
+            })
+
+            //f_existsNotice();
+            //定时查询是否有未读通知
+            //setInterval("f_existsNotice()", 60000)
+        })
+
+        //定时查询是否存在未读通知
+        function f_existsNotice() {
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGet/SelLibraryNoticeCount",
+                data: {   'UserNO': "@UserNO",//操作人
+                },
+
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result.IsSuccess) {
+                        if (result.Data[0].length > 0) {
+                            $(".Notice span").text("您有" + result.Data[0][0].Cou + "条未读通知，请点击查看!");
+                            if (result.Data[0][0].Cou == 0) {
+                                $(".Notice").hide();
+                            } else {
+                                $(".Notice").show();
+                            }
+                        } else {
+                            $(".Readed").addClass("gray");
+                        }
+                    } else {
+                    }
+                }
+            })
+        }
+
+
+    </script>
+</head>
+<body>
+    <div class="top">
+        <a href="../QRCodeLogin/Index" class="left">二维码</a>
+        <label>
+            主菜单</label>
+        <a href="/SiteLogin/Index" class="right">@(UserName)</a>
+    </div>
+    <div class="container">
+        <div class="content">
+         
+             
+        </div>
+        <div class="Notice">
+            <span>您有两条未读通知，请点击查看!</span>
+        </div>
+    </div>
+    <div class="bottom" id="btnBotton">
+        <span>返回</span>
+    </div>
+</body>
+</html>

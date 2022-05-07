@@ -1,0 +1,812 @@
+﻿@using Tops.FRM;
+
+@{
+    ViewBag.Title = "QueryManagerCtx";
+    Layout = "~/TopsLib/Views/Tools/_Layout.cshtml";
+    var bizName = (Request.QueryString["id"]+"").Trim(); 
+        
+    string metas = null; 
+    //是否是历史版本
+    string oldversion = string.Empty;
+    string bizId = string.Empty;
+    //是否是历史版本
+    if (Request.QueryString.AllKeys.Contains("oldversion"))
+    {
+        oldversion = Request.QueryString["oldversion"].ToString();
+        bizId = Request.QueryString["bizid"].ToString();
+    }
+     
+        
+    try{
+        metas=Tops.FRM.TopsMeta.LoadMetas(Request.QueryString["id"]).ToJson(true);
+         
+    }catch{}
+}
+<script type="text/javascript">
+    var bizName = "@(bizName)";
+    var oldversion = "@(oldversion)";
+    var bizId = "@(bizId)";
+    var IsSys = false;
+    var tab = null;
+    var accordion = null;
+    var tree = null;
+    var metas=@Html.Raw(metas??"null");
+    $(document).ready(function () { 
+    
+
+        var height = $(".l-layout-center").height();
+        //Tab
+        $("#main_tab").ligerTab({
+            height: height,
+            onAfterSelectTabItem: function (tabid) {
+            }
+        });
+        //面板
+        // $("#accordion_main").ligerAccordion({ height: height - 24, speed: null });
+        $(".l-link").hover(function () {
+            $(this).addClass("l-link-over");
+        }, function () {
+            $(this).removeClass("l-link-over");
+        });
+
+        tab = $("#framecenter").ligerGetTabManager();
+        heightChanged();
+        // tree = $("#tree1").ligerGetTreeManager();    l-layout-header        
+        $("#pageloading").hide();
+        function f_heightChanged(options) {
+            heightChanged();
+            if (tab)
+                tab.addHeight(options.diff);
+            if (accordion && options.middleHeight - 100 > 0)
+                accordion.setHeight(options.middleHeight - 24);
+        }
+        function heightChanged() {
+            var $accordion = $("#accordion_main")
+            var $accordion_p = $accordion.parent();
+            $accordion.height($accordion_p.height() - $accordion_p.children(".l-layout-header").height());
+        }
+        $("#save_bt").click(function () {
+            setConfigTableData();
+            var data = {
+                BizName: bizName,
+                IsSys: IsSys,
+                CountSql: $("textarea[name=CountSql]").val(),
+                HiddenFields: $("input[name=HiddenFields]").val(),
+                Scenes: $("input[name=Scenes]").val(),
+                ReadOnly4Adds: $("input[name=ReadOnly4Adds]").val(),
+                ReadOnly4Edits: $("input[name=ReadOnly4Edits]").val(),
+                NotNulls: $("input[name=NotNulls]").val(),
+                Sqls: GetSqls(),
+                Fields: GetFields(),
+                Lookups: GetLookups(),
+                Remarks:$("textarea[class=remark]").val().trim()
+            }
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/SaveBiz",
+                data: { data: $.toJSON(data), Type: 1 },
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功");
+                    } else {
+                        alert("保存失败，" + data.Msgs[0]);
+                    }
+                }
+            });
+        });
+        $("#del_bt").click(function () {
+            if (confirm("确定删除？")) {
+                $.topsAjax({
+                    type: "POST",
+                    url: "/Tools/DelBiz",
+                    data: { BizName: bizName },
+                    dealError: false,
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            alert("删除成功");
+                            window.parent.GetBizs()
+                            window.parent.f_removeTabItem(bizName);
+                        } else {
+                            alert("删除失败，" + data.Msgs[0]);
+                        }
+                    }
+                })
+            }
+        });
+        $("#export_bt").click(function () {
+            window.top.t_ExportBiz(bizName);
+            
+        });
+    
+        //如果是历史版本，则无需显示查阅历史版本按钮
+        if(oldversion != ""){
+            $("#save_bt").remove();
+            $("#del_bt").remove();
+            $("#export_bt").remove();
+            $("#check_bt").remove(); 
+        }
+
+        //查阅历史版本
+        $("#check_bt").click(function(){
+   
+
+            $.ligerDialog.open({
+                 title: "历史版本信息",
+                 width: 900,
+                 height: 650,
+                 url: "/tools/CheckOldVersionList?bizName="+bizName
+            }) 
+
+        })
+      
+        //JaneHe 如果是历史版本的,那么访问对象也不一致
+        var url = "/Tools/GetBiz";
+        var data = { BizName: bizName, Type: 1 };
+        if(oldversion!=""){
+            url = "/Tools/GetBizByOldVersion";
+            data = { BizId: bizId, Type: 1 };
+        }
+
+        //初始化
+        $.topsAjax({
+            type: "POST",
+            url: url,
+            data: data,
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    IsSys = data.Data.IsSys;
+                    if (IsSys)
+                    {
+                        $("#IsSys").show();
+                        $("#del_bt").hide();
+                    }
+                    SetFields(data.Data.Fields);
+                    SetSqls(data.Data.Sqls);
+                    SetLookups(data.Data.Lookups)
+                    $("textarea[name=CountSql]").val(data.Data.CountSql);
+                    $("input[name=HiddenFields]").val(data.Data.HiddenFields);
+                    $("input[name=Scenes]").val(data.Data.Scenes);
+                    $("input[name=ReadOnly4Adds]").val(data.Data.ReadOnly4Adds);
+                    $("input[name=ReadOnly4Edits]").val(data.Data.ReadOnly4Edits);
+                    $("input[name=NotNulls]").val(data.Data.NotNulls);
+
+                    if(oldversion!=""){
+                        $("textarea[class=remark]").val(data.Data.Remarks);
+                    }
+
+                    renderConfigTable(data.Data)
+                } else {
+                    alert("加载Biz失败：" + data.Msgs[0]);
+                }
+            }
+        });
+
+
+
+        $("input").live("focus", function () {
+            $(this).select();
+        });
+        $("#set_table_2 tbody input,#set_table_2 tbody td").live("click", function () {
+            $("#set_table_2 tbody tr").removeClass("selected_table_row");
+            $(this).closest("tr").addClass("selected_table_row");
+        });
+    });
+    function renderConfigTable(data)
+    {
+        if(metas!=null&&metas!="")
+        {
+            var trHtml=$("#set_table_2 tfoot").html();
+            var $tBody=$("#set_table_2 tbody");
+            var ReadOnly4Adds=data.ReadOnly4Adds.split(';');
+            var ReadOnly4Edits=data.ReadOnly4Edits.split(';');
+            $.each(metas,function(index){
+                $.each(metas[index],function(field){
+                    var $newTr=$(trHtml).attr("idx",index+1);
+                    $("td[tname=Idx]",$newTr).text(index+1);
+                    $("input[tname=FieldName]",$newTr).val(field);
+                    $("input[tname=Scenes]",$newTr).val(this.Scene);
+                    $("input[tname=HiddenFields]",$newTr).attr("checked",this.Hide);
+                    $("input[tname=ReadOnly4Adds]",$newTr).attr("checked",$.inArray(field,ReadOnly4Adds)>=0);
+                    $("input[tname=ReadOnly4Edits]",$newTr).attr("checked",$.inArray(field,ReadOnly4Edits)>=0);
+                    $("input[tname=NotNulls]",$newTr).attr("checked",this.NotNull);
+                    $tBody.append($newTr);
+                });
+            });
+        }
+    }
+    function setConfigTableData()
+    {
+        if(metas==null||metas=="")return;
+        var Scenes=[],
+            HiddenFields=[],
+            ReadOnly4Adds=[],
+            ReadOnly4Edits=[],
+            NotNulls=[];
+        $("#set_table_2 tbody tr").each(function(){
+            var $tr=$(this);
+            var field=$.trim($("input[tname=FieldName]",$tr).val());
+            var scene=$.trim($("input[tname=Scenes]",$tr).val());
+            var hiddenField=!!$("input[tname=HiddenFields]",$tr).attr("checked");
+            var readOnly4Add=!!$("input[tname=ReadOnly4Adds]",$tr).attr("checked");
+            var readOnly4Edit=!!$("input[tname=ReadOnly4Edits]",$tr).attr("checked");
+            var notNull=!!$("input[tname=NotNulls]",$tr).attr("checked");
+            if(scene!='')Scenes.push(field+"="+scene);
+            if(hiddenField)HiddenFields.push(field);
+            if(readOnly4Add)ReadOnly4Adds.push(field);
+            if(readOnly4Edit)ReadOnly4Edits.push(field);
+            if(notNull)NotNulls.push(field);
+        });
+        $("input[name=Scenes]").val(Scenes.join(';'));
+        $("input[name=HiddenFields]").val(HiddenFields.join(';'));
+        $("input[name=ReadOnly4Adds]").val(ReadOnly4Adds.join(';'));
+        $("input[name=ReadOnly4Edits]").val(ReadOnly4Edits.join(';'));
+        $("input[name=NotNulls]").val(NotNulls.join(';'));
+    }
+
+</script>
+<div>
+    <input type="hidden" id="oldversion" value="@(oldversion)" />
+    <input type="button" value="保存" class="save_bt" id="save_bt" />
+    <input type="button" value="删除" class="del_bt" id="del_bt"/>
+    <input type="button" value="导出" class="export_bt" id="export_bt"/>
+    <input type="button" value="查阅历史版本" class="export_bt" id="check_bt"/>
+    <label id="IsSys" style="color:Red; display:none;">[系统对象不能删除]</label>
+</div>
+<div id="main_tab">
+    <div tabid="center_set" title="配置">
+        <table id="set_table" class="main_table" border="0" cellpadding=0 cellspacing=0 width=100%>
+                <tr >
+                    <td width="150px" class="main_table_td main_table_head">
+                        查询对象名称：
+                    </td>
+                    <td  class="main_table_td" >
+                        <input value="@(bizName)" readonly="readonly" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                </tr>
+                <tr style="display:none">
+                    <td width="150px" class="main_table_td main_table_head">
+                        字段情景(用分号隔开)：
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="Scenes" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                </tr>
+                <tr style="display:none">
+                    <td width="150px" class="main_table_td main_table_head">
+                        隐藏字段(用分号隔开)：
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="HiddenFields" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                </tr>
+                <tr style="display:none">
+                    <td width="150px" class="main_table_td main_table_head">
+                        添加时只读(用分号隔开)：
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="ReadOnly4Adds" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                </tr>
+                <tr style="display:none">
+                    <td width="150px" class="main_table_td main_table_head">
+                        编辑时只读(用分号隔开)：
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="ReadOnly4Edits" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                </tr>
+                <tr style="display:none">
+                    <td width="150px" class="main_table_td main_table_head">
+                        非空字段(用分号隔开)：
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="NotNulls" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                </tr>
+        </table>
+        <table id="set_table_2" class="main_table" border="0" cellpadding=0 cellspacing=0 width=100%>
+                <thead>
+                    <tr class="main_table_head">
+                        <td width="30px" class="main_table_td">下标</td>
+                        <td width="200px" class="main_table_td">字段名称</td>
+                        <td width="200px" class="main_table_td">情景</td>
+                        <td width="100px" class="main_table_td">是否隐藏</td>
+                        <td width="100px" class="main_table_td">添加时只读</td>
+                        <td width="100px" class="main_table_td">编辑时只读</td>
+                        <td  class="main_table_td">非空字段</td>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot style="display:none">
+                    <tr>
+                        <td  class="main_table_td" tname="Idx">
+                            
+                        </td>
+                        <td  class="main_table_td">
+                            <input  class="input_bg" tname="FieldName" readonly="readonly" style=" width:100%;height:25px; border-width:0" />
+                        </td>
+                        <td  class="main_table_td">
+                            <input  class="input_bg" tname="Scenes" style=" width:100%;height:25px; border-width:0" />
+                        </td>
+                        <td  class="main_table_td">
+                            <input tname="HiddenFields" type="checkbox" checked />
+                        </td>
+                        <td  class="main_table_td">
+                            <input tname="ReadOnly4Adds" type="checkbox" checked />
+                        </td>
+                        <td  class="main_table_td">
+                            <input tname="ReadOnly4Edits" type="checkbox" checked />
+                        </td>
+                        <td  class="main_table_td">
+                            <input tname="NotNulls" type="checkbox" checked />
+                        </td>
+                    </tr>
+                </tfoot>
+        </table>
+    </div>
+    <div tabid="center_sql" title="查询语句">
+        <table id="sql_table" class="main_table" border="0" cellpadding=0 cellspacing=0 width=100%>
+            <thead>
+                <tr class="main_table_head">
+                    <td width="15px" class="main_table_td">
+                        选
+                    </td>
+                    <td width="20px"  class="main_table_td" >
+                        号
+                    </td>
+                    <td class="main_table_td">
+                        查询名称
+                    </td>
+                    <td  class="main_table_td" width="100px"">
+                        关键字
+                    </td>
+                    <td width="20px" class="main_table_td">
+                        删
+                    </td>
+                    <td width="20px" class="main_table_td">
+                        显
+                    </td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot style="display:none;">
+                <tr>
+                    <td  class="main_table_td">
+                        <input name="IsSqlRun" type="checkbox" checked />
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="SqlIndex" style=" width:20px;height:25px; border-width:0" value="1" />
+                    </td>
+                    <td class="main_table_td">
+                        <input  class="input_bg" name="SqlName" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td class="main_table_td">
+                        <input  class="input_bg" name="Key" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td  class="main_table_td">
+                        <input  class="del_sql del_bt_min" type="button" />
+                    </td>
+                    <td  class="main_table_td">
+                        <div class="open_img"></div>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="main_table_td" colspan=6>
+                        <textarea class="input_bg"  name="BizSql" style=" width:100%; height:200px; border-width:0" ></textarea>
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <p><input type="button" class="add_bt_min" id="add_sql_bt" /></p>
+    </div>
+    <div tabid="center_count" title="统计查询">
+        <textarea class="input_bg"  name="CountSql" style=" width:100%; height:500px; border-width:0" ></textarea>
+    </div>
+    <div tabid="center_parmas" title="参数设置">
+        <table id="fields_table" class="main_table" border="0" cellpadding=0 cellspacing=0 width=100%>
+            <thead>
+                <tr class="main_table_head">
+                    <td width="20px" class="main_table_td">
+                        号
+                    </td>
+                    <td width="150px" class="main_table_td">
+                        字段
+                    </td>
+                    <td width="150px"  class="main_table_td" >
+                        名称
+                    </td>
+                    <td width="100px" class="main_table_td">
+                        类型
+                    </td>
+                    <td class="main_table_td">
+                        查询/选项（例如："select key=id,value=name from table" 或者"0=全部;1=正常"）
+                    </td>
+                    <td width="20px" class="main_table_td">
+                        删
+                    </td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot style="display:none;">
+                <tr>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="FieldIndex" style=" width:20px;height:25px; border-width:0" value="1" />
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg"  name="Field" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td  class="main_table_td">
+                        <input  class="input_bg"  name="FieldName" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td    class="main_table_td" >
+                        <select name="FieldType" >
+                                    <option value="String">String</option>
+                                    <option value="Int">Int</option>
+                                    <option value="Bit">Bit</option>
+                                    <option value="DateTime">DateTime</option>
+                                    <option value="BeginDateTime">BeginDateTime</option>
+                                    <option value="EndDateTime">EndDateTime</option>
+                                    <option value="Float">Float</option>                     
+                        </select>
+                    </td>
+                    <td   class="main_table_td" >
+                        <input  class="input_bg" style=" width:100%;height:25px; border-width:0" name="FieldSql"  />
+                    </td>
+                    <td  class="main_table_td">
+                        <input  class="del_field del_bt_min" type="button" />
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <p><input type="button" class="add_bt_min" id="add_field_bt" /><input  title="自动生成参数" id="auto_Create_bt"  class="auto_Create auto_bt_min" type="button" /></p>
+    </div>
+
+    @*Lookup*@
+    <div tabid="center_lookups" title="专业选择">
+        <table id="lookup_table" class="main_table" border="0" cellpadding=0 cellspacing=0 width=100%>
+            <thead>
+                <tr class="main_table_head">
+                    <td width="100px" class="main_table_td">
+                        触发字段
+                    </td>
+                    <td width="100px"  class="main_table_td" >
+                        返回显示字段
+                    </td>
+                    <td   class="main_table_td" >
+                        返回值字段(用分好隔开,根据这些返回字段对应赋值)
+                    </td>
+                    <td width="200px" class="main_table_td">
+                        参数字段(用分好隔开)
+                    </td>
+                    <td class="main_table_td" width="150px" >
+                        查询对象
+                    </td>
+                    <td width="20px" class="main_table_td">
+                        删
+                    </td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot style="display:none;">
+                <tr>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="KeyField" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg"  name="ReturnTextField" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg"  name="ReturnValueField" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td  class="main_table_td">
+                        <input  class="input_bg"  name="ParamFields" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td    class="main_table_td" >
+                        <select name="QueryName">
+                        @{
+                            var data = Tops.FRM.Biz.GetBizList(Tops.FRM.BizType.Query);
+                            System.Data.DataTable dtQuery = data.Tables[0];
+                            }
+                        @for (int i = 0; i < dtQuery.Rows.Count; i++)
+                        { 
+                            <option value="@(dtQuery.Rows[i]["BizName"])">@(dtQuery.Rows[i]["BizName"])</option>
+                        }
+                        </select>
+                    </td>
+                    <td  class="main_table_td">
+                        <input  class="del_field del_bt_min" type="button" />
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <p><input type="button" class="add_bt_min" id="add_lookup_bt" /></p>
+    </div>
+
+    @*对象备注*@
+    <div tabid="center_remarks" title="对象备注">
+         <textarea rows="15" cols="5" class="remark" style="width: 100%; line-height: 30px;">
+         
+         </textarea>
+    </div>
+
+    @*业务员逻辑
+    <div tabid="center_bizs" title="专业选择">
+        <table id="biz_table" class="main_table" border="0" cellpadding=0 cellspacing=0 width=100%>
+            <thead>
+                <tr class="main_table_head">
+                    <td width="100px" class="main_table_td">
+                        业务类型
+                    </td>
+                    <td width="100px"  class="main_table_td" >
+                        业务名称
+                    </td>
+                    <td  width="200px"  class="main_table_td" >
+                        业务对象
+                    </td>
+                    <td class="main_table_td">
+                        业务说明
+                    </td>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot style="display:none;">
+                <tr>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg" name="KeyField" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg"  name="ReturnTextField" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td  class="main_table_td" >
+                        <input  class="input_bg"  name="ReturnValueField" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                    <td  class="main_table_td">
+                        <input  class="input_bg"  name="ParamFields" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+</div>*@
+
+@*查询语句*@
+<script type="text/javascript">
+    $(function () {
+        $("#add_sql_bt").click(function () {
+            var $newSql = $("#sql_table tfoot").eq(0);
+            var sqlIndex = $("#sql_table").data("sqlIndex");
+            sqlIndex = sqlIndex == undefined ? 0 : sqlIndex;
+            $("#sql_table").data("sqlIndex", sqlIndex + 1);
+            $("#sql_table tbody").append($newSql.html());
+            var $newSqlTr1 = $("#sql_table tbody tr:last").prev()
+            $newSqlTr1.find("input[name = SqlIndex]").val(sqlIndex + 1).select();
+        });
+        $("#sql_table input.del_sql").live("click", function () {
+            var $tr1 = $(this).closest("tr");
+            var $tr2 = $tr1.next();
+            $tr2.remove();
+            $tr1.remove();
+        });
+        $("#sql_table .open_img").live("click", function () {
+            var $tr1 = $(this).closest("tr");
+            var $tr2 = $tr1.next();
+            var isOpen = $(this).data("isOpen");
+            if (isOpen == undefined) {
+                isOpen = true;
+            }
+            if (isOpen) {
+                $(this).addClass("close_img");
+                $tr2.hide();
+                $(this).data("isOpen", false);
+            } else {
+                $(this).removeClass("close_img");
+                $tr2.show();
+                $(this).data("isOpen", true);
+            }
+        });
+        $("input[name=SqlName]").live("keydown", function (e) {
+            if (e.keyCode == '13') {
+                $(this).closest("tr").find(".open_img").click();
+            }
+        }).live("dblclick", function () {
+            $(this).closest("tr").find(".open_img").click();
+        });
+    });
+    function GetSqls() {
+        var sqls = new Array();
+        var $trs = $("#sql_table tbody tr");
+        $trs.each(function (index) {
+            if (index % 2 == 0) {
+                var $tr1 = $trs.eq(index);
+                var $tr2 = $tr1.next();
+                var isSqlRun = !!$tr1.find("input[name=IsSqlRun]").attr("checked"); 
+                sqls.push({
+                    Item: $tr1.find("input[name=SqlIndex]").val(),
+                    Name: $tr1.find("input[name=SqlName]").val(),
+                    Sql: $tr2.find("textarea[name=BizSql]").val(),
+                    Key: $tr1.find("input[name=Key]").val(),
+                    IsRun: isSqlRun
+                });
+            }
+        });
+        return sqls;
+    }
+    function SetSqls(sqls) {
+        var $newSql = $("#sql_table tfoot").eq(0);
+        $.each(sqls, function (index) {
+            var $newTr = $($newSql.html());
+            $("#sql_table tbody").append($newTr);
+            $newTr.find("input[name=SqlIndex]").val(this.Item);
+            $newTr.find("input[name=SqlName]").val(this.Name);
+            $newTr.find("input[name=Key]").val(this.Key);
+            $newTr.find("textarea[name=BizSql]").val(this.Sql);
+            $newTr.find("input[name=IsSqlRun]").attr("checked", this.IsRun);
+            $newTr.find(".open_img").click();
+        });
+    }
+</script>
+@*参数设置*@
+<script type="text/javascript">
+    $(function () {
+        $("#add_field_bt").click(function () {
+            var fieldIndex = $("#fields_table").data("fieldIndex");
+            fieldIndex = fieldIndex == undefined ? 0 : fieldIndex;
+            $("#fields_table").data("fieldIndex", fieldIndex + 1);
+
+            var $newCheck = $("#fields_table tfoot").eq(0);
+            var $newTr = $($newCheck.html());
+            $("#fields_table tbody").append($newTr);
+            $newTr.find("input[name = FieldIndex]").val(fieldIndex + 1).select();
+        });
+        $("#fields_table input.del_field").live("click", function () {
+            var $tr1 = $(this).closest("tr");
+            $tr1.remove();
+        });
+        $("#auto_Create_bt").click(function () {
+            var s = "";
+            $("#sql_table textarea").each(function () {
+                s += $(this).val() + " ";;
+            });
+            var re = /(@@:)\w+/ig;
+            var fields = s.match(re);
+            if (fields != null && fields.length > 0) {
+                $.each(fields, function (index) {
+                    //判断是否已经存在
+                    var isAdd = true;
+                    var currentField = this.substring(2);
+                    $("#fields_table tbody input[name=Field]").each(function () {
+                        if ($.trim(currentField) == $.trim($(this).val())) {
+                            isAdd = false;
+                            return false;
+                        }
+                    });
+                    //如果不存在
+                    if (isAdd) {
+                        $("#add_field_bt").click();
+                        $("#fields_table tbody tr:last input[name=Field]").val(currentField);
+                    }
+                });
+            }
+
+        });
+    });
+    function GetFields() {
+        var fields = new Array();
+        var $trs = $("#fields_table tbody tr");
+        $trs.each(function (index) {
+            var $tr1 = $(this);
+            fields.push({
+                FieldName: $tr1.find("input[name=Field]").val(),
+                Title: $tr1.find("input[name=FieldName]").val(),
+                FieldType: $tr1.find("[name=FieldType]").val(),
+                Sql: $tr1.find("input[name=FieldSql]").val(),
+                Index: $tr1.find("input[name=FieldIndex]").val()
+            });
+        });
+        return fields;
+    }
+    function SetFields(fields) {
+        var $newCheck = $("#fields_table tfoot").eq(0);
+        $.each(fields, function (index) {
+            var $newTr = $($newCheck.html());
+            $("#fields_table tbody").append($newTr);
+            $newTr.find("input[name=Field]").val(this.FieldName);
+            $newTr.find("input[name=FieldName]").val(this.Title);
+            $newTr.find("select[name=FieldType]").attr("value", this.FieldType);
+            $newTr.find("input[name=FieldSql]").val(this.Sql);
+            $newTr.find("input[name=FieldIndex]").val(this.Index);
+        });
+    }
+</script>
+@*专业选择*@
+<script type="text/javascript">
+    $(function () {
+        $("#add_lookup_bt").click(function () {
+            var $newLookup = $("#lookup_table tfoot").eq(0);
+            var $newTr = $($newLookup.html());
+            $("#lookup_table tbody").append($newTr);
+            $newTr.find("input").eq(0).select();
+        });
+        $("#lookup_table input.del_field").live("click", function () {
+            var $tr1 = $(this).closest("tr");
+            $tr1.remove();
+        });
+    });
+    function GetLookups() {
+        var fields = new Array();
+        var $trs = $("#lookup_table tbody tr");
+        $trs.each(function (index) {
+            var $tr1 = $(this);
+            fields.push({
+                KeyField: $tr1.find("input[name=KeyField]").val(),
+                ReturnValueField: $tr1.find("input[name=ReturnValueField]").val(),
+                ReturnTextField: $tr1.find("input[name=ReturnTextField]").val(),
+                ParamFields: $tr1.find("[name=ParamFields]").val(),
+                QueryName: $tr1.find("[name=QueryName]").val()
+            });
+        });
+        return fields;
+    }
+    function SetLookups(fields) {
+        var $newCheck = $("#lookup_table tfoot").eq(0);
+        $.each(fields, function (index) {
+            var $newTr = $($newCheck.html());
+            $("#lookup_table tbody").append($newTr);
+            $newTr.find("input[name=KeyField]").val(this.KeyField);
+            $newTr.find("input[name=ReturnValueField]").val(this.ReturnValueField);
+            $newTr.find("input[name=ReturnTextField]").val(this.ReturnTextField);
+            $newTr.find("input[name=ParamFields]").val(this.ParamFields);
+            $newTr.find("select[name=QueryName]").attr("value", this.QueryName);
+        });
+    }
+</script>
+@*业务逻辑*@
+<script type="text/javascript">
+    $(function () {
+        $("#add_lookup_bt").click(function () {
+            var $newLookup = $("#lookup_table tfoot").eq(0);
+            var $newTr = $($newLookup.html());
+            $("#lookup_table tbody").append($newTr);
+            $newTr.find("input").eq(0).select();
+        });
+        $("#lookup_table input.del_field").live("click", function () {
+            var $tr1 = $(this).closest("tr");
+            $tr1.remove();
+        });
+    });
+    function GetLookups() {
+        var fields = new Array();
+        var $trs = $("#lookup_table tbody tr");
+        $trs.each(function (index) {
+            var $tr1 = $(this);
+            fields.push({
+                KeyField: $tr1.find("input[name=KeyField]").val(),
+                ReturnValueField: $tr1.find("input[name=ReturnValueField]").val(),
+                ReturnTextField: $tr1.find("input[name=ReturnTextField]").val(),
+                ParamFields: $tr1.find("[name=ParamFields]").val(),
+                QueryName: $tr1.find("[name=QueryName]").val()
+            });
+        });
+        return fields;
+    }
+    function SetLookups(fields) {
+        var $newCheck = $("#lookup_table tfoot").eq(0);
+        $.each(fields, function (index) {
+            var $newTr = $($newCheck.html());
+            $("#lookup_table tbody").append($newTr);
+            $newTr.find("input[name=KeyField]").val(this.KeyField);
+            $newTr.find("input[name=ReturnValueField]").val(this.ReturnValueField);
+            $newTr.find("input[name=ReturnTextField]").val(this.ReturnTextField);
+            $newTr.find("input[name=ParamFields]").val(this.ParamFields);
+            $newTr.find("select[name=QueryName]").attr("value", this.QueryName);
+        });
+    }
+</script>
+@*<script type="text/javascript">
+    $(function () {
+        $(".open_img").click();
+    });
+</script>
+*@

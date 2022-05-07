@@ -1,0 +1,227 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "角色维护";
+    ViewBag.ModuleName = "角色维护";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    string RoleID = Request.QueryString["RoleID"] + "";
+    string RoleName =Server.UrlDecode(Request.QueryString["RoleName"] + "");
+    string powers = TopsUser.GetPowersByRoleID(RoleID).ToJson();
+     
+}
+@section Script{
+<script type="text/javascript">
+        var roleID = '@(RoleID)';
+        var updateFlag=roleID==""?"add":"update"; 
+        var powers=@(new MvcHtmlString(powers))
+
+        var powerlist = new Array();
+        $(function () {
+            if(roleID!=""){
+                $("#RoleID,#RoleName").attr("readonly","readonly");
+            } 
+            //重构power角色权限数组
+            for(var arr in powers){
+               powerlist.push({ "name":arr,"text":powers[arr],"state":"0" });
+            }
+
+
+            $("#saveBt").show().click(function(){
+                var RoleID=$.trim($("#RoleID").val()+"");
+                var RoleName=$.trim($("#RoleName").val()+"");
+                if(RoleID==""||RoleName=="")
+                {
+                    alert("角色编码或角色名称不能为空！");
+                }
+                $.topsAjax({
+                type: "POST",
+                url: "/AjaxPOST/SaveRolePower",
+                data: {
+                    //powers:GetPowers(),
+                    powers:GetPowers(),
+                    RoleID:$("#RoleID").val(),
+                    RoleName:$("#RoleName").val(),
+                    UpdateFlag:updateFlag
+                    },
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功");
+                        updateFlag="update";
+                        $("#RoleID,#RoleName").attr("readonly","readonly");
+                    } else {
+                        alert("保存失败，" + data.Msgs[0]);
+                    }
+                }
+            });
+            });
+            LoadTree();
+            $("input[name='IsChoosed']").live('click',function(){
+                var checked=$(this).attr("checked");
+                var $tr=$(this).closest("tr");
+                var PowerID=$tr.find("input[name=PowerID]").val();
+                var PowerName=$tr.find("input[name=PowerName]").val();
+                if(checked){
+                    powers[PowerID]=PowerName;
+                    var isExists = 0;
+                    powerlist.forEach(function(value,index){
+                        if(value.name == PowerID){
+                           isExists++;
+                           value.state = "1";
+                        }
+                    })
+                    if(isExists == 0){
+                        powerlist.push({"name":PowerID,"text":powers[PowerID],"state":"1" })
+                    }
+                }else{
+                    powers[PowerID]=undefined;
+                    powerlist.forEach(function(value,index){
+                        if(value.name == PowerID){
+                           value.state = "2";
+                        }
+                    })
+                }
+                 
+            });
+        });
+        function LoadTree() {
+            var loading = $("#tree_loading").show();
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/GetSysModules",
+                //data: {},
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        var treeData = data.Data;
+                        $("#treemenu").ligerTree({
+                            nodeWidth: 180,
+                            checkbox: false,
+                            data: treeData,
+                            onSelect: function (node) {
+                                if (node.data.children == undefined) {
+                                //f_addTab(node.data.id, node.data.text, node.data.url)
+                                $("#hide_back #msg").text("正在加载，请稍等...").show();
+                                $("#hide_back").show().find("img").show();
+                                $("#moduleID").text(node.data.id);
+                                $("#moduleName").text(node.data.text);
+                                $("#powers_table tbody").html('')
+                                //1.获取模块权限
+                                $.topsAjax({
+                                    type: "Get",
+                                    url: "/Tools/AjaxGet/SelPowersByModuleID",
+                                    data: { ModuleID: node.data.id,RoleID:roleID },
+                                    dealError: false,
+                                    success: function (data) {
+                                        if (data.IsSuccess) {
+                                            SetPowers(data.Data[0])
+                                        }
+                                        $("#hide_back #msg").hide(200);
+                                        $("#hide_back").hide(300)
+                                    }
+                                });
+
+                            }
+                            }
+                        });
+                        loading.hide();
+                    }
+                }
+            });
+        }
+    function GetPowers() {
+        var data = new Array();
+        $.each(powers, function (index) {
+            if(powers[index]!=null)
+            {
+                data.push({PowerID:index});
+            }
+        });
+        return data;
+    }
+    function GetPowers(){
+        var data = new Array();
+        powerlist.forEach(function(item,index){ 
+            if(item.state != "0"){
+               data.push({PowerID:item.name,PowerState:item.state});
+            }
+        });
+        
+        return data;
+    }
+    function SetPowers(powers) {
+            var $newSql = $("#powers_table tfoot").eq(0);
+            if (powers == null) return;
+            $.each(powers, function (index) {
+                var $newTr = $($newSql.html());
+                $("#powers_table tbody").append($newTr);
+                $newTr.find("input[name=PowerName]").val(this.PowerName);
+                $newTr.find("input[name=PowerID]").val(this.PowerID);
+                $newTr.find("input[name=IsChoosed]").attr("checked",HasPower(this.PowerID));
+            });
+        }
+    function HasPower(powerID)
+    {
+        var rs=false;
+        $.each(powers, function (index) {
+                if(index==powerID)
+                    {
+                    rs=true;
+                    return false;
+                    }
+        });
+        return rs;   
+    }
+</script>
+}
+@section Params{
+<table>
+    <tr>
+        <th>角色编码：</th><td><input id="RoleID"  type="text" value="@(RoleID)" /></td>
+        <th>角色名称：</th><td><input id="RoleName" type="text" value="@(RoleName)" /></td>
+    </tr>
+</table>
+}
+<div style="width: 310px; float: left; margin-left: 5px;">
+    <h2>
+        模块：</h2>
+    <div style="width: 300px; height: 400px; overflow: auto; border: 1px solid #BED5F3;">
+        <div id="treemenu">
+            <img id="tree_loading" src=""/TopsLib/Content/loading.gif" />
+        </div>
+    </div>
+</div>
+<div style="width: 310px; float: left; ">
+    <h2>权限：</h2>
+    <div style="width: 470px; height: 400px; overflow: auto; border: 1px solid #BED5F3;position:relative;">
+        <p><b><label id="moduleName"></label></b></p>
+        <table id="powers_table" class="main_table"  border="0" cellpadding=0 cellspacing=0 width=100%>
+            <thead class="main_table_head">
+                <tr>
+                    <td width="15px" class="main_table_td">
+                        选
+                    </td>
+                    <th class="main_table_td">权限名称</th>
+                    
+                </tr>
+            </thead>
+            <tbody></tbody>
+            <tfoot style=" display:none;">
+                <tr>
+                    <td  class="main_table_td">
+                        <input  name="IsChoosed" type="checkbox" />
+                    </td>
+                    <td class="main_table_td">
+                        <input name="PowerID" type="hidden" />
+                        <input readonly="readonly"  class="input_bg" name="PowerName" style=" width:100%;height:25px; border-width:0" />
+                    </td>
+                </tr>
+            </tfoot>
+        </table>
+        <div id="hide_back" style="width: 100%; height: 100%; position:absolute;top:0;background-color: #e2e2e2; 
+                opacity: 0.7; /* Safari, Opera */
+                -moz-opacity:0.70; /* FireFox */
+                filter: alpha(opacity=70); /* IE */">
+        <p style="margin:100px 100px"><a id="msg">请点击左边模块...</a><img style="display:none;" src=""/TopsLib/Content/loading_min.gif" /></p>
+    </div>
+    </div>
+</div>

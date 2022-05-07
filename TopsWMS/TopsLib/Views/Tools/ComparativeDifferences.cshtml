@@ -1,0 +1,180 @@
+﻿@{
+    Layout = null;
+    string Id = Request.QueryString["bizid"].ToString();
+    string Name = Request.QueryString["id"].ToString();
+    string CreateVersion = Request.QueryString["CreateVersion"].ToString();
+    
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>比较差异</title>
+    <style type="text/css">
+        .NowVersionSQL, .OldVersionSQL
+        {
+            white-space: pre;
+            width: calc(49%);
+            display: inline-block;
+            overflow-x: scroll;
+            border: 1px solid gray;
+            height: 500px;
+        }
+        .NowVersionSQL td
+        {
+            line-height: 21px;
+            width: 9px;
+        }
+        .showVersion
+        {
+            width: 49%;
+            display: inline-block;
+            text-align: center;
+        }
+    </style>
+    <script src="../../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var bizId = "@(Id)";
+        var bizName = "@(Name)";
+        $(function () {
+            var param = new Object();
+            param.type = "GET";
+            param.url = "AjaxGet/SelComparativeDifferences";
+            param.params = { BizName: bizName, Id: bizId };
+            param.collback = function (result) {
+                if (result.Data[0].length > 0) {
+                    //                    var NowSQLs = result.Data[0].filter(function (self) { debugger; return self.IsRun });
+                    //                    var OldSQLs = result.Data[1].filter(function (self) { debugger; return self.IsRun });
+                    var NowSQLs = result.Data[0];
+                    var OldSQLs = result.Data[1];
+
+
+
+                    var length = NowSQLs.length > OldSQLs.length ? OldSQLs.length : NowSQLs.length;
+
+                    for (var SQLindex = 0; SQLindex < length; SQLindex++) {
+                        var NowSQL = NowSQLs[SQLindex].NowSQL;
+                        var OldSQL = OldSQLs[SQLindex].OldSQL;
+
+                        var $NowVersionSQL = $(".temp .NowVersionSQL").clone(true);
+                        var $OldVersionSQL = $(".temp .OldVersionSQL").clone(true);
+
+                        $(document.body).append("<div class='showVersion' title='" + NowSQLs[SQLindex].n_Item + " " + NowSQLs[SQLindex].s_Name + "'>" + NowSQLs[SQLindex].n_Item + " " + NowSQLs[SQLindex].s_Name + "</div>");
+                        $(document.body).append("<div class='showVersion' title='" + OldSQLs[SQLindex].n_Item + " " + OldSQLs[SQLindex].s_Name + "'>" + OldSQLs[SQLindex].n_Item + " " + OldSQLs[SQLindex].s_Name + "</div>");
+
+                        $NowVersionSQL.attr("title", NowSQLs[SQLindex].n_Item + " " + NowSQLs[SQLindex].s_Name);
+                        $OldVersionSQL.attr("title", OldSQLs[SQLindex].n_Item + " " + OldSQLs[SQLindex].s_Name);
+
+                        $(document.body).append($NowVersionSQL);
+                        $(document.body).append($OldVersionSQL);
+
+                        NowSQL.split("\n").forEach(function (v, i) {
+
+                            $NowVersionSQL.append("<span row='" + i + "'>" + v + "</span>");
+                            $NowVersionSQL.append("<br/>");
+                        })
+
+                        OldSQL.split("\n").forEach(function (v, i) {
+
+                            $OldVersionSQL.append("<span row='" + i + "'>" + v + "</span>");
+                            $OldVersionSQL.append("<br/>");
+                        })
+                    }
+                  
+                    ComparativeDifferences();
+
+                } else {
+                    alert("暂无数据!");
+                }
+            }
+            SelCommonAjax(param);
+
+
+        })
+
+        //比较差异
+        function ComparativeDifferences() {
+            var nowlen = $(".NowVersionSQL").length;
+            var oldlen = $(".OldVersionSQL").length;
+
+            for (var diffindex = 0; diffindex < (nowlen >= oldlen ? nowlen : oldlen); diffindex++) {
+            
+                if ($(".OldVersionSQL[title='" + $(".NowVersionSQL").eq(diffindex + 1).attr("title") + "']").length == 0) {
+                    continue;
+                }
+
+                if (diffindex > oldlen) {
+                    return;
+                }
+
+                ComparativeDifferencesChildren(diffindex);
+
+
+            }
+        }
+
+        //比较差异子方法
+        function ComparativeDifferencesChildren(diffindex) {
+
+
+            var lenNowVersionSQL = $(".NowVersionSQL").eq(diffindex + 1).find("span").length;
+            var lenOldVersionSQL = $(".OldVersionSQL").eq(diffindex + 1).find("span").length;
+
+            if (lenNowVersionSQL >= lenOldVersionSQL) {
+                var len = $(".NowVersionSQL").eq(diffindex + 1).find("span").length;
+               
+                for (var index = 0; index < 1; index++) {
+
+                    $(".NowVersionSQL").eq(diffindex + 1).find("span").each(function (index, value) {
+                     
+                        if ($(".OldVersionSQL").eq(diffindex + 1).find("span[row=" + index + "]").text() != $(value).text()) {
+                            $(value).css("background", "yellow");
+                        }
+
+                        if (index > lenOldVersionSQL - 1) {
+                            $(value).css("background", "yellow");
+                        }
+                    })
+                }
+
+            } else {
+                $(".NowVersionSQL").eq(diffindex + 1).find("span").each(function (vindex, value) {
+
+                    if ($(".OldVersionSQL").eq(diffindex + 1).find("span[row=" + vindex + "]").text() != $(value).text()) {
+                        $(value).css("background", "yellow");
+                    }
+                })
+            }
+        }
+
+
+
+        //查询对象或业务对象调用方法
+        function SelCommonAjax(param) {
+            $.ajax({
+                type: param.type,
+                url: param.url,
+                data: param.params,
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result.IsSuccess) {
+                        param.collback(result);
+                    } else {
+                        alert(result.Msgs[0]);
+                    }
+                }
+            })
+        }
+    </script>
+</head>
+<body>
+    <div class="showVersion">
+        当前版本</div>
+    <div class="showVersion">@(CreateVersion)版本</div>
+    <div class="temp" style="display: none;">
+        <div class="NowVersionSQL">
+        </div>
+        <div class="OldVersionSQL">
+        </div>
+    </div>
+</body>
+</html>

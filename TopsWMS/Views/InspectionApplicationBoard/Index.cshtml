@@ -1,0 +1,355 @@
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>报检清单看板</title>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <style type="text/css">
+        .title
+        {
+            border: 1px solid blue; 
+            font-family:微软雅黑;
+            text-align:center;
+            width:98vw;
+            height:5vh;
+            font-size:18px;
+        }
+        .content
+        {
+            border: 1px solid blue; 
+            background:#eaf2fe;
+            font-family:微软雅黑;
+            text-align:center;
+            width:98vw;
+            height:90vh;
+            font-size:16px;
+        }
+        .title table,.content table
+        {
+            width:100%;
+        }
+        .title tr
+        {
+            background:#eaf2fe;    
+        }
+        .content tr:nth-child(odd)
+        {
+            background:#a2c9f7;    
+        }
+        .content tr:nth-child(even)
+        {
+            background:#bfd8f7;    
+        }
+        
+        .title td 
+        {    
+            width:calc(14%);
+            line-height:5vh;
+            font-weight:bold; 
+            height:5vh;
+        }
+        .content td
+        {    
+            width:calc(14%); 
+            line-height:5vh;
+            font-weight:bold; 
+            height:5vh;
+        }
+         
+        .title td:nth-child(1),
+        .title td:nth-child(2),
+        .content td:nth-child(1),
+        .content td:nth-child(2)
+        {
+            width:calc(12%);
+        } 
+        .title td:nth-child(7),
+        .content td:nth-child(7)
+        { 
+            width:calc(15%);
+        }
+        .title td:nth-child(6),
+        .content td:nth-child(6)
+        { 
+            width:calc(10%);
+        }
+        .title td:nth-child(3),
+        .content td:nth-child(3)
+        { 
+            width:calc(32%);
+        }
+        .title td:nth-child(4),
+        .title td:nth-child(5),
+        .content td:nth-child(4),
+        .content td:nth-child(5)
+        {
+            width:calc(8%);
+        } 
+        
+        
+        .content tr:last-child td:nth-child(1) div
+        {
+            display:inline-block;
+            background:#dbc7c2;
+            margin:0px 1vw;
+            width:6vw;
+            cursor:pointer;
+        }  
+        .content tr:last-child td:nth-child(1) div[name=submit]
+        { 
+            display:inline-block;
+            background:#dbc7c2;
+            margin:0px 1vw;
+            width:6vw;
+            cursor:pointer;
+            float:right;
+        }
+        
+        .content tr:last-child div:active
+        {
+            display:inline-block;
+            background:lightgreen;
+            margin:0px 1vw;
+            width:6vw;
+            cursor:pointer;
+        }
+        .content tr:last-child td:nth-child(1) label
+        {
+            margin-right 1vw; 
+        }
+        .content tr:last-child td:nth-child(1) span
+        {
+            color:blue;  
+        }
+        
+        
+        .shadow {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 998;
+            background-color: #000;
+            opacity: 0.6;
+        }
+        
+        .transform_class
+        {
+            -webkit-transform: rotateX(-90deg);
+            -ms-transform: rotateX(-90deg);
+            transform: rotateX(-90deg); 
+            animation: notransform 2s infinite;
+            animation-delay: 2s;
+            -webkit-animation: notransform 2s infinite;
+            -webkit-animation-delay: 2s;  
+        }
+
+        @@-webkit-keyframes notransform {
+            100% {transform: none;}
+        }
+        @@keyframes notransform {
+            100% {transform: none;}
+        }
+    </style>
+    <script type="text/javascript">
+        var timer = null; //计时器
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    InspectionApplicationBoardData: new Array(), //看板数据源 
+                    PageIndex: 1, //当前展示数据的页数
+                    IsShadowShow: false, //控制遮罩层
+                    transform_class: false, //显示刷新动画
+                    PageIndex: 1, //当前展示数据的页数
+                    NextPageIndex: 1, //下一次使用的页数
+                    InspectionApplication_Cou: 1, //总页数 
+                    showRecordCou: 14, //一页显示条数
+                },
+                methods: {
+                    //加载看板信息
+                    f_loadBoardData: function () {
+                        //vue.IsShadowShow = true;
+
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelInspectionApplicationBoardData",
+                            data: { PageIndex: vue.PageIndex },
+                            success: function (result) {
+                                //定时清空
+                                vue.InspectionApplicationBoardData = new Array();
+
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    if (result.Data[0].length > 0) {
+                                        vue.InspectionApplicationBoardData = result.Data[0]; 
+                                    }
+                                    if (result.Data[0].length < vue.showRecordCou) {
+                                        var len = result.Data[0].length
+                                        for (var index = 0; index <= vue.showRecordCou - len - 1; index++) {
+                                            var obj = $.extend(true, {}, result.Data[0][0]);
+                                            for (var column in obj) {
+                                                obj[column] = '';
+                                            }
+
+                                            vue.InspectionApplicationBoardData.push(obj);
+                                        }
+                                    } 
+                                    
+                                    //总页数赋值
+                                    vue.InspectionApplication_Cou = result.Data[1][0].InspectionApplication_Cou;
+                                    
+
+                                    //页数更新
+                                    if (vue.PageIndex >= result.Data[1][0].InspectionApplication_Cou) {
+                                        vue.NextPageIndex = 1;
+                                    } else {
+                                        vue.NextPageIndex += 1;
+                                    }
+                                } else {
+                                }
+
+                                vue.transform_class = true;
+                                //延迟关闭
+                                setTimeout(function () {
+                                    vue.transform_class = false;
+                                },4000)
+
+                                //vue.IsShadowShow = false;
+                            }
+                        })
+                    },
+                    //初始化页面
+                    f_loadPage: function () {
+
+                        vue.f_loadBoardData();
+
+                        //30s定时刷新数据
+                        setInterval(function () {
+                            vue.f_loadBoardData();
+                        }, 30000);
+
+                    },
+                    //根据页数读取数据
+                    f_loadDataByPage: function () {
+                        var name = $(event.target).attr("name");
+                        var pageindex_ing = -1;
+
+                        if (name == "first") {
+                            pageindex_ing = 1;
+                        } else if (name == "prev") {
+                            pageindex_ing = vue.PageIndex - 1 <= 1 ? 1 : vue.PageIndex - 1;
+                        } else if (name == "next") {
+                            pageindex_ing = vue.PageIndex + 1 > vue.InspectionApplication_Cou ? vue.InspectionApplication_Cou : vue.PageIndex + 1;
+                        } else if (name == "last") {
+                            pageindex_ing = vue.InspectionApplication_Cou;
+                        }
+                        clearTimeout(timer);
+
+                        vue.PageIndex = pageindex_ing;
+                        vue.NextPageIndex = pageindex_ing + 1 > vue.InspectionApplication_Cou ? 1 : pageindex_ing + 1;
+
+                        //alert(vue.PageIndex + "==" + vue.NextPageIndex + "==" + vue.InspectionApplication_Cou + "==Page");
+                        vue.f_loadBoardData();
+                    },
+                    //刷新页面
+                    f_reload: function () {
+
+                        vue.f_loadBoardData();
+                    }
+                }
+            })
+
+            //初始化页面
+            vue.f_loadPage();
+        })
+    </script>
+</head>
+<body>
+    <div class="body">
+        <div>
+            <div class="title">
+                <table>
+                    <tr>
+                        <td>
+                            储位码
+                        </td>
+                     @*   <td>
+                            条码
+                        </td>*@
+                        <td>
+                            产品编码
+                        </td>
+                        <td>
+                            产品名称
+                        </td>
+                        <td>
+                            批次
+                        </td>
+                        <td>
+                            数量
+                        </td>
+                        <td>
+                            报检人
+                        </td>
+                        <td>
+                            报检时间
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="content">
+                <table>
+                    <tr v-for="(option,index) in InspectionApplicationBoardData">
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.储位二维码 }}
+                        </td>
+                @*        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.条码 }}
+                        </td>*@
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.产品编码 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.产品名称 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.批次号 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.数量 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.锁定操作人 }}
+                        </td>
+                        <td :class="{ 'transform_class':transform_class }">
+                            {{ option.锁定操作时间 }}
+                        </td>
+                    </tr>
+                    
+                    <tr>
+                        <td colspan="9">
+                            <div name="first" v-on:click="f_loadDataByPage">首页</div>
+                            <div name="prev" v-on:click="f_loadDataByPage">上一页</div> 
+                            <label>当前页数:第<span>{{ PageIndex }}</span>页</label>
+                            <label>|</label>
+                            <label>总页数:<span>{{ InspectionApplication_Cou }}</span></label>
+                            <div name="next" v-on:click="f_loadDataByPage">下一页</div>
+                            <div name="last" v-on:click="f_loadDataByPage">最后一页</div>
+                            <div name="reload" v-on:click="f_reload">刷新页面</div> 
+                        </td> 
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <!--遮罩层-->
+        <div class="shadow" v-show="IsShadowShow === true">
+        </div>
+    </div>
+</body>
+</html>

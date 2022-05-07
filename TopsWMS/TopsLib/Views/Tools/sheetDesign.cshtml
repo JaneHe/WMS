@@ -1,0 +1,290 @@
+﻿@{
+    ViewBag.Title = "ShortCut";
+    Layout = "~/TopsLib/Views/Tools/_Layout.cshtml";
+    //数据库表名集合
+    var Biz = Tops.FRM.Biz.Execute("SelAllSheet", new System.Data.SqlClient.SqlParameter[] { new System.Data.SqlClient.SqlParameter { ParameterName = "SysParamId", Value = "5" } }, Tops.FRM.BizType.Query);
+    List<System.Data.DataTable> list = Biz.Data as List<System.Data.DataTable>;
+    Dictionary<string, string> DicList = new Dictionary<string, string>();
+    for (int index = 0; index < list[0].Rows.Count; index++)
+    {
+        DicList.Add(list[0].Rows[index]["name"].ToString(), list[0].Rows[index]["value"].ToString());
+
+    } 
+}
+<style type="text/css">
+    .container
+    {
+        position: relative;
+        top: 10px;
+        left: 15px;
+    }
+    .conditions
+    {
+        font-family: 微软雅黑;
+        font-size: 16px;
+        position: absolute;
+        line-height: 35px;
+    }
+    .conditions input:last-child
+    {
+        color: blue;
+        font-weight: bold;
+        width: 190px;
+        display: inline-block;
+        margin-left: 5px;
+    }
+    .edit
+    {
+        font-family: 微软雅黑;
+        font-size: 16px;
+        position: absolute;
+        left: 700px;
+        width: 100px;
+        line-height: 35px;
+        font-size: 18px;
+        font-family: 微软雅黑;
+        font-weight: bolder;
+        text-align: center;
+        display: inline-block;
+        background: #35A2FF;
+        margin: 0px 5px 0px 5px;
+        cursor: pointer;
+        color: White;
+    }
+    .export
+    {
+        font-family: 微软雅黑;
+        font-size: 16px;
+        position: absolute;
+        left: 810px;
+        width: 150px;
+        line-height: 35px;
+        font-size: 18px;
+        font-family: 微软雅黑;
+        font-weight: bolder;
+        text-align: center;
+        display: inline-block;
+        background: #35A2FF;
+        margin: 0px 5px 0px 5px;
+        cursor: pointer;
+        color: White;
+    }
+    .title
+    {
+        width: 1000px;
+        position: absolute;
+        top: 40px;
+    }
+    .columns
+    {
+        width: 1015px;
+        overflow-y: auto;
+        height: 600px;
+        position: absolute;
+        top: 75px;
+    }
+    .title table, .columns table
+    {
+        width: 100%;
+    }
+    .title table th
+    {
+        line-height: 35px;
+        font-family: 微软雅黑;
+        font-weight: bolder;
+        font-size: 16px;
+        text-align: center;
+        width: 14%;
+        background: #D6E7FC;
+        border-top: 1px solid gray;
+        border-left: 1px solid gray;
+        border-right: 1px solid gray;
+    }
+    .columns table td
+    {
+        line-height: 35px;
+        font-family: 微软雅黑;
+        font-size: 14px;
+        text-align: center;
+        width: 14%;
+        border: 1px solid gray;
+    }
+    .title table th:nth-child(2), .title table th:nth-child(3), .title table th:nth-child(4), .title table th:nth-child(5), .title table th:nth-child(6), .columns table td:nth-child(2), .columns table td:nth-child(3), .columns table td:nth-child(4), .columns table td:nth-child(5), .columns table td:nth-child(6)
+    {
+        width: 8%;
+    }
+    .title table th:nth-child(1), .columns table td:nth-child(1)
+    {
+        width: 24%;
+    }
+    .title table th:nth-child(7), .columns table td:nth-child(7)
+    {
+        width: 34%;
+    }
+    
+    
+    .CheckObject
+    {
+        background: #35A2FF;
+    }
+    .CheckInObject
+    {
+        background: green;
+    }
+</style>
+<form>
+<div class="container">
+    <div class="conditions">
+        <span>数据表名: </span>
+        <select class="sheet">
+            @foreach (var key in DicList.Keys)
+            { 
+                <option value="@(key)" name="@(DicList[key])">@(key)</option>
+            }
+        </select>
+        <input type="text" class="sheet_MSD" readonly disabled="disabled" />
+    </div>
+    <div class="edit">
+        编 辑</div>
+    <div class="export">
+        导出Excel</div>
+    <div class="title">
+        <table>
+            <tr>
+                <th>
+                    字段名
+                </th>
+                <th>
+                    主键
+                </th>
+                <th>
+                    类型
+                </th>
+                <th>
+                    长度
+                </th>
+                <th>
+                    是否为空
+                </th>
+                <th>
+                    默认值
+                </th>
+                <th>
+                    说明
+                </th>
+            </tr>
+        </table>
+    </div>
+    <div class="columns">
+        <table>
+        </table>
+    </div>
+</div>
+</form>
+<script type="text/javascript">
+
+    $(function () {
+        //数据库表选择事件
+        $(".sheet").change(function () {
+            $(".edit").text("编 辑");
+            $.ajax({
+                type: "GET",
+                url: "/tools/AjaxGet/SelAllColumns",
+                data: { Sheet: $(".sheet").find("option:selected").text() },
+                success: function (result) {
+                    result = JSON.parse(result);
+                    if (result.IsSuccess) {
+                        $(".columns table").empty();
+                        result.Data[0].forEach(function (v, i) {
+                            $(".columns table").append("<tr name='" + v.字段名 + "' value='" + v.字段说明 + "'><td>" + v.字段名 + "</td><td>" + v.主键 + "</td><td>" + v.类型 + "</td><td>" + v.长度 + "</td><td>" + v.允许空 + "</td><td>" + v.默认值 + "</td><td>" + v.字段说明 + "</td></tr>")
+                        })
+
+                        //数据超出给于滚动条
+                        if (result.Data[0].length < 16) {
+                            $(".columns").css("width", "1000px");
+                        } else {
+                            $(".columns").css("width", "1015px");
+                        }
+                    } else {
+                        alert(result.Msgs[0]);
+                    }
+                }
+            })
+            //赋值
+            localStorage["sheet"] = $(".sheet").find("option:selected").text();
+
+            $(".sheet_MSD").val($(".sheet").find("option:selected").attr("name"));
+            $(".sheet_MSD").removeAttr("OldSheetDescribe").attr("OldSheetDescribe", $(".sheet").find("option:selected").attr("name"));
+        })
+
+        //点击白色背景效果
+        $(".edit").mousedown(function () {
+            $(this).addClass("CheckInObject");
+        })
+
+        $(".edit").mouseup(function () {
+            $(this).removeClass("CheckInObject");
+        })
+
+        //导出WORD
+        $(".export").click(function () {
+            window.open("/ExcelHelp/DownloadSheetDesign");
+        })
+
+
+        //编辑/保存点击事件
+        $(".edit").click(function () {
+            if ($(".edit").text() == "编 辑") {
+                $(".edit").text("保 存");
+                $(".columns table tr").each(function (index, value) {
+                    $(this).find("td:eq(6)").html("<input type='text' style='width:300px;' value='" + $(this).attr("value") + "' />");
+                })
+                $(".sheet_MSD").removeAttr("readonly").removeAttr("disabled");
+
+            } else {
+
+                var Dic = new Array();
+                $(".columns table tr").each(function (index, value) {
+                    var olddes = $(this).attr("value");
+                    var des = $(this).find("input").val().trim();
+                    $(this).attr("value", des);
+                    $(this).find("td:eq(6)").html($(this).attr("value"));
+
+                    if (des != "" && olddes != des) {
+                        Dic.push({ OldSheetDescribe: $(".sheet_MSD").attr("OldSheetDescribe"), SheetDescribe: $(".sheet_MSD").val(), OldDescribe: olddes, Describe: des, Column: $(this).attr("name"), Sheet: $(".sheet").find("option:selected").text() });
+                    }
+                })
+
+                //$(".edit").text("编 辑");
+                //$(".sheet_MSD").attr("readonly", true).attr("disabled", "disabled");
+
+                $.ajax({
+                    type: "POST",
+                    url: "/tools/AjaxPost/UpdateColumnDescribe",
+                    data: { Dictionarys: Dic },
+                    success: function (result) {
+                        result = JSON.parse(result);
+                        if (result.IsSuccess) {
+                            //alert("修改成功");
+                            location.reload();
+                        } else {
+                            alert(result.Msgs[0]);
+                            location.reload();
+                        }
+                    }
+                })
+            }
+        })
+
+        //本地存储
+        if (window.localStorage != undefined && window.localStorage.getItem("sheet") != "undefined") {
+            $(".sheet").find("option[value=" + window.localStorage.getItem("sheet") + "]").attr("selected", true);
+        }
+
+        //默认点击触发
+        $(".sheet").change();
+    });
+
+
+    
+</script>

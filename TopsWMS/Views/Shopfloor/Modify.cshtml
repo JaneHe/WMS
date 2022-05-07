@@ -1,0 +1,263 @@
+﻿@using Tops.FRM;
+@{
+    //版本：1.2
+    ViewBag.Title = "车间信息";
+    ViewBag.ModuleName = "详细资料";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    string QueryName = "SelShopfloor";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    string ctrl = Request.QueryString["ctrl"];
+    string id = Request.QueryString["id"];
+    string Sel_Id = Request.QueryString["Sel_Id"];
+    ctrl = string.IsNullOrEmpty(ctrl) ? "edit" : ctrl;
+    //公开两台配置参数给分部视图
+    ViewBag.Biz = biz;
+    ViewBag.Metas = metas;
+    var moduleConfig = ModuleConfig.GetModuleConfig(metas, biz.Lookups, biz, ctrl);
+
+    //重组显示字段配置
+    foreach (string key in metas[0].Keys)
+    {
+        if (!metas[0][key].Hide)
+        {
+            //宽度大于300的string类型文本默认给文本域
+            if (metas[0][key].Width >= 300)
+            {
+                metas[0][key].Type = "Textarea";
+            }
+        }
+    }
+    
+}
+@section Params{
+    <form id="paramForm">
+    <div class="item_title">
+        详细资料：</div>
+    <input type="hidden" name="Sel_Id" value="@(Sel_Id)" />
+    <div id="paramlist" style="width: 1000px;">
+        @foreach (string key in metas[0].Keys)
+        {
+            if (!metas[0][key].Hide)
+            {
+                if (metas[0][key].Type.Equals("String") || metas[0][key].Type.Equals("Int32") || metas[0][key].Type.Equals("Float"))
+                {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span><input type="text" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" />
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("DateTime") || metas[0][key].Type.Equals("BeginDateTime") || metas[0][key].Type.Equals("EndDateTime"))
+                {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span><input type="datetime" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" />
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("Textarea"))
+                {
+            <div class="param_items" style="width:@(metas[0][key].Width + 180)px;display:block;">
+                <span>@(metas[0][key].Caption):</span><textarea rows="3" cols="3" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" ></textarea>
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("Int"))
+                {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span>
+                <select name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" >
+                    @foreach (string dkey in metas[0][key].DataList.Keys)
+                    { 
+                        <option key="@(dkey)">@(metas[0][key].DataList[dkey])</option>
+                    }
+                </select>
+            </div>
+                }
+            }
+        }
+    </div>
+    @if (metas.Count > 1)
+    { 
+        <div id="detaillist">
+            @Html.Partial("DetailList", ctrl)
+        </div> 
+    }
+    </form>
+}
+@section Script{
+    <style type="text/css">
+        .param_items
+        {
+            display: inline-block;
+            width: 280px;
+            line-height: 30px;
+            text-align: right;
+            margin: 2px;
+        }
+        
+        .param_items input, .param_items textarea
+        {
+            border: 1px solid skyblue;
+            margin-left: 5px;
+        }
+    </style>
+    <script type="text/javascript">
+    var moduleConfig=@Html.Raw(moduleConfig);
+    var topsRender = null;
+    var detailTab = null;
+    $(function () {
+        $(",#saveBt").show();
+    });
+
+    
+    //获取添加或修改所需要的数组
+    function f_getData(){
+        var obj = new Object();
+        $("#paramForm").find(".param_items").each(function(index,value){
+             if($(value).find("input").length > 0 ){
+                obj[$(value).find("input").attr("name")] = $(value).find("input").val();
+             }else if($(value).find("textarea").length > 0 ){
+                obj[$(value).find("textarea").attr("name")] = $(value).find("textarea").val(); 
+             }else if($(value).find("select").length > 0 ){
+                obj[$(value).find("select").attr("name")] = $(value).find("option:selected").attr("key"); 
+             }
+        })
+        obj.Sel_Id = $("[name=Sel_Id]").val()
+        return obj;
+    }
+
+    //加载数据
+    function f_setData(data){
+        for(var d in data){
+            if($("[name="+d+"]").attr("type") == "text" || $("[name="+d+"]").attr("type") == "datetime"  || $("[name="+d+"]").attr("type") == "textarea"){ 
+               $("[name="+d+"]").val(data[d]);
+            }else{  
+               $("[name="+d+"]").find("option[key="+data[d]+"]").attr("selected","selected");  
+            }
+        }
+    }
+    
+    //是否是数字
+    function checkNum() {
+        //检查是否是非数字值
+        if (isNaN(this.value)) {
+            this.value = "";
+        } 
+    };
+
+    </script>
+    @if (ctrl == "add")
+    {
+        <script type="text/javascript">
+
+            $(function () {
+                $("#saveBt").show();
+                //渲染插件
+                topsRender = $("#paramForm *[fieldType]").pluginRender({ moduleConfig: moduleConfig });
+
+                //数字验证
+                $("[name=s_Shopfloor_Phone]").keyup(checkNum);
+
+                //添加保存
+                $("#saveBt").click(function () {
+                    $("#module_toolbar input").attr("disabled", "disabled");
+                    $("#loading_img").show();
+                    //var data = topsRender.serializeData(); 
+                    var data = f_getData();
+
+                    $.topsAjax({
+                        type: "POST",
+                        url: "/AjaxPost/AddShopfloor",
+                        data: data,
+                        dealError: false,
+                        success: function (data) {
+                            if (data.IsSuccess) {
+                                alert("保存成功！");
+                                //添加成功后刷新列表并关闭标签
+                                window.parent.f_flushGrid();
+                                window.parent.f_closeTab("Add");
+                            } else {
+                                if (data.Other1 != null)
+                                    topsRender.setError(data.Other1);
+                                alert("保存失败：" + data.Msgs[0]);
+                            }
+                            $("#module_toolbar input").removeAttr("disabled");
+                            $("#loading_img").hide();
+                        }
+                    });
+                });
+            });
+        </script>
+    }
+    else if (ctrl == "edit")
+    {
+        <script type="text/javascript">
+    var idData =@Html.Raw(Server.UrlDecode(id))
+    $(function () {
+        $("#saveBt").show();
+        //加载数据
+        $.topsAjax({
+            type: "GET",
+            url: "/AjaxGet/SelShopfloor",
+            data: idData,
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    //渲染插件
+                    topsRender = $("#paramForm *[fieldType]").pluginRender({ data: data.Data,moduleConfig: moduleConfig });
+               
+                    //数字验证
+                    $("[name=s_Shopfloor_Phone]").keyup(checkNum);
+
+                    if(data.Data[0].length>0){
+                       f_setData(data.Data[0][0]);
+                    }
+                } else {
+                    alert("获取数据失败：" + data.Msgs[0]);
+                }
+            }
+        });
+    
+        //保存修改
+        $("#saveBt").click(function () {
+            $("#module_toolbar input").attr("disabled", "disabled");
+            $("#loading_img").show();
+            //var data = topsRender.serializeData();
+            var data = f_getData();
+
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/UpdateShopfloor",
+                data: data,
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存修改成功！");
+                        //刷新列表
+                        window.parent.f_flushGrid();
+                        window.parent.f_closeTab("Modify");
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("保存修改失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        });
+  
+    });
+     
+        </script>   
+    }
+    <script type="text/javascript">
+        $(function () {
+            detailTab = $("#detaillist").ligerTab({
+                onAfterSelectTabItem: function (tabID) {
+                    var $g = $("div[tabid=" + tabID + "] div[fieldtype=grid]", $(this.element));
+                    if ($g.length == 0) return;
+                    var gIndex = $g.attr("objindex");
+                    topsRender.find("grid" + gIndex).obj.grid.setWidth();
+                }
+            });
+        });
+    </script>
+}

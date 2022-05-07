@@ -1,0 +1,287 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "仓库信息";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelWarehouseList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    foreach (string key in metas[0].Keys)
+    {
+        metas[0][key].Type = "String";
+    }
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz); 
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+    <div id="hiddenlist">
+    </div>
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+            string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+            var fieldName = biz.Fields[i].FieldName;
+            var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+            <div class="param_item">
+                @if (lookupField != null && lookupField.ToList().Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                    <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                    </script>
+                }
+                else if (biz.Fields[i].DataList.Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <select name="@(fieldName)" fieldType="select" >
+                        @foreach (var item in biz.Fields[i].DataList)
+                        {
+                            <option value="@(item.Key)">@(item.Value)</option>
+                        }
+                    </select>
+                }
+                else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                }
+                else
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                }
+            </div>
+        }
+        <div style="clear: both;">
+        </div>
+    </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+
+//    FIFO系统储位数据
+//--A 保险杠库区 62 17 07
+//--B 门槛条库区 23 17 14
+//--C 油漆仓库库区 08 01 34
+//--D 保险杠 08 28 03
+//--E 外购件库区 14 11 05
+//--F 原料库区 06 03 34
+//--G 新仓库库区 11 09 01
+//--H F3X保险杠库区 02 01 14
+//--k 门槛条底漆
+//--Z 小件车间 01 01 01
+
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#addBt,#searchBt,#delBt,#addMoreBt,#checkBt,#addSubtaskBt").show();
+        
+        $("#addBt").attr("value","添加仓库信息");
+        $("#addMoreBt").attr("value","添加货架信息");
+        $("#delBt").attr("value","停用仓库信息");
+        $("#checkBt").attr("value","修改仓库信息");
+        $("#addSubtaskBt").attr("value","仓库储位锁定");
+
+        //复制
+        var unlock = $("#addSubtaskBt").clone();
+        $(unlock).attr("value","仓库储位解锁");  
+
+        var $toolbar = $("#module_toolbar").clone(true); 
+
+        //储位停用 
+        var del_space = $("#addSubtaskBt").clone();
+        $(del_space).attr("value","仓库储位停用").attr("id","del_space"); 
+
+        
+        //储位货物可用状态判定 
+        var del_goods = $("#addSubtaskBt").clone();
+        $(del_goods).attr("value","储位货物可用状态判定").attr("id","del_goods"); 
+
+         
+        $("#module_toolbar").empty().append($toolbar.find("#searchBt"))
+        .append($toolbar.find("#addBt"))
+        .append($toolbar.find("#checkBt"))
+        .append($toolbar.find("#delBt"))
+        .append($toolbar.find("#addMoreBt"))
+        .append($toolbar.find("#addSubtaskBt"))
+        .append($(unlock))
+        //.append($(del_space))
+        .append($(del_goods));
+
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+         
+
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelWarehouseList',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:true,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                
+                var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return; 
+
+                f_addTab("Modify", "货架信息[" + rowdata["s_Warehouse_Name"] + "]", "/Rack/Index?"+"&WarehouseId="+ rowdata[idKey] +"&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            $('select[name=rp]').val($(".l-bar-group,.l-bar-selectpagesize").find("option:selected").val());
+            grid.options.parms = $("form#paramForm").serializeArray();
+            $('select[name=rp]').change();
+        });
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "/Warehouse/Modify?"+"ctrl=add&" + Math.random());
+        }); 
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        })
+
+        //停用事件
+        $("#delBt").click(function(){
+            var rows = grid.getSelectedRows();
+           
+            if(!confirm("请确认是否真的需要删除!")){
+               return;
+            }
+
+            if(rows.length == 0){
+               return;
+            }
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/DelWarehouse",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("停用成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+        
+        //修改事件
+        $("#checkBt").click(function(){
+        
+            var rows = grid.getSelectedRows();
+            
+            if(rows.length == 0){
+               return;
+            }
+            
+            var idKey='@(biz.Sqls[0].Key)';
+            if($.trim(idKey)=='')return;
+            var idData=new Object();
+            idData[idKey]=rows[0][idKey];
+
+            f_addTab(rows[0][idKey], "维护[" + rows[0]["s_Warehouse_Name"] + "]", "/Warehouse/Modify?"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&Sel_Id="+ rows[0][idKey] +"&" + Math.random());
+        })
+
+        //添加货架信息事件
+        $("#addMoreBt").click(function(){
+            
+            f_addTab("AddRack", "添加货架信息", "/Rack/Modify?"+"ctrl=add" +"&" + Math.random());
+        })
+
+        //仓库锁定事件
+        $("#addSubtaskBt").click(function(){
+            
+            var rows = grid.getSelectedRows();
+            
+            if(rows.length == 0){
+               return;
+            }
+
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/UpdateWarehouseLocationLock",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("锁定成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+
+        //仓库解锁事件
+        $(unlock).click(function(){
+            var rows = grid.getSelectedRows();
+            
+            if(rows.length == 0){
+               return;
+            }
+
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/UpdateWarehouseLocationUnLock",
+                data:{Dictionarys:rows},
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("锁定成功");
+                       $("#searchBt").click();
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+
+        //仓库储位停用
+        $("#del_space").click(function(){
+            var rows = grid.getSelectedRows();
+            
+            if(rows.length == 0){
+               return;
+            }
+
+            f_addTab(rows[0]["n_Warehouse_Id"], "仓库储位停用[" + rows[0]["s_Warehouse_Name"] + "]", "/Warehouse/DelSpace?n_Warehouse_Id=" + rows[0]["n_Warehouse_Id"] +"&s_Warehouse_Name="+ rows[0]["s_Warehouse_Name"] +"&" + Math.random());
+        })
+
+        //储位货物可用状态
+        $("#del_goods").click(function(){
+            var rows = grid.getSelectedRows();
+            
+            if(rows.length == 0){
+               return;
+            }
+
+            f_addTab(rows[0]["s_Warehouse_Name"], rows[0]["s_Warehouse_Name"] + "_可用状态判定", "/Warehouse/AvailableStatus?n_Warehouse_Id="+ rows[0]["n_Warehouse_Id"]+"&s_Warehouse_Name=" + rows[0]["s_Warehouse_Name"]);
+        })
+
+        $("#searchBt").click();
+    });
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+    </script>
+}
+<div id="datagrid">
+</div>

@@ -1,0 +1,78 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_Layout.cshtml";
+    ViewBag.Title = "系统登录";
+    var backUrl = Request.QueryString["backUrl"] + "";
+    backUrl = string.IsNullOrEmpty(backUrl) ? "" : Server.UrlDecode(backUrl);
+}
+    <style type="text/css">
+    *
+    {
+    color: #1A52A6;font-size: 50px;}
+    .title
+    { padding:10px;
+        background-color:blueviolet;color:white; font-size:50px;
+    }
+    .title a
+    { color:white;
+    }
+    .title a:visited
+    { color:white;
+    }
+    #section,#header
+    { margin:10px; padding:10px;font-size:50px;
+    }
+
+</style>
+</style>
+    <header>
+        <h2>安卓用户登录</h2>
+
+    </header>
+    <section style="margin: 10px;">
+        <article>
+            <p>用户：<input class="login_input" tabindex="1" id="UserNO" /></p>
+            <p>密码：<input class="login_input" tabindex="2" type="password" id="Password" /></p>
+            <p>
+                <input  type="button" id="subBt" value="登录" /></p>
+            <p>
+                <img height="50px" id="loading" src="/TopsLib"/TopsLib/Content/loading_min.gif" style="display: none" /><label id="error" style="color: Red">
+                </label>
+            </p>
+        </article>
+    </section>
+    <script type="text/javascript">
+        var backUrl = '@(new MvcHtmlString(backUrl))';
+        
+        $(function () {
+            $("#UserNO").select();
+            $("body").keydown(function (e) {
+                if (e.keyCode == 13) {
+                    $("#subBt").click();
+                }
+            });
+            $("#subBt").click(function () {
+                var $bt = $(this);
+                $("#error").text('');
+                $("#loading").show();
+                $bt.attr("disabled", "disabled")
+                $.topsAjax({
+                    type: "POST",
+                    url: "/Account/Login",
+                    data: { UserNO: $("#UserNO").val(), Password: $("#Password").val() },
+                    dealError: false,
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            window.location.href = backUrl == '' ? ("/m/Products?" + Math.random()) : backUrl;
+                        } else {
+                            $("#error").text(data.Msgs[0]);
+                            $("#loading").hide();
+                            $bt.removeAttr("disabled");
+                        }
+
+                    }
+                });
+            });
+
+        });
+</script>
+

@@ -1,0 +1,504 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+
+    string n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+
+    string n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"];
+
+    //在储位信息表ID
+    string n_ReportInventoryCurrent_Id = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("n_ReportInventoryCurrent_Id"))
+    {
+        n_ReportInventoryCurrent_Id = Request.QueryString["n_ReportInventoryCurrent_Id"];
+    }
+
+    //储位二维码
+    string s_ReportInventoryCurrent_Code = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("s_ReportInventoryCurrent_Code"))
+    {
+        s_ReportInventoryCurrent_Code = Request.QueryString["s_ReportInventoryCurrent_Code"];
+    }
+
+    //当前日期
+    string datetime = DateTime.Now.ToString("yyyy-MM-dd");
+
+
+    string isShowDetail = Request.QueryString["isShowDetail"];
+}
+@section Body{
+    <div class="body"> 
+        <div v-bind:style="{ display:isShowDetail ? 'none':'' }">
+            <input type="text" v-bind:class="spaceClass_Showed" placeholder="可输入储位二维码进行筛选" v-on:keyup.enter="f_SelInventoryNewReportInventoryCurrent" />
+        </div>
+        <div v-bind:class="titleTab_Showed">
+            <table>
+                <tr>
+                    <th>
+                        储位码/<br />
+                        产品编码/<br />
+                        器具码
+                    </th>
+                    <th>
+                        产品名称
+                    </th>
+                    <th>
+                        批次号/<br />
+                        库存数量
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="infoTab_Showed" v-bind:style="{ display:isShowDetail ? 'none':'' }">
+            <table>
+                <tr v-for="(item,i) in DataList" :style="{ 'display':item.isShow ? '':'none' }" :index="i" :n_ReportInventoryCurrent_Id="item.n_ReportInventoryCurrent_Id" :class="{ 'morechecked':item.isCheck }" v-on:click="f_checkInventoryOperationRecord">
+                    <td>
+                        {{ item.s_ReportInventoryCurrent_Code }} / <br />
+                        {{ item.s_ReportInventoryCurrent_GoodsProductCode }}/ <br />
+                        {{ item.s_Bin_Code }}
+                    </td>
+                    <td>
+                        {{ item.s_ReportInventoryCurrent_GoodsProductName }}
+                    </td>
+                    <td>
+                        {{ item.s_ReportInventoryCurrent_BatchNumber }} / <br />
+                        {{ item.n_ReportInventoryCurrent_Number }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div class="infoTab_checked" v-bind:style="{ display:isShowDetail ? '':'none' }">
+            <table>
+                <tr v-for="(item,i) in CheckDataList" :index="i" :n_ReportInventoryCurrent_Id="item.n_ReportInventoryCurrent_Id" :class="{ 'morechecked':item.isCheck }" v-on:click="f_checkedInventoryOperationRecord">
+                    <td>
+                        {{ item.s_ReportInventoryCurrent_Code }} / <br />
+                        {{ item.s_ReportInventoryCurrent_GoodsProductCode }}/ <br />
+                        {{ item.s_Bin_Code }}
+                    </td>
+                    <td>
+                        {{ item.s_ReportInventoryCurrent_GoodsProductName }}
+                    </td>
+                    <td>
+                        {{ item.s_ReportInventoryCurrent_BatchNumber }} / <br />
+                        {{ item.n_ReportInventoryCurrent_Number }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <div v-bind:class="button_Div_Showed">
+                <div v-on:click="f_doingInventoryOperation" v-bind:style="{ display:isShowDetail ? 'none':'' }">进行盘空</div>
+                <div v-on:click="f_checkInventoryOperation" v-bind:style="{ display:isShowDetail ? 'none':'' }">查看已选盘空记录</div>
+                <div v-on:click="f_delcheckInventoryOperation" v-bind:style="{ display:isShowDetail ? '':'none' }">删除</div>
+                <div v-on:click="f_saveInventoryOperation" v-bind:style="{ display:isShowDetail ? 'none':'' }">保存</div>
+            </div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .dateClass {
+            line-height: 25px;
+            width: calc(90%);
+            margin: calc(1.5%) calc(5%);
+            border: 1px solid lightblue;
+        }
+
+        .spaceClass {
+            line-height: 25px;
+            width: calc(90%);
+            margin: calc(1.5%) calc(5%);
+            border: 1px solid lightblue;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .titleTab {
+            width: calc(90%);
+            line-height: 25px;
+            margin: calc(1.5%) calc(5%) calc(0%) calc(5%);
+        }
+
+            .titleTab table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .titleTab th {
+                width: 33%;
+                font-family: 微软雅黑;
+                border: 1px solid #a5e0a5;
+                font-weight: normal;
+                background: rgb(200 220 232);
+                font-size: 12px;
+            }
+
+        .infoTab {
+            width: calc(90%);
+            line-height: 25px;
+            margin: calc(0%) calc(5%) calc(1.5%) calc(5%);
+            height: 145px;
+            overflow-y: scroll;
+        }
+
+            .infoTab table {
+                width: 100%;
+                border-collapse: collapse;
+            }
+
+            .infoTab td {
+                width: 33%;
+                font-family: 微软雅黑;
+                border: 1px solid #a5e0a5;
+                font-weight: normal;
+                font-size: 12px;
+                text-align: center;
+            }
+
+        .infoTab_checked {
+            width: calc(90%);
+            line-height: 25px;
+            margin: calc(0%) calc(5%) calc(1.5%) calc(5%);
+            height: 145px;
+            overflow-y: scroll; 
+        }
+
+        .infoTab_checked table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .infoTab_checked td {
+            width: 33%;
+            font-family: 微软雅黑;
+            border: 1px solid #a5e0a5;
+            font-weight: normal;
+            font-size: 12px;
+            text-align: center;
+        }
+
+
+        .button_Div div {
+            width: calc(90%);
+            margin: calc(1.5%) calc(0%) calc(2%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+
+        .morechecked {
+            background: #a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Post对象
+        var ajaxobjFirst = null;
+
+        //ajax Get对象
+        var ajaxobjSecond = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    dateClass_Showed: "dateClass", //时间选择框样式
+                    spaceClass_Showed: "spaceClass", //储位输入框样式
+                    titleTab_Showed: "titleTab", //标题表格样式
+                    infoTab_Showed: "infoTab",  //结果表格样式
+                    button_Div_Showed: "button_Div", //按钮样式
+                    DataList: [],
+                    CheckDataList:[], //已选择的盘点记录行
+                    isShowDetail:@(isShowDetail) //控制显示切换主页与明细页的变量 true显示明细页,false显示主页
+                },
+                methods: {
+                    //加载在库的库位详细信息
+                    f_SelInventoryNewReportInventoryCurrent: function () {
+                        //对象名 查询在库的库位详细信息
+                        var objectName = "SelInventoryGoodsInfo_Inventory";
+                        //传递参数
+                        var param = {
+                            s_ReportInventoryCurrent_Code: $(".spaceClass").val(),
+                            n_BillStockInOut_Id: "@(n_BillStockInOut_Id)"
+                        }
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            vue.DataList = [];
+                            if (result.Data[0].length > 0) {
+                                result.Data[0].forEach(function (value, index) {
+                                    vue.DataList.push({
+                                        n_ReportInventoryCurrent_Id: value.n_ReportInventoryCurrent_Id,
+                                        s_ReportInventoryCurrent_Code: value.s_ReportInventoryCurrent_Code,
+                                        s_ReportInventoryCurrent_GoodsProductCode: value.s_ReportInventoryCurrent_GoodsProductCode,
+                                        s_ReportInventoryCurrent_GoodsProductName: value.s_ReportInventoryCurrent_GoodsProductName,
+                                        s_Bin_Code: value.s_Bin_Code,
+                                        s_ReportInventoryCurrent_BatchNumber: value.s_ReportInventoryCurrent_BatchNumber,
+                                        n_ReportInventoryCurrent_Number: value.n_ReportInventoryCurrent_Number,
+                                        isCheck: false,
+                                        isShow: true
+
+                                    })
+                                })
+
+                                vue.f_GetCheckDataListBylocalStorage("Sel");
+                            }
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+
+                        //重新聚焦
+                        $(".spaceClass").val("").focus();
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("盘点操作");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件
+                            window.parent.f_loadEvent(!vue.isShowDetail ?
+        "../../../../InventoryOperation/Index?ParentIds=" + "@ParentIds" :
+        "AddBillStockInOutDetailInventory?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)" +"&isShowDetail=false"
+);
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                            var url = !vue.isShowDetail ?
+        "../../../../InventoryOperation/Index?ParentIds=" + "@ParentIds" :
+        "AddBillStockInOutDetailInventory?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)" +"&isShowDetail=false"
+
+                                 location.href = url;
+                            })
+                        }
+
+                        //加载在库的库位详细信息
+                        vue.f_SelInventoryNewReportInventoryCurrent();
+                    },
+                    //选择需异动盘空的记录行
+                    f_checkInventoryOperationRecord: function () {
+                        var index = $(event.target).parent().attr("index");
+
+                        vue.DataList[index].isCheck = (vue.DataList[index].isCheck ? false:true);
+                    },
+                    //选择已选择盘空的记录行
+                    f_checkedInventoryOperationRecord: function () {
+                        var index = $(event.target).parent().attr("index");
+
+                        vue.CheckDataList[index].isCheck = (vue.CheckDataList[index].isCheck ? false:true);
+                    },
+                    //获取浏览器缓存存储已经选择的盘空数据 Ope Add 为选择数据进行添加 Sel 为主页面数据做筛选
+                    f_GetCheckDataListBylocalStorage:function(Ope){
+
+                        //获取浏览器缓存存储已经选择的盘空数据的ID
+                        var InventoryOperation_CheckDataList_Id = localStorage.getItem("InventoryOperation_CheckDataList_Id") == undefined ?
+        "":localStorage.getItem("InventoryOperation_CheckDataList_Id");
+                        if(InventoryOperation_CheckDataList_Id.indexOf(",")!= -1){
+                            var arr = InventoryOperation_CheckDataList_Id.split(",");
+                            vue.DataList.forEach(function(value,index){
+                                arr.forEach(function(v,i){
+                                    if(value.n_ReportInventoryCurrent_Id == v){
+                                        if(Ope == "Add"){
+                                           vue.CheckDataList.push(value);
+                                        }
+                                        value.isShow = false;
+                                    }
+                                })
+                            })
+                        }
+                    }, 
+                    //进行盘空操作
+                    f_doingInventoryOperation: function () {
+                        if (vue.DataList.length == 0) {
+                            return;
+                        }
+
+                        var check_arr = vue.DataList.filter(function (item) {
+                            return item.isCheck;
+                        })
+
+                        if (vue.DataList.length >= 1 && check_arr.length == 0) {
+                            f_commonShowMsg("请选择进行盘空的记录!");
+                            return;
+                        }
+
+                        //获取当前储位中还是否存在货物，如不存在默认带出该库区全部在储位信息
+                        var uncheck_arr = vue.DataList.filter(function (item) {
+                            return !item.isCheck;
+                        })
+
+                        vue.DataList.forEach(function (v, i) {
+                            if(v.isCheck){
+                               v.isShow = false;
+                               v.isCheck = false;
+                            }
+                        })
+
+                        var CheckDataList_Id = localStorage.getItem("InventoryOperation_CheckDataList_Id") == undefined ?
+        "":localStorage.getItem("InventoryOperation_CheckDataList_Id");
+
+                        check_arr.forEach(function(value,index){
+                            if(CheckDataList_Id.indexOf(value.n_ReportInventoryCurrent_Id) == -1)
+                               CheckDataList_Id += value.n_ReportInventoryCurrent_Id+",";
+                        })
+
+                        localStorage.setItem("InventoryOperation_CheckDataList_Id",CheckDataList_Id);
+
+                        f_commonShowMsg("成功加入盘空列表,如完成请点击【保存】!");
+
+                        //获取当前储位中还是否存在货物，如不存在默认带出该库区全部在储位信息
+                        if(uncheck_arr.length == 0){
+                            //重新初始化
+                            $(".spaceClass").val("");
+                            vue.DataList = new Array();
+                            vue.f_SelInventoryNewReportInventoryCurrent();
+                        }
+
+                    },
+                    //查看盘点操作记录
+                    f_checkInventoryOperation:function(){
+                        vue.isShowDetail = true;
+
+                        vue.f_GetCheckDataListBylocalStorage("Add");
+
+                        //重新加载返回事件
+                        window.parent.f_loadEvent(!vue.isShowDetail ?
+        "../../../../InventoryOperation/Index?ParentIds=" + "@ParentIds" :
+        "AddBillStockInOutDetailInventory?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)" +"&isShowDetail=false"
+);
+                    },
+                    //删除已选中盘点的记录
+                    f_delcheckInventoryOperation:function(){
+                        if (vue.CheckDataList.length == 0) {
+                            return;
+                        }
+
+                        var check_arr = vue.CheckDataList.filter(function (item) {
+                            return item.isCheck;
+                        })
+
+                        if (vue.CheckDataList.length >= 1 && check_arr.length == 0) {
+                            f_commonShowMsg("请选择进行删除的盘空记录!");
+                            return;
+                        }
+
+                        if(!confirm("确定是否删除选择的盘空记录?")){
+                           return;
+                        }
+                        var temp = new Array();
+                        vue.CheckDataList.forEach(function (v, i) {
+                            if(!v.isCheck){
+                               temp.push(v);
+                            }
+                        })
+                        vue.CheckDataList = temp;
+
+                        //重新展示在主页中
+                        vue.DataList.forEach(function (value, index) {
+                            check_arr.forEach(function(v,i){
+                                if(v.isCheck){
+                                   value.isShow = false;
+                                   value.isCheck = false;
+                                }
+                            })
+                        })
+
+
+                        var CheckDataList_Id = "";
+                        vue.CheckDataList.forEach(function(value,index){
+                            CheckDataList_Id += value.n_ReportInventoryCurrent_Id+",";
+                        })
+                        localStorage.setItem("InventoryOperation_CheckDataList_Id",CheckDataList_Id);
+
+                        f_commonShowMsg("删除成功!")
+                    },
+                    //保存选择的盘空记录
+                    f_saveInventoryOperation:function(){
+
+                        if(!confirm("确定是否保存选择的盘空记录?")){
+                           return;
+                        }
+
+                        var obj = event.target;
+                        if ($(obj).is("[disabled]")) {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjFirst != null) {
+                            ajaxobjFirst.abort();
+                            ajaxobjFirst = null;
+                            return;
+                        }
+
+                        //初始化选择的盘空记录，重新获取
+                        vue.CheckDataList = new Array();
+                        vue.f_GetCheckDataListBylocalStorage("Add");
+
+                        if (vue.CheckDataList.length == 0) {
+                            f_commonShowMsg("请先把需盘空的记录进行盘空操作!");
+                            return;
+                        }
+
+                        var arr = new Array();
+                        vue.CheckDataList.forEach(function(value,index){
+                            var obj = new Object();
+                            obj.BarCode = value.s_ReportInventoryCurrent_GoodsProductCode + value.s_ReportInventoryCurrent_BatchNumber + "0001";
+                            obj.GoodsProductCode = value.s_ReportInventoryCurrent_GoodsProductCode;
+                            obj.BinBarCode = value.s_Bin_Code;
+                            obj.n_ReportInventoryCurrent_Id = value.n_ReportInventoryCurrent_Id;
+                            obj.SpaceBarCode = value.s_ReportInventoryCurrent_Code;
+                            obj.n_BillStockInOut_Id = "@(n_BillStockInOut_Id)";
+                            obj.s_ReportInventoryCurrent_GoodsProductCode = value.s_ReportInventoryCurrent_GoodsProductCode;
+                            obj.GoodsProductName = value.s_ReportInventoryCurrent_GoodsProductName;
+                            obj.QualityStatus = "1";
+                            obj.SureAmount = 0
+                            obj.n_ReportInventoryCurrentDetail_Id = "";
+                            arr.push(obj);
+
+                        })
+
+                        //新增异动盘空信息记录
+                        var param = { Dictionary: arr };
+                        var objectName = "InsertRecordInventoryMoveDifferenceCount_Inventory";
+
+                        ajaxobjFirst = ajaxhelper.ajax_Post(objectName, param, function (result) {
+                            f_commonShowMsg("保存成功!");
+                            //重新初始化
+                            vue.f_SelInventoryNewReportInventoryCurrent();
+                            localStorage.setItem("InventoryOperation_CheckDataList_Id","");
+
+                            $(obj).removeAttr("disabled");
+                            ajaxobjFirst = null;
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjFirst = null;
+
+                            $(obj).removeAttr("disabled");
+
+                        })
+                    }
+                }
+            })
+
+            vue.f_reloadPage();
+        })
+
+    </script>
+}

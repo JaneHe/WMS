@@ -1,0 +1,238 @@
+﻿@using Tops.FRM;
+@{
+    //版本：1.2
+    ViewBag.Title = "员工基础信息管理";
+    ViewBag.ModuleName = "详细资料";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    string QueryName = "SelStaffInfoTow";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    metas[0]["UserName"].Caption = "员工名称";
+    metas[0]["BanCi"].Caption = "班次";
+    metas[0]["Sex"].Caption = "性别";
+    metas[0]["DepartmentName"].Caption = "部门";
+    metas[0]["EntryDate"].Caption = "入厂日期";
+    metas[0]["RegularDate"].Caption = "转正日期";
+    metas[0]["DimissionDate"].Caption = "离职日期";
+    metas[0]["Remarks"].Caption = "备注";
+    metas[0]["ContactWay"].Caption = "联系方式";
+    metas[0]["Birthday"].Caption = "生日";
+    metas[0]["Address"].Caption = "家庭住址";
+    metas[0]["WorkingProcedure"].Caption = "工序";
+    metas[0]["JobNumber"].Caption = "工号";
+    metas[0]["Address"].Width = 400;
+    metas[0]["Remarks"].Width = 130;
+    string ctrl = Request.QueryString["ctrl"];
+    string JobNumber = Request.QueryString["JobNumber"];
+    ctrl = string.IsNullOrEmpty(ctrl) ? "edit" : ctrl;
+    //公开两台配置参数给分部视图
+    ViewBag.Biz = biz;
+    ViewBag.Metas = metas;
+    var moduleConfig=ModuleConfig.GetModuleConfig(metas, biz.Lookups,biz,ctrl);
+
+}
+
+@section Params{
+    <form id="paramForm">
+        <div class="item_title">详细资料：</div>
+        <div id="paramlist" style="width: 600px;">
+            @Html.Partial("ObjParamList",ctrl)
+        </div>
+        @if(metas.Count>1)
+        {
+        <div id="detaillist">
+            @Html.Partial("DetailList",ctrl)
+        </div> 
+        }
+    </form>
+    
+}
+@section Script{
+<script src="../../Scripts/jquery.hz2py-min.js"></script>
+<script type="text/javascript">
+    var moduleConfig=@Html.Raw(moduleConfig);
+    var topsRender = null;
+    var detailTab = null;
+    
+    $(function () {
+        $(",#saveBt").show();
+    });
+</script>
+@if(ctrl=="add")
+{
+<script type="text/javascript">
+    $(function () {
+        $("#saveBt").show();
+        //渲染插件
+        topsRender = $("#paramForm *[fieldType]").pluginRender({ moduleConfig: moduleConfig });
+        $('input[name=UserName]').blur(function () {
+            var str = ($(this).toPinyin() + "").toLocaleLowerCase();
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGet/SelRealUserNO",
+                data: { UserNO: str },
+                success: function (data) {
+                    data = JSON.parse(data);
+                    if (data.IsSuccess) {
+                        $('input[name=UserNO]').val(data.Data[0][0].UserNO);
+                    
+                    }
+                }
+            }) 
+        })
+        $("input[name=WorkingProcedure]").blur(function () {
+            var str = ($(this).toPinyin() + "").toLocaleLowerCase();
+            $('input[name=tProgramName]').val(str);
+        })
+        $('.param_item').eq(0).hide();
+        $('.param_item').eq(2).hide();
+        $('.param_item').eq(3).hide();
+        $('.param_item').eq(17).hide();
+        //添加保存
+        $("#saveBt").click(function () {
+
+            $("#module_toolbar input").attr("disabled", "disabled");
+            $("#loading_img").show();
+
+            //加密密码
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("PasswordEncrypt", "StaffManage")',
+                data: "UserNO=" + $('input[name=UserNO]').val(),
+                dealError: false,
+                async: false,
+                success: function (data) {
+                    $('input[name=Password]').val(data);
+                }
+            });
+
+            var data = topsRender.serializeData();
+
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/AddStaff",
+                data: data,
+                dealError: false,
+                async: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功！");
+                        //添加成功后刷新列表并关闭标签
+                        window.parent.f_flushGrid();
+                        window.parent.f_closeTab("Add");
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("保存失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        });
+    });
+</script>
+}else if(ctrl=="edit")
+{
+<script type="text/javascript">
+    $(function () {
+        $("#saveBt").show();
+        var idData ={ "JobNumber":"@Html.Raw(Server.UrlDecode(JobNumber))",'UserName':''};
+        //加载数据
+        $.topsAjax({
+            type: "GET",
+            url: "/AjaxGet/SelStaffInfoTow",
+            data:idData,
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    //渲染插件
+                    topsRender = $("#paramForm *[fieldType]").pluginRender({ data: data.Data,moduleConfig: moduleConfig });
+
+                } else {
+                    alert("获取数据失败：" + data.Msgs[0]);
+                }
+            }
+        });
+        
+        $('input[name=UserName]').blur(function () {
+            var str = ($(this).toPinyin()+"").toLocaleLowerCase();
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGet/SelRealUserNO",
+                data: { UserNO: str },
+                success: function (data) {
+                    data = JSON.parse(data);
+                    if (data.IsSuccess) {
+                        $('input[name=UserNO]').val(data.Data[0][0].UserNO);
+
+                    }
+                }
+            }) 
+        })
+        $('.param_item').eq(0).hide();
+        $('.param_item').eq(3).hide();
+        $('.param_item').eq(17).hide();
+  
+        //保存修改
+        $("#saveBt").click(function () {
+            var str = ($("input[name=WorkingProcedure]").toPinyin()+"").toLocaleLowerCase();
+            $('input[name=tProgramName]').val(str);
+            $("#module_toolbar input").attr("disabled", "disabled");
+            $("#loading_img").show();
+            $('input[name=RegularDate]').val($('input[name=RegularDate]').val() == '' ? null : $('input[name=RegularDate]').val());
+            
+            //加密密码
+            $.ajax({
+                type: "POST",
+                url: '@Url.Action("PasswordEncrypt", "StaffManage")',
+                data: "UserNO=" + $('input[name=UserNO]').val(),
+                dealError: false,
+                async: false,
+                success: function (data) {
+                    $('input[name=Password]').val(data);
+                }
+            });
+            
+            var data = topsRender.serializeData();
+            
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/UpdateStaffInfo",
+                data: data,
+                dealError: false,
+                async: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存修改成功！");
+                        //刷新列表
+                        window.parent.f_flushGrid();
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("保存修改失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        });
+        
+    });
+</script>   
+}
+<script type="text/javascript">
+    $(function () {
+        detailTab=$("#detaillist").ligerTab({
+            onAfterSelectTabItem:function(tabID){
+                var $g=$("div[tabid="+tabID+"] div[fieldtype=grid]",$(this.element));
+                if($g.length==0)return;
+                var gIndex=$g.attr("objindex");
+                topsRender.find("grid"+gIndex).obj.grid.setWidth();
+            }
+        });
+    });
+</script>
+}
+
+

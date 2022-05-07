@@ -1,0 +1,194 @@
+﻿@{
+    Layout = null;
+    string UserNO = Tops.FRM.TopsUser.UserNO;
+    string UserName = Tops.FRM.TopsUser.UserName;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>主菜单</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="full-screen" content="yes">
+    <script src="../../Scripts/jquery-1.4.4.js" type="text/javascript"></script>
+    <script src="../../Scripts/Mask.js" type="text/javascript"></script>
+    <script src="../../Scripts/Translate.js" type="text/javascript"></script>
+    <style type="text/css">
+        body
+        {
+            margin: 0px;
+        }
+        .top
+        {
+            width: 100%;
+            background-color: rgb(6, 137, 213);
+            color: White;
+            font-family: 微软雅黑;
+            text-align: center;
+            font-weight: bold;
+            line-height: 53px;
+            font-size: 25px;
+            width: calc(100%);
+        }
+        .container
+        {
+            width: calc(100%);
+        }
+        .content
+        {
+            position: absolute;
+            top: calc(10%);
+            width: 100%; 
+        }
+        .option
+        {
+            width: calc(60%);
+            margin: 15px auto;
+            line-height: 52px;
+            border: 1px solid gray;
+            box-shadow: 0 0 5px 1px gray;
+            background-color: #B5C7E7;
+            cursor: pointer;
+            font-family: 微软雅黑;
+            font-weight: bold;
+            text-align: center;
+            font-size: 20px;
+        }
+        
+       @* .top a:nth-child(even)
+        {
+            float: right;
+            margin-right: 10px;
+            color: white;
+            text-decoration: inherit;
+            position: absolute;
+            right: 0px;
+        }*@
+        .left
+        {
+            float: left;
+            color: white;
+            text-decoration: inherit;
+        }
+        .right
+        {
+            float: right;
+            color: white;
+            text-decoration: inherit;
+        }
+    </style>
+    <script>
+        //$.Translate({ moduleText: "现场跟单", language: "es" });
+
+        $(function () {
+            //选项点击事件
+            $(".option").click(function () {
+                var url = "";
+                switch ($(this).text().trim()) {
+                    case "机台跟单（操作员）":
+                        url = "../Terminal/tiaoma";
+                        break;
+                    case "工作站跟单(周转员)":
+                        url = "../Storage/StorageOP";
+                        break;
+                    case "机台维修":
+                        url = "../DeviceRepair/DeviceRepair";
+                        break;
+                    case "工单入出库":
+                        url = "../OrderInStorage/Index";
+                        break;
+                    case "工单发货":
+                        url = "../ShipmentsOP/Index";
+                        break;
+                    case "交班管理":
+                        url = "../Shfit/ShiftList";
+                        break;
+                    case "工单拆单":
+                        url = "../OrderInStorage/OrderSplit";
+                        break;
+                    case "个人绩效":
+                        url = "../PerformanceInfo/Index";
+                        break;
+                    case "工单QC":
+                        url = "../QC/Index";
+                        break;
+                    case "设备清机":
+                        url = "../CheckMachine/Index";
+                        break;
+                    case "问题收集":
+                        url = "../ProblemCollect/Index";
+                        break;
+                    case "标签出入库管理":
+                        url = "../CRK/index";
+                        break;
+                    case "质量问题采集器":
+                        url = "../StopEvent/EnterInfoMoblie";
+                        break;
+                    case "质量问题采集器":
+                        url = "../StopEvent/EnterInfoMoblie";
+                        break;
+                    //case "序间件标签绑定":
+                    //    url = "../SFPLableBinding/GoodPrint";
+                    //    break;
+                    case "补标/重打/尾箱改数量":
+                        url = "../BuBiaoOrChongDa/Index";
+                        break;
+                    case "现场盘点":
+                        url = "../OnlineCheck/Index";
+                        break;
+                }
+
+                location.href = url;
+            })
+
+
+        })
+    </script>
+</head>
+<body>
+    <div class="top">
+        <a href="../QRCodeLogin/Index" class="left">二维码</a>
+        <label>
+            主菜单</label>
+        <a href="/SiteLogin/Index" class="right">@(UserName)</a>
+    </div>
+    <div class="container">
+        <div class="content">
+            <div class="option" languagetext="机台跟单（操作员）">
+                机台跟单（操作员）</div>
+            <div class="option" style="background: lightgoldenrodyellow;" languagetext="工作站跟单(周转员)">
+                工作站跟单(周转员)</div>
+            <div class="option" style="background: #A7E1B9;" languagetext="机台维修">
+                机台维修</div>
+            <div class="option" style="background: #FFAA74;" languagetext="工单入出库">
+                工单入出库</div>
+            <div class="option" style="background: #d299ea;" languagetext="工单上下架">
+                工单上下架</div>
+            <div class="option" style="background: #F8A9CC;" languagetext="工单发货">
+                工单发货</div>
+            <div class="option" style="background: #63A7EF;" languagetext="交班管理">
+                交班管理</div>
+            <div class="option" style="background: #B89FC6;" languagetext="个人绩效">
+                个人绩效</div>
+            <div class="option" style="background: #9A9788;" languagetext="工单拆单">
+                工单拆单</div>
+            <div class="option" languagetext="工单QC"> 
+                工单QC</div>
+            <div class="option" style="background: lightgoldenrodyellow;" languagetext="设备清机">
+                设备清机</div>
+            <div class="option" style="background: #90ee90;" languagetext="问题收集">
+                问题收集</div>
+            <div class="option" style="background: #FF8000;" languagetext="标签出入库管理">
+                标签出入库管理</div>
+            <div class="option" style="background: #d299ea;" languagetext="质量问题采集器">
+                质量问题采集器</div>
+           @*  <div class="option" style="background: #78909B;" languagetext="序间件标签绑定">
+                序间件标签绑定</div>*@
+            <div class="option" style="background: #4E6548;" languagetext="补标/重打/尾箱改数量">
+                补标/重打/尾箱改数量</div>
+            <div class="option" style="background: #B89FC6;" languagetext="现场盘点">
+                现场盘点</div>
+        </div>
+    </div>
+</body>
+</html>

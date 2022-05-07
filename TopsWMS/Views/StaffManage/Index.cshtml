@@ -1,0 +1,275 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "员工基础信息管理";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelStaffInfo";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas=Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    metas[0]["UserName"].Caption = "员工名称";
+    metas[0]["BanCi"].Caption = "班次";
+    metas[0]["Sex"].Caption = "性别";
+    metas[0]["DepartmentName"].Caption = "部门";
+    metas[0]["EntryDate"].Caption = "入厂日期";
+    metas[0]["RegularDate"].Caption = "转正日期";
+    metas[0]["DimissionDate"].Caption = "离职日期";
+    metas[0]["Remarks"].Caption = "备注";
+    metas[0]["ContactWay"].Caption = "联系方式";
+    metas[0]["Birthday"].Caption = "生日";
+    metas[0]["Address"].Caption = "家庭住址";
+    metas[0]["WorkingProcedure"].Caption = "库区";
+    metas[0]["JobNumber"].Caption = "工号";
+    metas[0]["RoleID"].Caption = "角色";
+    
+    metas[0]["Remarks"].Width = 120;
+    metas[0]["ContactWay"].Width = 100;
+    metas[0]["Address"].Width = 400;
+    var cols =  ModuleConfig.GetColumns(metas[0], biz.Lookups,biz.Sqls[0], biz);
+}
+
+@section Params{ 
+    <form id="paramForm" method="post" action="/ExcelHelp/DownloadBasicInformation">
+    <input type="hidden" name="IsPower" value="@(Tops.FRM.TopsUser.Powers.Contains("SelShopfloorList_ExcelData".ToUpper()))" />
+    <div id="hiddenlist">
+        <input type="hidden" name="BasicInformationDataName" value="" />
+        <input type="hidden" name="BasicInformationSheetName" value="员工基础信息管理" />
+    </div> 
+    @*<div id="search_title">查询条件：</div>*@
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+        string labelStr=string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+        var fieldName = biz.Fields[i].FieldName;
+        var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+        <div class="param_item">
+            @if (lookupField != null && lookupField.ToList().Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                        <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                        </script>
+                    }
+            else if (biz.Fields[i].DataList.Count > 0)
+            {
+                <label class="plugin_label">@(labelStr):</label>
+                <select name="@(fieldName)" fieldType="select" >
+                    @foreach(var item in biz.Fields[i].DataList){
+                    <option value="@(item.Key)">@(item.Value)</option>
+                    }
+            </select>
+            }else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+            {
+                <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+            }
+            else
+            {
+            <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+            }
+        </div>
+        }
+        <div style=" clear:both;">
+            <input type="button" value="打印工牌二维码" id="Print" style="display:none;"/>
+
+            <input type="button" value="" id="hide" hidden="hidden"/>
+        </div>
+    </div>
+    </form>
+    
+}
+<script src="../../Scripts/jquery.hz2py-min.js"></script>
+@section Script{
+<script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#editBt,#searchBt,#addBt,#delBt").show();
+        //$("#module_toolbar").append($("#batrepair"),$("#Print"));
+
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        //document.getElementById('module_params').style.marginTop="18px";
+        //document.getElementById('paramForm').style.height="3px";
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelStaffInfo',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+          
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:true,
+            checkbox: true,
+            isChecked: f_isChecked, onCheckRow: f_onCheckRow,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                var idKey='@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+                f_addTab(rowdata[idKey], "明细工程[" + rowdata['DeviceName'] + "]", "/Device/DeviceRelation?"+"id=" +rowdata['Id']+ "&" + Math.random());
+            }
+
+        });
+        //打印
+        $("#Print").click(function(){
+            if(ArrayUserNO.length>0){
+         
+                f_addTab("Print", "打印", "/StaffManage/PrintList?"+"ctrl=add&ArrayQRCode="+ArrayQRCode+" &ArrayUserNO="+ArrayUserNO+"&ArrayUserName="+ArrayUserName+"&ArrayBanCi="+ArrayBanCi+"&ArrayJobNumber="+ArrayJobNumber+"&ArrayDepartment="+ArrayDepartment+"&" +Math.random());
+            }else{
+                alert('请选择要打印的员工记录'); return;
+            }
+        })
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+             ArrayUserNO=[];
+             ArrayUserName=[];
+             ArrayBanCi=[];
+             ArrayJobNumber=[];
+             ArrayDepartment=[];
+             ArrayQRCode=[]
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+  
+        });
+        $("#searchBt").click();
+        $("#addBt").click(function () {
+
+            f_addTab("Add", "添加", "/StaffManage/Modify?"+"ctrl=add&" + Math.random());
+        });
+        $("#editBt").click(function () {
+            var row = grid.getSelectedRow();
+            if (!row) { alert('请选择要修改的员工记录!'); return; }
+            f_addTab("edit", "修改", "/StaffManage/Modify?"+"ctrl=edit&UserNO="+row["UserNO"] +"&" + Math.random());
+            
+        });
+        
+        //基础信息导入
+        $("#checkBt").click(function(){
+            f_addTab("Add", "添加", "/Common/Import?ModuleName="+ 
+            "车间基础信息管理" + "&TableName="+"tShopfloor"+"&Id="+"n_Shopfloor_Id"+"&SelQueryObjectName="+"SelShopfloorList_ExcelData"
+            +"&TableColumnsStateName="+"n_Shopfloor_state" + "&TableColumnsUpdatorName="+"s_Shopfloor_Updator"+ "&TableColumnsUpdatimeName="+"d_Shopfloor_UpdateTime" ); 
+        })
+        
+        //查阅是否有权限
+        if($("[name=IsPower]").val() == "False"){
+           $("#checkBt").hide();
+        }
+
+        //停用
+        $("#delBt").click(function(){
+        
+            var rows = grid.getSelectedRows();
+            if (rows.length > 0) { alert('请选择要删除的员工记录!'); return; }
+
+            if(!confirm("确定是否真的删除该员工记录!")){
+                return
+            }
+
+            $.ajax({
+                type:"POST",
+                url:"/AjaxPost/DelStaffInfo",
+                data:{ Dictionarys:rows },
+                success:function(result){
+                    result = JSON.parse(result);
+                    if(result.IsSuccess){
+                       alert("停用员工记录成功!")
+                    }else{
+                       alert(result.Msgs[0]);
+                    }
+                }
+            })
+        })
+    });
+    
+        function f_flushGrid()
+        {
+            grid.loadData();
+        }
+
+        var ArrayUserNO=[];
+        var ArrayUserName=[];
+        var ArrayBanCi=[];
+        var ArrayJobNumber=[];
+        var ArrayDepartment=[];
+        var ArrayQRCode=[]
+  
+        function findCheckedCustomer(UserNO)
+        {
+            for(var i =0;i<ArrayUserNO.length;i++)
+            {
+                if(ArrayUserNO[i] == UserNO) return i;
+            }
+            return -1;
+        }
+        function addCheckedCustomer(UserNO,UserName,BanCi,JobNumber,WorkingProcedure,QRCode)
+        {
+            ArrayQRCode.push(QRCode)    
+            ArrayUserNO.push(UserNO);
+            ArrayUserName.push(UserName);
+            ArrayBanCi.push(BanCi);
+            ArrayJobNumber.push(JobNumber);
+            ArrayDepartment.push(WorkingProcedure);
+ 
+        }
+
+        function removeCheckedCustomer(UserNO)
+        {
+            var i = findCheckedCustomer(UserNO);
+
+            if(i==-1) return;
+            ArrayUserNO.splice(i,1);
+            ArrayUserName.splice(i,1);
+            ArrayBanCi.splice(i,1);
+            ArrayJobNumber.splice(i,1);
+            ArrayDepartment.splice(i,1);
+            ArrayQRCod.splice(i,1)
+        }
+        function f_isChecked(rowdata)
+        {
+            if (findCheckedCustomer(rowdata.UserNO) == -1)
+                return false;
+            return true;
+        }
+        function f_onCheckRow(checked, data)
+        {   
+            
+            if (checked) addCheckedCustomer(data.UserNO,data.UserName,data.BanCi,data.JobNumber,data.WorkingProcedure,data.QRCode);
+            else removeCheckedCustomer(data.UserNO,data.UserName,data.BanCi,data.JobNumber,data.WorkingProcedure,data.QRCode);
+        }
+</script>
+}
+<style>
+    #editBt {
+        background-image: url("../../TopsLib/Content/icon/03/007.gif" );
+        background-position: 3px center;
+        background-repeat: no-repeat;
+        padding-left: 20px;
+        margin: 2px;
+        border-color: #f6f6f6;
+    }
+    #Print{
+        background-image: url("../../TopsLib/Content/icon/01/321.gif" );
+        background-position: 3px center;
+        background-repeat: no-repeat;
+        padding-left: 20px;
+        margin: 2px;
+        border-color: #f6f6f6;
+    }
+</style>
+
+<div id="datagrid"></div>
+
+

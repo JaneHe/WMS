@@ -1,0 +1,200 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "模块名称";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelManageLoadingFBQAList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+    string ExcelDate = DateTime.Now.ToString("yyyyMMdd"); 
+}
+
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+        <div id="hiddenlist">
+            <input type="hidden" name="exportdata" value="SelManageLoadingASN_ExcelData" />
+            <input type="hidden" name="exportcolumn" value="SelManageLoadingASN_ExcelColumns" />
+            <input type="hidden" name="exportsheetname" value="WMS-ASN信息管理_@(ExcelDate)" />
+            <input type="hidden" name="exportcondition" value="" />
+        </div>
+        <div id="paramlist">
+            @for (int i = 0; i < biz.Fields.Count; i++)
+            {
+                string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+                var fieldName = biz.Fields[i].FieldName;
+                var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+                <div class="param_item">
+                    @if (lookupField != null && lookupField.ToList().Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                        <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                        </script>
+                    }
+                    else if (biz.Fields[i].DataList.Count > 0)
+                    {
+                        <label class="plugin_label">@(labelStr):</label>
+                        <select name="@(fieldName)" fieldType="select" >
+                            @foreach (var item in biz.Fields[i].DataList)
+                            {
+                                <option value="@(item.Key)">@(item.Value)</option>
+                            }
+                        </select>
+                    }
+                    else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                    {
+                        <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                    }
+                    else
+                    {
+                        <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                    }
+                </div>
+            }
+            <div style="clear: both;"></div>
+        </div>
+    </form>
+
+}
+@section Script{
+    <script type="text/javascript">
+        var topsRender=null;
+        var grid =null;
+        $(function () {
+            $("#module_toolbar input").hide();
+            $("#searchBt").show();
+            $(".param_item:eq(0)").hide();
+            $(".param_item:eq(1)").hide();
+            $(".param_item:eq(2)").hide();
+            //渲染插件
+            topsRender=$("#paramlist *[fieldType]").pluginRender();
+            //初始化表格
+            grid = $("#datagrid").ligerGrid({
+                columns: [
+                     {
+                         "name": "LogCode",
+                         "display": "漆件条码",
+                         "align": "left",
+                         "width": 160,
+                         "hide": false,
+                         "type": "String",
+                         "editor": null
+                     },
+ {
+     "name": "Names",
+     "display": "漆件名称",
+     "align": "left",
+     "width": 160,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "PaintMCode",
+     "display": "漆件客户料号",
+     "align": "left",
+     "width": 160,
+     "hide": false,
+     "type": "String",
+     "editor": null,
+     "frozen": false
+ },
+ {
+     "name": "Batch",
+     "display": "批次",
+     "align": "left",
+     "width": 160,
+     "hide": false,
+     "type": "String",
+     "editor": null,
+     "frozen": false
+ },
+ {
+     "name": "CarType",
+     "display": "产品大类",
+     "align": "left",
+     "width": 160,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "CarColor",
+     "display": "颜色",
+     "align": "left",
+     "width": 100,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ },
+ {
+     "name": "ModelState",
+     "display": "状态",
+     "align": "left",
+     "width": 100,
+     "hide": false,
+     "type": "String",
+     "editor": null
+ }
+                ],
+                url: '/AjaxGridData/SelManageLoadingFBQAList',
+                method: 'get',
+                delayLoad: true,
+                dataType: "local",
+                dataAction: 'server',
+                root: 'Data',                       //数据源字段名
+                record: 'Other1',                     //数据源记录数字段名
+                rownumbers: true,
+                showTitle: false,
+                width: '99.5%',
+                height: '100%',
+                heightDiff: -10,
+                enabledSort:false,
+                onSuccess: function (data, b) {
+                    $.topsErrorDeal(data);
+                }
+            });
+            GetRequest() ;
+
+            //绑定按钮事件
+            $("#searchBt").click(function () {
+                grid.options.parms = $("form#paramForm").serializeArray();
+                grid.loadServerData(grid.options.parms);
+            });
+            $("#searchBt").click();
+
+            $("#exportBt").click(function(){
+                $("#paramForm").submit();
+            });
+        });
+
+        function f_flushGrid()
+        {
+            grid.loadData();
+        }
+        // 获取url中数据
+        function GetRequest() {
+            var url = location.search; //获取url中"?"符后的字串   
+            var theRequest = new Object();
+            if (url.indexOf("?") != -1) {
+                var str = url.substr(1);
+                strs = str.split("&");
+                for (var i = 0; i < strs.length; i++) {
+                    theRequest[strs[i].split("=")[0]] = unescape(strs[i].split("=")[1]);
+                }
+            }
+
+            $("input[name='BeginTime']").val(theRequest.begTime); 
+            $("input[name='EndTime']").val(theRequest.endTime); 
+            $("input[name='PaintMCode']").val(theRequest.paCode); 
+
+           
+        }
+
+    </script>
+}
+<div id="datagrid"></div>
+
+

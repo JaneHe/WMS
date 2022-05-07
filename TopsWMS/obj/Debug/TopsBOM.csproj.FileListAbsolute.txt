@@ -1,0 +1,9 @@
+E:\LianWang\TopsBOM\TopsBOM\bin\TopsBOM.dll
+E:\LianWang\TopsBOM\TopsBOM\bin\TopsBOM.pdb
+E:\LianWang\TopsBOM\TopsBOM\obj\Debug\TopsBOM.dll
+E:\LianWang\TopsBOM\TopsBOM\obj\Debug\TopsBOM.pdb
+E:\LianWang\TopsBOM\TopsBOM\bin\Tops.FRM.dll
+E:\LianWang\TopsBOM\TopsBOM\bin\Newtonsoft.Json.dll
+E:\LianWang\TopsBOM\TopsBOM\bin\EncryptCode.dll
+E:\LianWang\TopsBOM\TopsBOM\bin\Tops.FRM.pdb
+E:\LianWang\TopsBOM\TopsBOM\obj\Debug\TopsBOM.csprojResolveAssemblyReference.cache

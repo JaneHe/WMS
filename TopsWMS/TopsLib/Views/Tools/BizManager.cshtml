@@ -1,0 +1,308 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Tools/_Layout.cshtml";
+    ViewBag.Title = "BizManager";
+}
+<style type="text/css">
+
+</style>
+<script type="text/javascript">
+    var tab = null;
+    var accordion = null;
+    var tree = null;
+    var menu = null;
+    var addBizDialog = null,renameBizDialog = null;
+    var Bizs = null;
+    $(document).ready(function () {
+        $("#layout1").ligerLayout({
+            leftWidth: 210,
+            height: '100%',
+            heightDiff: -4,
+            space: 4,
+            onHeightChanged: f_heightChanged,
+            onSuccess: function () {
+                //alert(1);
+            }
+        });
+
+        var height = $(".l-layout-center").height();
+        //Tab
+        $("#framecenter").ligerTab({ height: height });
+        //面板
+        // $("#accordion_main").ligerAccordion({ height: height - 24, speed: null });
+        $(".l-link").hover(function () {
+            $(this).addClass("l-link-over");
+        }, function () {
+            $(this).removeClass("l-link-over");
+        });
+
+        tab = $("#framecenter").ligerGetTabManager();
+        accordion = $("#accordion_main").ligerGetAccordionManager(); 
+        // tree = $("#tree1").ligerGetTreeManager();    l-layout-header        
+        $("#pageloading").hide();
+        function f_heightChanged(options) { 
+            if (tab)
+                tab.addHeight(options.diff);
+            if (accordion && options.middleHeight - 100 > 0)
+                accordion.setHeight(options.middleHeight - 24);
+        }
+        function heightChanged() {
+            var $accordion = $("#accordion_main")
+            var $accordion_p = $accordion.parent();
+            $accordion.height($accordion_p.height() - $accordion_p.children(".l-layout-header").height());
+        }
+        $(window).resize(function () {
+            heightChanged();
+        });
+        heightChanged();
+        menu = $.ligerMenu({
+            top: 100, left: 100, width: 160, items:
+            [
+                { text: '重命名', click: t_RenameBiz, icon: '../../Content/icon/01/178.gif', type: "biz" },
+            ]
+        });
+        tree = $("#treemenu").ligerTree({
+            nodeWidth: 180,
+            checkbox: true,
+            data: [],
+            onClick: function (node) {
+                if (node.data.children == undefined) {
+                    f_addTab(node.data.id, node.data.text, '/tools/BizManagerCtx?id=' + node.data.id + "&" + Math.random())
+                }
+
+            }, onContextmenu: function (node, e) {
+                var actionNodeID = node.data.id;
+                menu.selNote = node;
+                menu.show({ top: e.pageY, left: e.pageX });
+                return false;
+            }
+        });
+        GetBizs();
+        $("#flush_bt").click(function () {
+            GetBizs();
+        });
+        $("#add_bt").click(function () {
+            addBizDialog.show();
+            $("#AddBizName").val("").select();
+            $("#AddBiz_msg").text("")
+            $("#IsSys").attr("checked", false);
+        });
+        $("#export_bt").click(function () {
+            var checkedNodes = tree.getChecked();
+            if (checkedNodes.length == 0)
+            {
+                alert("请选择要导出的对象");
+                return;
+            }
+            var checkedBizs = new Array();
+            $.each(checkedNodes, function (index) {
+                if (checkedNodes[index].data.children == null)
+                {
+                    checkedBizs.push(checkedNodes[index].data.id);
+                }
+            });
+            window.top.t_ExportBiz(checkedBizs.join(','));
+        });
+        //初始化添加弹出框
+        addBizDialog = $.ligerDialog({
+            show: false,
+            title: "添加Biz",
+            content: $("#addBiz_content")
+        });
+        
+        addBizDialog.hide();
+        $("#AddBiz_submit").click(function () {
+            $("#AddBiz_msg").text("")
+            var bizName = $("#AddBizName").val();
+            if ($.trim(bizName) == '') {
+                $("#AddBizName").select();
+                $("#AddBiz_msg").text("Biz不能为空");
+                return;
+            }
+            var isSys = $("#IsSys").attr("checked");
+            isSys = (isSys == "true" || isSys == "checked") ? true : false
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/AddBiz",
+                data: { BizName: bizName, IsSys: isSys, Type: 2 },
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        GetBizs();
+                        f_addTab(bizName, bizName, '/tools/BizManagerCtx?id=' + bizName + "&" + Math.random())
+                        addBizDialog.hide();
+                    } else {
+                        $("#AddBizName").select();
+                        $("#AddBiz_msg").text(data.Msgs[0]);
+                    }
+                }
+            });
+
+        });
+        
+        $("#AddBiz_cxl").click(function () {
+            addBizDialog.hide();
+        });
+        $("#BizName").keydown(function () {
+            filterTree();
+        }).change(function () {
+            filterTree();
+        });
+        function filterTree() {
+            tree.clear();
+            tree.loading.show();
+            var nodes = BizsFilter(Bizs, $("#BizName").val());
+            tree.append(null, nodes);
+            tree.loading.hide();
+        }
+    });
+    //添加tab的方法
+    function f_addTab(tabid, text, url) {
+        tab.addTabItem({ tabid: tabid, text:"业务"+ text, url: url });
+    }
+    function f_removeTabItem(tabid) {
+        tab.removeTabItem(tabid)
+    }
+    function GetBizs() {
+        tree.clear();
+        tree.loading.show();
+        $.topsAjax({
+            type: "POST",
+            url: "/Tools/GetBizs",
+            data:{Type:2},
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    Bizs = data.Data[0];
+                    var nodes = BizsFilter(data.Data[0], $("#BizName").val());
+                    tree.append(null, nodes);
+                    tree.loading.hide();
+                }
+            }
+        });
+    }
+    function BizsFilter(data, str) {
+        var nodes = new Array();
+        var SysNodes = new Array();
+        var OrdinaryNodes = new Array();
+        $.each(data, function () {
+            var isAdd = true;
+            if ($.trim(str) != '' && this.BizName.toLocaleLowerCase().indexOf(str.toLocaleLowerCase()) < 0)
+                isAdd = false;
+            if (isAdd) {
+                if (this.IsSys)
+                    SysNodes.push({ id: this.BizName, text: this.BizName, icon: '/TopsLib/Content/icon/03/083.gif' });
+                else
+                    OrdinaryNodes.push({ id: this.BizName, text: this.BizName, icon: '/TopsLib/Content/icon/03/081.gif' });
+            }
+        });
+        nodes.push({ id: "SysBiz", text: "系统对象",isexpand:false, children: SysNodes });
+        nodes.push({ id: "OrdinaryBiz", text: "普通对象", children: OrdinaryNodes });
+        return nodes;
+    }
+
+    </script>
+
+    <div id="pageloading">
+    </div>
+    <div id="layout1" style="width: 99.2%; margin: 0 auto; margin-top: 4px;">
+        <div position="left" title="业务对象" id="accordion_main" style="overflow: auto">
+            <div>
+                <table border=0 cellpadding=0 cellspacing=0><tr>
+                    <td><input  class="filter_input" id="BizName" /></td>
+                    <td><input type="button" class="add_bt_min" id="add_bt" /></td>
+                    <td><input type="button" class="flush_bt_min" id="flush_bt" /></td>
+                    <td><input type="button" class="export_bt_min" id="export_bt" /></td>
+                </tr></table>
+            </div>
+            <div id="treemenu" style="width:100%">
+            </div>
+        </div>
+        <div position="center" id="framecenter">
+        <div tabid="home" title="主页">
+                <pre>
+复合对象执行业务请求的方法：
+var data={
+    Name:'Tom',
+    Age:18,
+    Addrs:[{Address:'地之一',post:'510000'},{Address:'地之二',post:'520000'}]
+}
+$.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/AddTestUser",
+                data: data,
+                dealError: false,
+                success: function (data) {
+                    
+                }
+            });
+---------------------
+注意：
+1）对象中的“Addrs”属性是随意的，不影响执行；
+2）而“Addrs”属性的值（”[{Address:'地之一',post:'510000'},{Address:'地之二',post:'520000'}]“）就代表循环参数“Address”,
+框架会根据该数组中设置的“循环字段”的个数，循环执行相同次数的Sql
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <div id="addBiz_content">
+        <p>业务名称：<input id="AddBizName" /></p>
+        <p>系统对象：<input id="IsSys" type="checkbox" /><font color="gray">系统业务不能删除</font></p>
+        <p><input id="AddBiz_submit" class="add_bt" type="button" value="确定" />
+        <input id="AddBiz_cxl"  class="cxl_bt" type="button" value="取消" /></p>
+        <p id="AddBiz_msg" class="tool_error"></p>
+    </div>
+    <div id="renameBiz_content">
+        <p>业务名称：<a id="RenameOldBizName"  ></a></p>
+        <p>新名称：<input id="RenameNewBizName" type="text" /></p>
+        <p><input id="RenameBiz_submit" class="add_bt" type="button" value="确定" />
+        <p id="RenameBiz_msg" class="tool_error"></p>
+    </div>
+<script type="text/javascript">
+    $(function () {
+        //初始化重命名弹出框
+        renameBizDialog = $.ligerDialog({
+            show: false,
+            title: "重命名Biz",
+            content: $("#renameBiz_content")
+        });
+        renameBizDialog.hide();
+        $("#RenameBiz_submit").click(function () {
+            $("#RenameBiz_msg").text("")
+            var newBizName = $("#RenameNewBizName").val();
+            var oldBizName = $("#RenameOldBizName").text();
+            if ($.trim(newBizName) == '') {
+                $("#RenameNewBizName").select();
+                $("#RenameBiz_msg").text("名称不能为空");
+                return;
+            }
+            $.topsAjax({
+                type: "POST",
+                url: "/Tools/RenameBiz",
+                data: { OldBizName: oldBizName, NewBizName: newBizName },
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        GetBizs();
+                        f_removeTabItem(oldBizName);
+                        f_addTab(newBizName, newBizName, '/tools/BizManagerCtx?id=' + newBizName + "&" + Math.random());
+                        renameBizDialog.hide();
+                    } else {
+                        $("#RenameNewBizName").select();
+                        $("#RenameBiz_msg").text(data.Msgs[0]);
+                    }
+                }
+            });
+
+        });
+        
+    });
+    function t_RenameBiz() {
+        var cNote = menu.selNote;
+        var oldBizID = cNote.data.id;
+        $("#RenameOldBizName").text(oldBizID);
+        $("#RenameNewBizName").val(oldBizID).select();
+        renameBizDialog.show();
+        $("#RenameNewBizName").select();
+    }
+</script>

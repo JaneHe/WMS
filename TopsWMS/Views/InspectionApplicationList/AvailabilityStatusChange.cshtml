@@ -1,0 +1,98 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>货物可用状态变更</title>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <style type="text/css">
+        table
+        {
+            width:220px;
+            font-family:微软雅黑;
+        }
+        td:nth-child(even)
+        {
+            color:Blue;    
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            var body = new Vue({
+                el: ".body",
+                data: {
+                    n_InspectionApplicationList_AfterQCQualityStatus_data: new Array(), //货物可用状态数据源
+                    n_isOpenLock:1 //储位是否解锁 1:否 2;是
+                },
+                methods: {
+                    //查询当前货物可用状态以及是否需要进行储位解锁的信息
+                    f_SelAddInspectionApplicationInfo: function () {
+                        $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelAddInspectionApplicationInfo",
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    result.Data[0].forEach(function(value,index){
+                                        value.isChecked = false;
+                                        body.n_InspectionApplicationList_AfterQCQualityStatus_data.push(value);
+                                    }) 
+
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+                            }
+                        })
+                    },
+                    //选择判定的货物可用状态事件
+                    f_changeAfterQCQualityStatus: function () {
+                        body.n_isOpenLock = $(event.target).find("option:selected").attr("isOpenLock"); 
+                    }
+                }
+            })
+
+            body.f_SelAddInspectionApplicationInfo();
+        })
+
+        //获取选择的数据
+        function f_loadSelectedData() {
+            return {
+                n_InspectionApplicationList_AfterQCQualityStatus: $(".n_InspectionApplicationList_AfterQCQualityStatus").find("option:selected").attr("keys"),
+                n_isOpenLock: $(".n_InspectionApplicationList_AfterQCQualityStatus").find("option:selected").attr("isOpenLock")
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div class="body">
+        <div style="color:red;">说明:如果货物可用状态判定为合格，则对应的储位会进行解锁.</div>
+        <div>
+            <table> 
+                <tr>
+                    <td>
+                        货物可用状态判定:
+                    </td>
+                    <td>
+                        <select class="n_InspectionApplicationList_AfterQCQualityStatus" v-on:click="f_changeAfterQCQualityStatus">
+                        <option v-for="(item,i) in n_InspectionApplicationList_AfterQCQualityStatus_data" :keys="item.keys" :isOpenLock="item.isOpenLock" :index="i" :selected="item.isChecked" >
+                            {{ item.value }}
+                        </option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        储位是否解锁:
+                    </td>
+                    <td>
+                        {{ n_isOpenLock == "1"?"否":"是" }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html>

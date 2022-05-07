@@ -1,0 +1,239 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "模块名称";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelSQLList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+    <div id="hiddenlist">
+    </div>
+    <div id="paramlist">
+     
+
+    @for (int i = 0; i < biz.Fields.Count; i++)
+    {
+        string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+        var fieldName = biz.Fields[i].FieldName;
+        var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+        <div class="param_item">
+            @if (lookupField != null && lookupField.ToList().Count > 0)
+            {
+                <label class="plugin_label">@(labelStr):</label>
+                <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                </script>
+            }
+            else if (biz.Fields[i].DataList.Count > 0)
+            {
+                <label class="plugin_label">@(labelStr):</label>
+                <select name="@(fieldName)" fieldType="select" >
+                    @foreach (var item in biz.Fields[i].DataList)
+                    {
+                        <option value="@(item.Key)">@(item.Value)</option>
+                    }
+                </select>
+            }
+            else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+            {
+                <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+            }
+            else
+            {
+                <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+            }
+        </div>
+    }
+    <div style="clear: both;">
+    </div>
+    </div>
+    </form>
+}
+@section Script{
+    <script src="../../Content/vue.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        var topsRender = null;
+        var grid = null;
+        $(function () {
+            $("#module_toolbar input").hide();
+            $(",#searchBt").show();
+            //渲染插件
+            topsRender = $("#paramlist *[fieldType]").pluginRender();
+             
+
+            //初始化表格
+            grid = $("#datagrid").ligerGrid({
+                columns: [
+  {
+      "name": "语句编译时间",
+      "display": "语句编译时间",
+      "align": "left",
+      "width": 150,
+      "hide": false,
+      "type": "date",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "上次执行时间",
+      "display": "上次执行时间",
+      "align": "left",
+      "width": 150,
+      "hide": false,
+      "type": "date",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "物理读取总次数",
+      "display": "物理读取总次数",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "Int64",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "每次逻辑读次数",
+      "display": "每次逻辑读次数",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "Int64",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "逻辑读取总次数",
+      "display": "逻辑读取总次数",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "Int64",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "逻辑写入总次数",
+      "display": "逻辑写入总次数",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "Int64",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "执行次数",
+      "display": "执行次数",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "Int64",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "所用的CPU总时间ms",
+      "display": "所用的CPU总时间ms",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "Int64",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "总花费时间ms",
+      "display": "总花费时间ms",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "Int64",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "平均时间ms",
+      "display": "平均时间ms",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "Int64",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "执行语句",
+      "display": "执行语句",
+      "align": "left",
+      "width": 200,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "语句总览",
+      "display": "语句总览",
+      "align": "left",
+      "width": 500,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  }
+],
+                url: '/AjaxGridData/SelSQLList',
+                method: 'get',
+                delayLoad: true,
+                dataType: "local",
+                dataAction: 'server',
+                root: 'Data',                       //数据源字段名
+                record: 'Other1',                     //数据源记录数字段名
+                rownumbers: true,
+                //data: AllProductData, 
+                showTitle: false,
+                width: '99.5%',
+                height: '100%',
+                heightDiff: -10,
+                enabledSort: false,
+                usePager: false,
+                onSuccess: function (data, b) {
+                    $.topsErrorDeal(data);
+                },
+                onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                    var idKey = '@(biz.Sqls[0].Key)';
+                    if ($.trim(idKey) == '') return;
+                    var idData = new Object();
+                    idData[idKey] = rowdata[idKey];
+                    f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/MaintSche/Modify?" + "ctrl=edit&id=" + escape($.toJSON(idData)) + "&" + Math.random());
+                }
+            });
+            //绑定按钮事件
+            $("#searchBt").click(function () {
+                grid.options.parms = $("form#paramForm").serializeArray();
+                grid.loadServerData(grid.options.parms);
+            });
+            $("#addBt").click(function () {
+                f_addTab("Add", "添加", "/MaintSche/Modify?" + "ctrl=add&" + Math.random());
+            });
+            $("#exportBt").click(function () {
+                $("#paramForm").submit();
+            })
+            //$("#searchBt").click();
+        });
+        function f_flushGrid() {
+            grid.loadData();
+        }
+    </script>
+}
+<div id="datagrid">
+</div>

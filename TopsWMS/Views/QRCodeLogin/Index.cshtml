@@ -1,0 +1,384 @@
+﻿@{
+    Layout = null;
+    ViewBag.Title = "二维码登录";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>手持终端登录</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="full-screen" content="yes">
+    <style type="text/css">
+        body
+        {
+            background: url(../../../Images/Login/bk-login.png) no-repeat;
+        }
+        div
+        {
+            -wekbit-user-select: none;
+        }
+        .login_content
+        {
+            background: white;
+            width: calc(70%);
+            margin: calc(0%) calc(15%);
+        }
+        .login_logo
+        {
+            font-family: 微软雅黑;
+            font-weight: bold;
+            background-color: white;
+            color: black;
+            text-align: center;
+            width: calc(70%);
+            margin: calc(4%) calc(15%) calc(4%) calc(15%);
+            line-height: 55px;
+            font-size: 20px;
+            order-bottom: 1px solid #cccccc;
+        }
+ 
+        input[type=text], input[type=password]
+        {
+            line-height: 40px;
+            font-size: 20px;
+            width: calc(60%);
+            margin: calc(3%) calc(20%);
+            border: 1px solid lightblue;
+        }
+        .Login_QR  
+        {
+            width: calc(40%);
+            margin: calc(3%) calc(3%) calc(3%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-weight: bold;
+            font-size: 20px;
+            line-height: 60px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 5px;
+        }
+        .QRCode_Return
+        {
+            width: calc(40%);
+            margin: calc(5%) calc(5%) calc(5%) calc(3%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-weight: bold;
+            font-size: 20px;
+            line-height: 60px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            letter-spacing: 5px;
+            display: inline-block;
+        }
+        .Login_QR:hover,.QRCode_Return:hover
+        {
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+            background-color: #4472C5;
+        }
+ 
+    </style>
+    <script src="../../TopsLib/Scripts/jquery-1.7.1.js?@DateTime.Now" type="text/javascript"></script>
+    <script type="text/javascript">
+        //ajax对象
+        var saveobj = null;
+
+        //计时器对象
+        var timer = null;
+
+        $(function () {
+            f_PageEvent();
+
+        })
+
+        window.onload = function () {
+            //文本不可选中
+            document.body.onselectstart = document.body.ondrag = function () {
+                return false;
+            }
+
+            f_autowrite();
+        }
+
+        //页面事件加载
+        function f_PageEvent() { 
+            //自动登录点击事件
+            $(".login_checkboxs label:eq(1)").live("click", function () {
+                if ($(this).find("input").attr("checked") == "checked") {
+                    $(".login_checkboxs label:eq(0) input").attr("checked", "checked");
+                } else {
+                    $(".login_checkboxs label:eq(0) input").removeAttr("checked");
+                }
+            })
+
+            //登录事件 
+            $(".Login_QR").live("click", function () {
+                if ($(this).text().trim() == "登录") {
+
+                    if (!f_IsEmptyAllInput()) {
+                        return;
+                    }
+                    
+                    $(this).text("取消");
+
+                    f_iceform();
+
+                    var param = new Object();
+                    //param.UserNO = $("input[name=username]").val();
+                    //param.Password = $("input[name=password]").val();
+                    param.QRCode = $("input[name=QRCode]").val();
+                    
+                    f_rememberusername(param.UserNO);
+                    f_autologin();
+                    f_rememberpassword(param.Password);
+
+                    if (saveobj != null) {
+                        saveobj.abort();
+                        saveobj = null;
+                    }
+                    timer = setTimeout(function () {
+                        saveobj = $.ajax({
+                            type: "POST",
+                            url: "/Account/Login_QRCode",
+                            data: param,
+                            success: function (data) {
+                                data = JSON.parse(data);
+                                if (data.IsSuccess) {
+                                    saveobj = null;
+                                    window.location.href = "/SiteLogin/Layout";
+                                } else {
+                                    f_commonShowMsg(data.Msgs[0]);
+                                    $(".Login_QR").text("登录"); 
+                                    f_openform();
+                                    $("input[name=QRCode]").val("");
+                                    $("[name=QRCode]").focus();
+                                }
+                            }
+                        });
+                    }, 3000)
+                } else if ($(this).text().trim() == "取消") {
+                    $(this).text("登录");
+                    if (timer != null) {
+                        window.clearTimeout(timer);
+                        f_openform();
+                        timer = null;
+                    }
+                }
+
+            })
+
+            //返回
+            $(".QRCode_Return").live("click", function () {
+                location.href = "../SiteLogin/Index";
+            })
+
+            $("[name=QRCode]").focus();
+
+            //单击Enter事件 
+            $("input[name=QRCode]").keydown(function (e) {
+                if (e.keyCode == 13) {
+                    $(".Login_QR").click();
+                }
+            })
+        }
+
+        //对所有对象的非空检查
+        function f_IsEmptyAllInput() {
+            $(document.body).find("input[type!=checkbox]").each(function () {
+                if ($(this).val() == "") {
+                    $(this).attr("IsEmpty", "IsEmpty");
+                } else {
+                    $(this).removeAttr("IsEmpty");
+                }
+            })
+
+            if ($(document.body).find("input[IsEmpty]").length > 0) {
+                var str = $(document.body).find("input[IsEmpty]:eq(0)").attr("key");
+                f_commonShowMsg(str + "不能为空，请输入");
+                $(document.body).find("input[IsEmpty]:eq(0)").focus().select();
+                return false;
+            } else {
+                return true;
+            }
+        }
+
+        //冻结用户界面控件
+        function f_iceform() {
+            $(document.body).find("input").each(function () {
+                $(this).attr("readonly", true).attr("disabled", "disabled");
+            })
+        }
+
+        //开放用户界面控件
+        function f_openform() {
+            $(document.body).find("input").each(function () {
+                $(this).removeAttr("readonly").removeAttr("disabled");
+            })
+        }
+
+        //记住账号
+        function f_rememberusername(username) {
+            if (localStorage.getItem["username"]) {
+                localStorage["username"] = username;
+            } else {
+                localStorage.username = username;
+            }
+        }
+
+        //记住密码
+        function f_rememberpassword(password) {
+
+            var isCheck = $("input[name=remember]").attr("checked") == "checked" ? true : false;
+            localStorage["remember"] = isCheck;
+            //是否记住密码 
+            if (isCheck) {
+                localStorage["password"] = password;
+            } else {
+                localStorage.removeItem("remember");
+                localStorage.removeItem("password");
+            }
+        }
+
+        //自动登录
+        function f_autologin() {
+            var isCheck = $("input[name=autologin]").attr("checked") == "checked" ? true : false;
+            if (isCheck) {
+                $("input[name=remember]").attr("checked", "checked");
+                localStorage["autologin"] = isCheck;
+            } else {
+                localStorage.removeItem("autologin");
+            }
+        }
+
+        //加载页面一开始加载账号密码 自动登录
+        function f_autowrite() {
+            if (localStorage["username"] != "") {
+                $("input[name=username]").val(localStorage["username"]);
+            }
+            if (localStorage.hasOwnProperty("password")) {
+                $("input[name=password]").val(localStorage["password"]);
+            }
+            if (localStorage.hasOwnProperty("remember")) {
+                $("input[name=remember]").attr("checked", localStorage["remember"]);
+            }
+            if (localStorage.hasOwnProperty("autologin")) {
+                $("input[name=autologin]").attr("checked", localStorage["autologin"]);
+            }
+
+            if (localStorage.hasOwnProperty("autologin")) {
+                $(".Login_QR").click();
+            }
+        }
+
+ 
+
+
+
+        /*
+        * add David 20151023 没事不要乱改
+        * 设置弹出消息的方法，而不用 alert
+        * msg 消息字符串,  container 消息追加的容器
+        * feu
+        */
+        var msgtimer;
+        function f_commonShowMsg(msg, container) {
+            if (msgtimer) {
+                clearTimeout(msgtimer);
+                $(".msgdiv").hide().remove();
+            }
+            var msgdiv = $('<div id="msgdiv" class="msgdiv">' + msg + '</div>');
+            // msgdiv.css({
+            //     "display": "none",
+            //     "position": "absolute",
+            //     "min-width": "100px",
+            //     "max-width": "600px",
+            //     "min-height": "50px",
+            //     "line-height": "50px",
+            //     "background": "#E5EFFE",
+            //     "padding": "0px 10px",
+            //     "color": "black",
+            //     "top": "3px",
+            //     "left": "50%",
+            //     "z-index": "1000",
+            //     "text-align": "center",
+            //     "font-weight": "bold",
+            //     "border-radius": "5px",
+            //     "box-shadow": "0px 0px 5px 2px gray",
+            //     "font-size": "16px"
+            // });
+
+            //移动端调整
+            msgdiv.css({
+                "display": "none",
+                "position": "absolute",
+                "min-width": "320px",
+                "width": "100%",
+                "min-height": "50px",
+                "line-height": "50px",
+                "background": "#E5EFFE",
+                "padding": "0px 0px",
+                "color": "white",
+                "background-color": "black",
+                "top": "0px",
+                "left": "50%",
+                "z-index": "1000",
+                "text-align": "center",
+                "font-weight": "bold",
+                "border-radius": "0px",
+                "box-shadow": "0px 2px 5px 2px gray",
+                "font-size": "16px",
+                "font-family": "微软雅黑",
+                "opacity": "0.9"
+            });
+            //end
+
+            if (typeof (container) != 'undefined') {
+                if ($("#" + container).length > 0) {
+                    $("#" + container).append(msgdiv);
+                } else if ($("." + container).length > 0) {
+                    $("." + container).append(msgdiv);
+                } else {
+                    $(document).append(msgdiv);
+                }
+            } else {
+                $("body").append(msgdiv);
+            }
+            msgdiv.css("margin-left", -Math.floor(msgdiv.width() / 2) + "px");
+            // if (msgdiv.width() == 600) {
+            //     msgdiv.css("line-height", "25px");
+            // }
+            msgdiv.fadeIn(function () {
+                msgtimer = setTimeout(function () {
+                    msgdiv.fadeOut(function () {
+                        msgdiv.remove();
+                    });
+                }, 3000);
+            });
+        }
+
+    </script>
+</head>
+<body>
+    <div class="login_content">
+        <div class="login_logo">
+            手持终端-登录
+        </div>
+        <div>
+            <input type="text" name="QRCode" key="二维码" placeholder="二维码" />
+        </div>
+        <div class="Login_QR">   
+                登录
+        </div>
+        <div class="QRCode_Return">
+                返回<!--钮要返回到手持终端登录页首页-->
+        </div>
+    </div>
+</body>
+</html>

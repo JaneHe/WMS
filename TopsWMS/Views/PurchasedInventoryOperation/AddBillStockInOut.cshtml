@@ -1,0 +1,368 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";  
+
+    string ParentIds = Request.QueryString["ParentIds"];
+
+    //形成盘点单据编号
+    string BillStockInOutCode = "YDPD" + DateTime.Now.ToString("yyyyMMddHHmmssfff"); 
+    
+    //获取当前用户信息
+    string PutOnOffPerson = Tops.FRM.TopsUser.UserName;
+    
+
+    //根据当前账号绑定的库位对应默认优选仓库
+    Tops.FRM.BizResult br = Tops.FRM.Biz.Execute("SelWarehouseForUserNO", new System.Data.SqlClient.SqlParameter[] { new System.Data.SqlClient.SqlParameter("@Operator", Tops.FRM.TopsUser.UserNO) }, Tops.FRM.BizType.Query);
+    List<System.Data.DataTable> list = br.Data as List<System.Data.DataTable>;
+
+    string n_Warehouse_Id = string.Empty;
+    Dictionary<string, string> dic = new Dictionary<string, string>(); 
+    if (list.Count > 0)
+    {
+        if (list[0].Rows.Count > 0)
+        {
+            for (int index = 0; index < list[0].Rows.Count; index++)
+            {
+                n_Warehouse_Id += list[0].Rows[index]["n_Warehouse_Id"].ToString() + ";";
+            }
+        }
+        
+        if (list[1].Rows.Count > 0)
+        {
+            for (int index = 0; index < list[1].Rows.Count; index++)
+            {
+                dic.Add(list[1].Rows[index]["keys"].ToString(), list[1].Rows[index]["value"].ToString());
+            }
+        }
+    }
+}
+@section Body{
+    <div class="body">
+        <div>
+            <input type="text" readonly="readonly" disabled="disabled" v-bind:class="BillStockInOutCode_Showed" placeholder="请输入单据编号" value="@(BillStockInOutCode)" />
+        </div>
+        <div>
+            <input type="hidden" name="n_Warehouse_Id" value="@(n_Warehouse_Id)" />
+            <select v-bind:class="ChangeWarehouse_Showed"  v-on:change="changeWarehouseInfo($event)">
+                <option :id="item.n_Warehouse_Id" v-for="(item,i) in WarehouseDataList" :selected="item.n_Warehouse_selected">
+                {{ item.s_Warehouse_Name }}
+                </option>
+            </select>
+        </div>
+        <div> 
+            <select class="s_Warehouse_ShelfForm"  v-on:change="changeFormInfo($event)">
+                <option :keys="item.keys" v-for="(item,i) in ShelfFormDataList" :selected="item.isCheck">
+                {{ item.Forms }}
+                </option>
+            </select>
+        </div>
+        <div> 
+            <select class="n_BillStockInOut_QCQualityStatus">
+                @if(dic.Count>0){
+                    foreach(string key in dic.Keys){
+                        <option keys="@(key)">@(dic[key])</option>
+                    }
+                }
+            </select>
+        </div>
+        <div>
+            <input type="text" readonly="readonly" disabled="disabled" v-bind:class="PutOnOffPerson_Showed" placeholder="请输入盘点员工" value="@(PutOnOffPerson)" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="BillStockInOutRemark_Showed" placeholder="请输入单据备注" />
+        </div>
+        
+        <div v-bind:class="button_Div_Showed">
+             <div v-on:click="f_SaveBillStockInOut">确认新建</div> 
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .BillStockInOutCode, .PutOnOffPerson, .BillStockInOutRemark
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%);
+            line-height: 22px;
+            border: 1px solid lightblue;
+            text-align: center; 
+        }
+        .ChangeWarehouse
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .n_BillStockInOut_QCQualityStatus
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .s_Warehouse_ShelfForm
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        
+        
+        .button_Div div {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px; 
+
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Post请求变量
+        var ajaxobjFirst = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    BillStockInOutCode_Showed: "BillStockInOutCode", //单据编号文本框样式
+                    PutOnOffPerson_Showed: "PutOnOffPerson",   //盘点员工文本框样式
+                    BillStockInOutRemark_Showed: "BillStockInOutRemark",   //单据备注文本框样式
+                    ChangeWarehouse_Showed: "ChangeWarehouse",  //选择仓库下拉框样式
+                    button_Div_Showed: "button_Div", //按钮样式
+                    WarehouseDataList: new Array(),  //拼装仓库选择数据源
+                    ShelfFormDataList: new Array() //录入方式选择数据源
+                },
+                methods: {
+                    //加载仓库选择数据源
+                    f_loadWarehouseDataList: function () {
+                        //对象名 查询新建单据的可选仓库信息
+                        var objectName = "SelPurchasedInventoryOperationWarehouseInfo";
+                        //参数
+                        var param = {};
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+
+                            //录入方式选择数据源
+                            vue.ShelfFormDataList = new Array();
+                            if (result.Data[1].length > 0) {
+                                result.Data[1].forEach(function (value, index) {
+                                    value.isCheck = false;
+                                    vue.ShelfFormDataList.push(value);
+                                })
+                            }
+
+                            //拼装仓库选择数据源
+                            vue.WarehouseDataList = new Array();
+                            if (result.Data[0].length > 0) {
+                                var warehouse_Id = $("[name=n_Warehouse_Id]").val();
+                                var warehouse_arr = new Array();
+                                if (warehouse_Id.indexOf(";") != -1) {
+                                    var warehouse_arr = warehouse_Id.split(";");
+
+                                }
+
+                                result.Data[0].forEach(function (value, index) {
+
+                                    var n_Warehouse_selected = false;
+                                    if (warehouse_arr.length > 0) {
+                                        if (warehouse_arr[0] == value.n_Warehouse_Id) {
+                                            n_Warehouse_selected = true;
+                                        }
+                                    }
+                                    vue.WarehouseDataList.push({
+                                        n_Warehouse_Id: value.n_Warehouse_Id,
+                                        s_Warehouse_Name: value.s_Warehouse_Name,
+                                        s_Warehouse_ShelfForm: value.s_Warehouse_ShelfForm,
+                                        n_Warehouse_selected: n_Warehouse_selected
+                                    })
+                                })
+
+
+                                //如果没有员工绑定的对应库区，则默认选中第一个库区
+                                var selected_data = vue.WarehouseDataList.filter(function (item) {
+                                    return item.n_Warehouse_selected;
+                                });
+
+                                if (selected_data.length == 0 && vue.WarehouseDataList.length > 0) {
+                                    vue.WarehouseDataList[0].n_Warehouse_selected = true;
+                                    //仓库的上架录入方式默认带出
+                                    vue.ShelfFormDataList.forEach(function (v, i) {
+                                        v.isCheck = false;
+                                        if (v.keys == vue.WarehouseDataList[0].s_Warehouse_ShelfForm) {
+                                            v.isCheck = true;
+                                        }
+                                    })
+                                }
+
+                                //默认选择合格
+                                $(".n_BillStockInOut_QCQualityStatus").find("option[keys=1]").attr("selected", true);
+                            }
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+
+                        //页面初始化
+                        //this.f_reloadPage();
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("新建单据");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件
+                            window.parent.f_loadEvent("../../../../PurchasedInventoryOperation/Index?ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../PurchasedInventoryOperation/Index?ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+                        //结果表格选中样式处理
+                        $(".InfoTab tr").live("click", function () {
+
+                            $(this).siblings().removeClass("morechecked");
+                            $(this).addClass("morechecked")
+                        })
+
+                        //加载仓库选择数据源
+                        vue.f_loadWarehouseDataList();
+                    },
+                    //新增单据记录
+                    f_SaveBillStockInOut: function () {
+
+                        var obj = event.target;
+                        if ($(obj).is("[disabled]")) {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjFirst != null) {
+                            ajaxobjFirst.abort();
+                            ajaxobjFirst = null;
+                        }
+
+                        $(obj).attr("disabled", "disabled");
+
+                        var arr = new Array();
+                        arr.push({
+                            Warehouse_Id: $(".ChangeWarehouse").find("option:selected").attr("id"),
+                            BillStockInOut_Code: $(".BillStockInOutCode").val(),
+                            BillStockInOut_QualityStatus: 1,
+                            BillStockInOut_Remark: $(".BillStockInOutRemark").val(),
+                            BillStockInOut_WorkOrderQuantity: 0,
+                            n_BillStockInOut_ShelfForm: $(".s_Warehouse_ShelfForm").find("option:selected").attr("keys"),
+                            n_BillStockInOut_QCQualityStatus: $(".n_BillStockInOut_QCQualityStatus").find("option:selected").attr("keys")
+                        })
+
+                        //对象名称  新增打包盘点单据记录
+                        var ObjectName = "InsertPurchasedInventoryOperationBillStockInOut";
+                        //参数
+                        var param = { Dictionarys: arr };
+
+                        ajaxobjFirst = ajaxhelper.ajax_Post(ObjectName, param, function (result) {
+
+                            f_commonShowMsg("新建单据成功!");
+                            //清空数据并跳转到盘点操作页
+                            ajaxobjFirst = null;
+                            //setTimeout('location.href = "../../../../InventoryOperation/Index?ParentIds=" + "@(ParentIds)"', 2000);
+
+                            //获取选中的仓库数据
+                            var check_arr = vue.ShelfFormDataList.filter(function (item) {
+                                return item.isCheck;
+                            })
+
+                            if (check_arr.length == 0) {
+                                return;
+                            }
+
+                            //根据单据的所属仓库,去判定该单据的条码扫描是批量盘点[2] 还是 单件盘点[1]
+                            if (check_arr[0]["keys"] == "2") {
+                                //新建完成后，直接跳转到批量盘点条码扫描界面
+                                setTimeout('location.href = "AddBillStockInOutDetail?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "' + check_arr[0]["n_Warehouse_Id"] + '" + "&n_BillStockInOut_Id=" + "' + result.OutPut.n_BillStockInOut_Id + '" + "";', 3000);
+
+                            } else if (check_arr[0]["keys"] == "1") {
+                                //新建完成后，直接跳转到单件盘点条码扫描界面
+                                setTimeout('location.href = "AddBillStockInOutDetailSingle?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "' + check_arr[0]["n_Warehouse_Id"] + '" + "&n_BillStockInOut_Id=" + "' + result.OutPut.n_BillStockInOut_Id + '" + "";', 3000);
+
+                            } else if (check_arr[0]["keys"] == "3") {
+                                //新建完成后，直接跳转到库位盘空界面
+                                setTimeout('location.href = "AddBillStockInOutDetailInventory?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "' + check_arr[0]["n_Warehouse_Id"] + '" + "&n_BillStockInOut_Id=" + "'+ result.OutPut.n_BillStockInOut_Id + '" + "&isShowDetail=false " + "";', 2000);
+
+                            }
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjFirst = null;
+
+                            $(obj).removeAttr("disabled");
+                        })
+                    },
+                    //验证所填是否是数字,不是则清空
+                    checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    },
+                    //选择仓库下拉框
+                    changeWarehouseInfo: function (event) {
+
+                        //下拉框选中赋值
+                        vue.WarehouseDataList.forEach(function (value, index) {
+                            value.n_Warehouse_selected = false;
+                            if (value.n_Warehouse_Id == $(event.target).find("option:selected").attr("id")) {
+                                value.n_Warehouse_selected = true;
+                                //仓库的上架录入方式默认带出
+                                vue.ShelfFormDataList.forEach(function (v, i) {
+
+                                    v.isCheck = false;
+                                    if (v.keys == value.s_Warehouse_ShelfForm) {
+                                        v.isCheck = true;
+                                    }
+                                })
+                            }
+                        })
+
+                    },
+                    //选择录入方式下拉框
+                    changeFormInfo: function (event) {
+
+                        //方式变更
+                        vue.ShelfFormDataList.forEach(function (value, index) {
+                            value.isCheck = false;
+                            if (value.keys == $(event.target).find("option:selected").attr("keys")) {
+                                value.isCheck = true;
+                            }
+                        })
+                    }
+                }
+            })
+
+            //加载并初始化页面信息
+            vue.f_reloadPage();
+        })
+    </script>
+}

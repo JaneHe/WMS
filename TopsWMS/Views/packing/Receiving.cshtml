@@ -1,0 +1,768 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "收货入库";
+    ViewBag.ModuleName = "收货入库";
+    Layout = "../../TopsLib/Views/Shared/_Layout.cshtml";
+    var UserNo = Tops.FRM.TopsUser.UserNO;
+}
+
+<html>
+<head>
+
+    <title>单件流打包</title>
+    <style>
+        /*禁止这个页面内容被选中*/
+        body
+        {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            font-family: 微软雅黑;
+        }
+        /*主容器*/
+        .main
+        {
+            width: 100%;
+            max-width: 100%;
+            font-weight: bold;
+            margin: 0 auto;
+        }
+        /*头部*/
+        .top
+        {
+            width: 95%;
+            height: 150px;
+            margin: auto;
+        }
+
+        .top_centre
+        {
+            width: 100%;
+            float: left;
+            height: 100%;
+            font-size: 20px;
+        }
+
+            .top_centre > div
+            {
+                height: 100%;
+                float: left;
+            }
+
+        .yj1
+        {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            width: 72%;
+            font-size: 20px;
+            height: 58px;
+        }
+
+        input
+        {
+            outline: medium;
+        }
+
+
+        .l_qx_div1
+        {
+            margin-top: 10px;
+            font-weight: 100;
+            height: 650px;
+            border: 3px solid #0072ffc7;
+            overflow-y: auto;
+            width: 98%;
+            margin: 1px auto;
+        }
+
+
+            .l_qx_div1::-webkit-scrollbar
+            { /*滚动条整体样式*/
+                width: 40px; /*高宽分别对应横竖滚动条的尺寸*/
+                height: 1px;
+            }
+
+            .l_qx_div1::-webkit-scrollbar-thumb
+            { /*滚动条里面小方块*/
+                border-radius: 40px;
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                background: #535353;
+            }
+
+            .l_qx_div1::-webkit-scrollbar-track
+            { /*滚动条里面轨道*/
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                border-radius: 40px;
+                background: #EDEDED;
+            }
+
+        /*打印【结束】*/
+
+        .div_d1
+        {
+            height: 100px;
+            width: 100%;
+            float: left;
+            /*overflow: hidden;*/
+        }
+
+        ul, li
+        {
+            list-style: none;
+        }
+
+        .qx_List_div2
+        {
+            overflow-y: auto;
+        }
+
+
+            .qx_List_div2::-webkit-scrollbar
+            { /*滚动条整体样式*/
+                width: 40px; /*高宽分别对应横竖滚动条的尺寸*/
+                height: 1px;
+            }
+
+            .qx_List_div2::-webkit-scrollbar-thumb
+            { /*滚动条里面小方块*/
+                border-radius: 40px;
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                background: #535353;
+            }
+
+            .qx_List_div2::-webkit-scrollbar-track
+            { /*滚动条里面轨道*/
+                -webkit-box-shadow: inset 0 0 5px rgba(0,0,0,0.2);
+                border-radius: 40px;
+                background: #EDEDED;
+            }
+
+
+        #qx_ok
+        {
+            width: 250px;
+            color: #000;
+            background: rgb(255, 246, 143);
+            border: 1px solid #000;
+            font-size: 30px;
+            text-align: center;
+            margin-right: 30px;
+        }
+
+        #qx_no
+        {
+            width: 250px;
+            color: #000;
+            background: rgb(255, 246, 143);
+            border: 1px solid #000;
+            font-size: 30px;
+            text-align: center;
+            margin-right: 30px;
+        }
+
+        #qx_List
+        {
+            top: 9%;
+            left: 9%;
+            width: 80%;
+            height: 80%;
+            display: none;
+            background: #fff;
+            z-index: 8886;
+            position: absolute;
+            border: 2px solid #000;
+        }
+
+
+
+        .div_zxHaoone
+        {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            height: 90px;
+            width: 100%;
+        }
+
+        table
+        {
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        td, th
+        {
+            padding: 0;
+        }
+
+        .pure-table
+        {
+            width: 100%;
+            border-collapse: collapse;
+            border-spacing: 0;
+            empty-cells: show;
+            border: 1px solid #cbcbcb;
+        }
+
+            .pure-table caption
+            {
+                color: #000;
+                font: italic 85%/1 arial,sans-serif;
+                padding: 1em 0;
+                text-align: center;
+            }
+
+            .pure-table td, .pure-table th
+            {
+                border-left: 1px solid #cbcbcb;
+                border-width: 0 0 0 1px;
+                font-size: inherit;
+                margin: 0;
+                overflow: visible;
+                padding: .5em 1em;
+            }
+
+            .pure-table thead
+            {
+                font-size: 12px;
+                background-color: #e0e0e0;
+                color: #000;
+                text-align: left;
+                vertical-align: bottom;
+            }
+
+        #Tables
+        {
+            font-size: 12px;
+            color: #000;
+        }
+
+        .pure-table td
+        {
+            background-color: transparent;
+            border: 1px solid #cbcbcb;
+        }
+
+        .button
+        {
+            background-color: #0072ffc7; /* Green */
+            border-radius: 10px;
+            border: none;
+            color: white;
+            padding: 20px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-transition-duration: 0.4s; /* Safari */
+            transition-duration: 0.4s;
+        }
+
+        .button3
+        {
+            background: #DDDDDD; /* Green */
+            border-radius: 10px;
+            border: none;
+            color: #000;
+            padding: 20px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            -webkit-transition-duration: 0.4s; /* Safari */
+            transition-duration: 0.4s;
+        }
+
+        .button2:hover
+        {
+            box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+        }
+
+        #div_List2_dialog
+        {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            filter: alpha(Opacity=50);
+            -moz-opacity: 0.3;
+            opacity: 0.5;
+            z-index: 5000;
+        }
+    </style>
+
+    <style type="text/css">
+        .selectContainer
+        {
+            position: relative;
+            width: 60%;
+        }
+
+        .selectInput
+        {
+            border-top-right-radius: 10px;
+            border-top-left-radius: 10px;
+            border-bottom-right-radius: 10px;
+            border-bottom-left-radius: 10px;
+            width: 80%;
+            font-size: 30px;
+            height: 70px;
+            border-style: none;
+            border: 1px solid #999;
+            padding: 0 3px;
+            margin-left: 15px;
+        }
+
+
+        .picture_click
+        {
+            background: url(img/select-default.png) no-repeat;
+            opacity: 1;
+            width: 15px;
+            height: 8px;
+            position: absolute;
+            top: 10px;
+            right: 125px;
+        }
+
+            .picture_click:hover
+            {
+                background-image: url(img/select-hover.png);
+            }
+
+        .selectList
+        {
+            width: 350px;
+            height: 212px;
+            overflow-y: scroll;
+            text-align: left;
+            margin-left: 10px;
+            border: 1px solid #999;
+            display: none;
+            position: absolute;
+            background: #fff;
+        }
+
+            .selectList div
+            {
+                cursor: pointer;
+            }
+
+        .nullcon
+        {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div id="div_List2_dialog" style="display: none;"></div>
+    <div style="border: 2px solid #232323; height: 980px;">
+        <div class="top">
+            <div class="top_centre">
+                <div class="top_centre_OperType" style="width: 70%; padding: 10px 0px;">
+                    <button id="fxBox" style="font-size: 60px;" class="button button2">&nbsp; 确&nbsp;认&nbsp;入&nbsp;库&nbsp;</button>
+                </div>
+
+                <div style="float: left; font-weight: bold; line-height: 60px; text-align: right; width: 30%; color: black; font-size: 28px;">
+                    <div>当前用户:&nbsp;<span style="color: #0072ffc7" class="userName">@UserNo</span></div>
+                    <div style="color: #0072ffc7"><span id="sp_date">2018/3/15</span>&nbsp;&nbsp;<span id="sp_time">11:52:15</span></div>
+                </div>
+            </div>
+        </div>
+        <div class="div_List1" style="width: 98%; border: 2px solid #232323; margin: 1px auto;">
+            <div class="main">
+                <div id="mjxz" style="width: 95%; height: 92px; margin: 10px auto;">
+                    <div class="div_d1">
+                        <div class="div_zxHaoone">
+                            <button id="HouPrint" style="width: 26%; font-size: 30px;" class="button3">
+                                装箱单号
+                            </button>
+
+                            <div id="cityContainer" class="selectContainer">
+                                <input type="text" list="cityList" class="selectInput" name="cityName" id="cityName" value="" onfocus="fuzzySearch.call(this, 'cityList')" autocomplete="off" />
+                                <div class="picture_click dropDowns" style=""></div>
+                                <div id="cityList" class="selectList"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="qx_List">
+                <div class="qx_List_div2" style="border: 2px solid #0072ffc7; height: 80%; margin: 5px"></div>
+                <div style="height: 20%; display: flex; justify-content: flex-end; flex-wrap: nowrap">
+                    <div style="width: 40%; height: 90%; display: flex; justify-content: center; align-items: center">
+                        <button id="qx_ok" class="button button2">确&nbsp;&nbsp;&nbsp;&nbsp;定</button>
+                        <button id="qx_no" class="button button2">取&nbsp;&nbsp;&nbsp;&nbsp;消</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div style="height: 20px;"></div>
+        <div class="l_qx_div1">
+            <table class="pure-table" id="table1">
+                <thead>
+                    <tr style="text-align: center">
+                        <th style="width: 20%; text-align: center; font-size: 30px;">#</th>
+                        <th style="width: 78%; font-size: 30px;">装箱条码</th>
+                    </tr>
+                </thead>
+                <tbody id="Tables" style="font-size: 25px;"></tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
+<script src="../../TopsLib/Scripts/tFronQueentJs.js"></script>
+<script type="text/javascript">
+    var listArr = [];
+    $(function () {
+        // 加载所有的未入库ASN
+        LoadIsNotASN();
+        reloop();  //日期显示
+    })
+
+    // 加载所有的未入库ASN
+    function LoadIsNotASN() {
+        listArr = [];
+        $.topsAjax({
+            type: "GET",
+            data: {},
+            url: "/AjaxGet/SelIsLoadReceivingASN",
+            success: function (data) {
+                for (var i = 0; i < data.Data[0].length; i++) {
+                    var arr = {};
+                    arr.eleId = i
+                    arr.eleName = data.Data[0][i].s_LoadingASN;
+                    listArr.push(arr);
+                }
+            }
+        })
+    }
+
+    function fuzzySearch(listId) {
+        var that = this;
+        //初始化下拉框
+        initSearchInput(that, listId);
+
+        var aa = $('#' + listId);
+
+        //遍历数组，创建元素默认显示
+        $('#' + listId).html('');
+        $.each(listArr, function (index, item) {
+            var divStr = '<div id=' + item.eleId + '>' + item.eleName + '</div>';
+            $('#' + listId).append(divStr);
+        })
+        $('#' + listId).append('<div id="nullcon" class="nullcon">没有找到内容</div>');
+
+        //current用来记录当前元素的索引值
+        var current = 0;
+        //匹配文本框中输入的字符串
+        var showList = searchText(that, listArr, listId);
+
+        bindFun();
+
+        //为文本框绑定键盘引起事件
+        $(this).keyup(function (e) {
+            //如果输入空格自动删除
+            this.value = this.value.replace(' ', '');
+            //列表框显示
+            $('#' + listId).show();
+            if (e.keyCode == 38) {
+                current--;
+                if (current <= 0) {
+                    current = 0;
+                }
+            } else if (e.keyCode == 40) {
+                //down
+                current++;
+                if (current >= showList.length) {
+                    current = showList.length - 1;
+                }
+            }
+
+            else {
+                //other
+                showList = searchText(that, listArr, listId);
+                current = 0;
+            }
+
+
+            //设置当前项的背景色及位置
+            if (showList && showList.length != 0) {
+                $.each(showList, function (index, item) {
+                    if (index == current) {
+                        $('#' + item.eleId).css('background', '#eee');
+                        $('#' + listId).scrollTop($('#' + item.eleId).get(0).offsetTop);
+                    } else {
+                        $('#' + item.eleId).css('background', '');
+                    }
+                })
+            }
+            //设置下拉框的高度
+            //212为列表框的最大高度
+            if (showList && showList.length != 0) {
+                if (212 > $('#' + listId).find('div').eq(0).height() * showList.length) {
+                    $('#' + listId).height($('#' + listId).find('div').eq(0).height() * showList.length);
+                } else {
+                    $('#' + listId).height(212);
+                }
+            }
+        })
+    }
+
+    //绑定事件
+    function bindFun() {
+        //给下拉箭头绑定点击事件  点击下拉箭头显示/隐藏对应的列表
+        //输入框的类名为selectInput
+        //下拉箭头的类名为picture_click、dropDowns
+        //下拉列表的类名为selectList
+        for (var i = 0; i < $('.picture_click').length; i++) {
+            $('.picture_click').eq(i).click(function () {
+                $(this).parent().find('.selectList').toggle();
+            })
+        }
+
+        //为列表中的每一项绑定鼠标经过事件
+        $('.selectList div').mouseenter(function () {
+            $(this).css("background", "#eee").siblings().css("background", "");
+        });
+        //为列表中的每一项绑定单击事件
+        $('.selectList div').bind('click', function () {
+            //文本框为选中项的值
+            $(this).parent().parent().find('.selectInput').val($(this).html());
+            //下拉框隐藏
+            $(this).parent().hide();
+        });
+    }
+
+
+    function initSearchInput(that, listId) {
+
+        //点击下拉框外部的时候使下拉框隐藏
+        var dropDowns = document.getElementsByClassName('dropDowns');
+        var selectList = document.getElementsByClassName('selectList');
+
+        document.body.onclick = function (e) {
+            e = e || window.event;
+            var target = e.target || e.srcElement;
+            //console.info('target', target);
+            //console.info('that', that);
+            //console.info('===', target == that)
+            if (target == that) {
+                $('#' + listId).show();
+            } else {
+                for (var i = 0; i < dropDowns.length; i++) {
+                    if (target != dropDowns[i] && target != selectList[i]) {
+                        selectList[i].style.display = 'none';
+                    }
+                }
+            }
+
+        }
+    }
+
+
+    function searchText(that, listArr, listId) {
+        //文本框中输入的字符串
+        var searchVal = $(that).val();
+        var showList = [];
+        if (showList.length == 0 && !$(that).val()) {
+            //showList为列表中和所输入的字符串匹配的项
+            showList = listArr;
+        }
+
+        if (searchVal) {
+            //将和所输入的字符串匹配的项存入showList
+            //将匹配项显示，不匹配项隐藏
+            $.each(listArr, function (index, item) {
+                if (item.eleName.indexOf(searchVal) != -1) {
+                    $('#' + item.eleId).css('display', 'block');
+                    showList.push(item);
+                } else {
+                    $('#' + item.eleId).css('display', 'none');
+                }
+            })
+        } else {
+            showList = listArr;
+            $.each(listArr, function (index, item) {
+                $('#' + item.eleId).css('display', 'block');
+            })
+            $(that).siblings('.selectList').find('#nullcon').hide();
+        }
+
+        if (showList.length == 0 && $(that).val()) {
+            $('#' + listId).height(50);
+            $(that).siblings('.selectList').find('#nullcon').html('没有找到"' + $(that).val() + '"的内容').show();
+        }
+
+        //  console.log('showList', showList);
+
+        return showList;
+    }
+
+
+    // 单件流条码回车事件
+    $("#cityName").keydown(function (e) {
+        if (e.keyCode == 13) {
+            var s_PackingASN = $("#cityName").val();
+            $("#cityName").val("");
+            if ($("#HouPrint").text().trim() == "ASN") {
+                if (s_PackingASN == "" || s_PackingASN == undefined || s_PackingASN == null) {
+                    alertN("请扫入条码！");
+                    $("#cityName").val("");
+                    $("#cityName").focus().val();
+                    return;
+                }
+
+                for (var i = 0; i < datass.length; i++) {
+                    if (datass[i] == s_PackingASN) {
+                        alertN("该箱号已录入！");
+                        return;
+                    }
+                }
+                datass[nusberss] = s_PackingASN;
+
+                $.topsAjax({
+                    type: "GET",
+                    data: {
+                        ASN: s_PackingASN
+                    },
+                    url: "/AjaxGet/SelReceivingList",
+                    success: function (data) {
+                        //有值赋值
+                        //if (data.Data[1].length > 0) {
+                        //    alertN("该箱号已扫描请重新扫入!");
+                        //    $("#s_PackingASN").val("");
+                        //    $("#s_PackingASN").focus().val();
+                        //    return;
+                        //}
+                        //debugger;
+                        if (data.Data[0].length > 0) {
+                            var tr = ""
+                            for (var i = 0; data.Data[0].length > i; i++) {
+                                nusberss = nusberss + 1;
+                                if (data.Data[0][i].d_OutTime.length == 0) {
+                                    tr += "<tr name='" + data.Data[0][i].s_PackingASN + "' style='background:#99CCFF;'><td  style='text-align:center'>" + nusberss
+                                         + "</td><td style='text-align:center'>" + data.Data[0][i].s_PackingASN
+                                          + "</td></tr>"
+                                } else {
+                                    tr += "<tr name='" + data.Data[0][i].s_PackingASN + "' style='background:#29e112;'><td  style='text-align:center'>" + nusberss
+                                         + "</td><td style='text-align:center'>" + data.Data[0][i].s_PackingASN
+                                          + "</td></tr>"
+                                }
+                            }
+                            $("#Tables").prepend(tr);
+                            $("#cityName").focus().val();
+                        } else {
+                            alertN("该ASN不存在！");
+                            datass = [];
+                            $("#cityName").val("");
+                            $("#cityName").focus().val();
+                        }
+                    }
+                })
+            } else {
+                if ($("tr[name='" + s_PackingASN + "']").length == 0) {
+                    alert("请确认该装箱单是否为当前ASN下");
+                    return;
+                } else {
+                    $("tr[name='" + s_PackingASN + "']").css({ "background": "#29e112" }).addClass("xz_ASN")
+
+                }
+
+            }
+        }
+    });
+
+
+    //日期时间显示
+    function reloop() {
+        var time = new Date();
+        var year = time.getFullYear();
+        var month = time.getMonth() + 1;
+        var day = time.getDate();
+        var hour = time.getHours();
+        var minute = time.getMinutes();
+        var second = time.getSeconds();
+        if (minute < 10) {
+            minute = "0" + minute;
+        }
+        if (second < 10) {
+            second = "0" + second;
+        }
+        $("#sp_date").html(year + "/" + month + "/" + day);
+        $("#sp_time").html(hour + ":" + minute + ":" + second);
+        setTimeout("reloop()", 1000);
+    }
+
+    //* 阻止键盘弹出
+    function f_preventKeyBoardsss() {
+        $("#cityName").click(function () {
+            $(this).attr("readonly", "readonly");
+            nowfocus = $(this);
+            setTimeout(function () {
+                nowfocus.removeAttr("readonly");
+            }, 100);
+        });
+
+        //focus
+        $("#cityName").focus(function () {
+            $(this).attr("readonly", "readonly");
+            nowfocus = $(this);
+            setTimeout(function () {
+                nowfocus.removeAttr("readonly");
+            }, 100);
+        });
+    }
+
+    //点击切换扫码状态
+
+    $("#HouPrint").click(function () {
+        if ($(this).text().trim() == "装箱单号") {
+            $(this).text("ASN");
+        } else if ($(this).text().trim() == "ASN") {
+            $(this).text("装箱单号");
+        }
+    });
+    var datass = [];
+    var nusberss = 0;
+
+    // 封车
+    $("#fxBox").click(function () {
+
+        if (datass.length == 0) {
+            return;
+        }
+
+        var ASN = new Array();
+
+        for (var i = 0; i < datass.length; i++) {
+            ASN[i] = {
+                LoadingASN: datass[i]
+            }
+        };
+
+        $.topsAjax({
+            type: "POST",
+            url: "/AjaxPost/AddSelReceivingList",
+            data: { ASN: ASN },
+            success: function (data) {
+                if (data.IsSuccess) {
+                    alert("入库完成");
+                    setTimeout("location.reload();", 4000);
+                }
+            }
+        })
+    });
+
+</script>

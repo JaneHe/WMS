@@ -1,0 +1,308 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+}
+@section Body{
+    <div class="body">
+        <div>
+            <table v-bind:class="SearchTab_Showed">
+                <tr>
+                    <td>
+                        储位
+                    </td>
+                    <td>
+                        <input type="text" v-bind:class="SpaceBarCode_Showed" placeholder="储位二维码" v-on:keyup.enter="f_keyupSpaceBarCode" />
+                    </td>
+                    <td>
+                        器具
+                    </td>
+                    <td>
+                        <input type="text" v-bind:class="BinBarCode_Showed" placeholder="器具二维码" v-on:keyup.enter="f_keyupBinBarCode"  />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        条码
+                    </td>
+                    <td colspan="3">
+                        <input type="text" v-bind:class="BarCode_Showed" placeholder="请录入条形码" v-on:keyup.enter="f_keyupBarCode" />
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        数量
+                    </td>
+                    <td colspan="3">
+                        <input type="text" v-bind:class="Amount_Showed" placeholder="请输入数量" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <table v-bind:class="InfoTab_Showed">
+                <tr>
+                    <td>
+                        储位
+                    </td>
+                    <td>
+                        {{ DataList.SpaceBarCode }}
+                    </td>
+                    <td>
+                        器具
+                    </td>
+                    <td>
+                        {{ DataList.BinBarCode }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        条码
+                    </td>
+                    <td colspan="3">
+                        {{ DataList.BarCode }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        工件编码
+                    </td>
+                    <td colspan="3">
+                        {{ DataList.GoodsProductCode }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        工件名称
+                    </td>
+                    <td colspan="3">
+                        {{ DataList.GoodsProductName }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        车型
+                    </td>
+                    <td>
+                        {{ DataList.CarSeries }}
+                    </td>
+                    <td>
+                        颜色
+                    </td>
+                    <td>
+                        {{ DataList.CarColor }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        批次
+                    </td>
+                    <td>
+                        {{ DataList.Batch }}
+                    </td>
+                    <td>
+                        库位数量
+                    </td>
+                    <td>
+                        {{ DataList.SpaceSurplusAmount }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="button_Div_Showed">
+            <div v-on:click="f_SaveInventoryRecord">
+                确认保存</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .SearchTab
+        {
+            width: calc(90%);
+            margin: calc(2%) calc(5%);
+            font-size: 13px;
+        }
+        .SearchTab td:nth-child(odd)
+        {
+            width: 10%;
+            text-align: center;
+            line-height: 26px;
+        }
+        .SearchTab td:nth-child(even)
+        {
+            width: 40%;
+            line-height: 26px;
+            text-align: center;
+        }
+        .SpaceBarCode, .BinBarCode, .BarCode
+        {
+            width: 90%;
+            border: 1px solid lightblue;
+            line-height: 25px;
+            margin: 0 10% 0 0;
+        }
+        .BarCode
+        {
+            width: 95.7%;
+            border: 1px solid lightblue;
+            line-height: 25px;
+        }
+        .Amount
+        {
+            width: 95.8%;
+            border: 1px solid lightblue;
+            line-height: 25px;
+            float: left;
+        }
+        
+        .InfoTab
+        {
+            width: calc(90%);
+            line-height: 26px;
+            border-collapse: collapse;
+            margin: calc(2%) calc(5%);
+            font-size: 13px;
+        }
+        .InfoTab td:nth-child(odd)
+        {
+            width: 20%;
+            text-align: center;
+            line-height: 26px;
+            border: 1px solid green;
+        }
+        .InfoTab td:nth-child(even)
+        {
+            width: 30%;
+            line-height: 26px;
+            text-align: center;
+            border: 1px solid green;
+        }
+        
+        .button_Div div
+        {
+            width: calc(90%);
+            margin: calc(0%) calc(5%) calc(2%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 14px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Get对象
+        var ajaxobjSecond = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    SearchTab_Showed: "SearchTab", //输入表格的样式
+                    SpaceBarCode_Showed: "SpaceBarCode", //储位二维码的样式
+                    BinBarCode_Showed: "BinBarCode",  //器具二维码的样式
+                    BarCode_Showed: "BarCode", //条码的样式
+                    Amount_Showed: "Amount", //数量的样式
+                    InfoTab_Showed: "InfoTab",  //信息表格的样式
+                    button_Div_Showed: "button_Div", //按钮的样式
+                    DataList: {
+                        SpaceBarCode: "", //储位二维码
+                        BinBarCode: "", //器具二维码
+                        BarCode: "", //条码二维码
+                        GoodsProductCode: "", //工件编码
+                        GoodsProductName: "", //工件名称
+                        SpecificationModel: "", //规格型号
+                        CarSeries: "", //车型
+                        CarColor: "", //颜色
+                        Batch: "", //批次
+                        SpaceSurplusAmount: "---" //剩余库位数量
+                    }
+                },
+                methods: {
+                    //保存盘点操作记录
+                    f_SaveInventoryRecord: function () {
+
+                    },
+                    //储位二维码改值事件
+                    f_keyupSpaceBarCode: function () {
+
+                        vue.DataList.SpaceBarCode = $(".SpaceBarCode").val();
+                        $(".SpaceBarCode").val("");
+
+                        //自动聚焦于条码文本框
+                        $(".BarCode").val("").select();
+                    },
+                    //器具二维码改值事件
+                    f_keyupBinBarCode:function(){
+
+                        vue.DataList.BinBarCode = $(".BinBarCode").val();
+                        $(".BinBarCode").val("");
+
+                        //自动聚焦于数量文本框
+                        $(".Amount").val("").select();
+                    },
+                    //条码二维码改值事件
+                    f_keyupBarCode: function () {
+
+                        vue.DataList.BarCode = $(".BarCode").val();
+                        $(".BarCode").val("");
+
+                        //自动聚焦于数量文本框
+                        $(".Amount").val("").select();
+
+                        //对象名 根据喷涂下线QA码查询到相应的货物信息
+                        var objectName = "SelInventoryGoodsInfo";
+                        //传递参数
+                        var param = {
+                            GoodsBarCode: vue.DataList.BarCode,
+                            SpaceBarCode: vue.DataList.SpaceBarCode,
+                            s_ReportInventoryCurrent_QualityStatus: 1
+                        };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            if (result.Data != []) {
+                                vue.DataList.GoodsProductCode = result.Data[0][0].s_MotherCode;
+                                vue.DataList.GoodsProductName = result.Data[0][0].s_Mother_Desc;
+                                vue.DataList.SpecificationModel = "---";
+                                vue.DataList.CarSeries = result.Data[0][0].s_CarSeries;
+                                vue.DataList.CarColor = result.Data[0][0].s_CarColor;
+                                vue.DataList.Batch = result.Data[0][0].s_Batch;
+                                vue.DataList.SpaceSurplusAmount = result.Data[0][0].s_SurplusAmount;
+                            }
+                        }, function (result) {
+
+                            f_commonShowMsg("该条码无对应的工件信息，请确认BOM是否有该工件信息!");
+
+                        })
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("盘点操作");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //加载返回事件 
+                        window.parent.f_loadEvent("../../../../InventoryOperation/Index?ParentIds=" + "@ParentIds");
+
+                        //自动焦点
+                        $(".SpaceBarCode").val("").focus();
+
+                    }
+                }
+            })
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+ 
+    </script>
+}

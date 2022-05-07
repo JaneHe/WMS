@@ -1,0 +1,302 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "漆件预测库存日当量统计报表";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelForecastWareDayStockList";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    //var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName); 
+    
+    //foreach (string key in metas[0].Keys)
+    //{
+    //    metas[0][key].Type = "String";
+    //}
+     
+    
+    //var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+
+    //Excel文件名称时间后缀
+    string ExcelDate = DateTime.Now.ToString("yyyyMMdd"); 
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+    <div id="hiddenlist">
+        <input type="hidden" name="exportdata" value="SelForecastWareDayStockList_ExcelData" />
+        <input type="hidden" name="exportcolumn" value="SelForecastWareDayStockList_Columns" />
+        <input type="hidden" name="exportsheetname" value="预测库存日当量报表_@(ExcelDate)" />
+        <input type="hidden" name="exportcondition" value="" />
+    </div>
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+            string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+            var fieldName = biz.Fields[i].FieldName;
+            var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+            <div class="param_item">
+                @if (lookupField != null && lookupField.ToList().Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                    <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                    </script>
+                }
+                else if (biz.Fields[i].DataList.Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <select name="@(fieldName)" fieldType="select" >
+                        @foreach (var item in biz.Fields[i].DataList)
+                        {
+                            <option value="@(item.Key)">@(item.Value)</option>
+                        }
+                    </select>
+                }
+                else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                }
+                else
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                }
+            </div>
+        }
+        <div style="clear: both;">
+        </div>
+    </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+        var topsRender = null;
+        var grid = null;
+
+        var beginDate = new Date();
+        var bdate = beginDate.getDate();
+        bdate = bdate + 1;
+        beginDate.setDate(bdate);
+
+        var endDate = new Date();
+        var edate = endDate.getDate();
+        edate = edate + 8;
+        endDate.setDate(edate);
+
+        var beginDates = beginDate.getFullYear().toString() + "-" + (beginDate.getMonth() + 1 < 10 ? "0" + (beginDate.getMonth() + 1) : (beginDate.getMonth() + 1).toString())
+            + "-" + (beginDate.getDate() < 10 ? "0" + beginDate.getDate() : beginDate.getDate().toString());
+
+        var endDates = endDate.getFullYear().toString() + "-" + (endDate.getMonth() + 1 < 10 ? "0" + (endDate.getMonth() + 1) : (endDate.getMonth() + 1).toString())
+            + "-" + (endDate.getDate() < 10 ? "0" + endDate.getDate() : endDate.getDate().toString());
+
+        $(function () {
+            $("#module_toolbar input").hide();
+            $("#searchBt,#exportBt").show();
+
+            //渲染插件
+            topsRender = $("#paramlist *[fieldType]").pluginRender();
+
+            $("#module_toolbar").append("<label style='color:red;'>说明:出库数量取自FIFO系统的出库记录表。      公式:历史日均出库量 = 阶段出库量/均分天数</label>");
+
+            $("[name=BeginTime]").val(beginDates);
+            $("[name=EndTime]").val(endDates);
+
+            $("[name=DayCou]").val(7);
+
+            //初始化表格
+            grid = $("#datagrid").ligerGrid({
+                columns: [
+  {
+      "name": "JISBeginTime",
+      "display": "开始时间",
+      "align": "left",
+      "width": 80,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISEndTime",
+      "display": "结束时间",
+      "align": "left",
+      "width": 80,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISBrand",
+      "display": "品牌",
+      "align": "left",
+      "width": 70,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISVariant",
+      "display": "系列",
+      "align": "left",
+      "width": 70,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISMatherCode",
+      "display": "U9系统产品编码",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISPartNumber",
+      "display": "存货代码",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISPartName",
+      "display": "存货名称",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISPartType",
+      "display": "产品大类",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISPackageGroupName",
+      "display": "分类",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISPartColor",
+      "display": "颜色",
+      "align": "left",
+      "width": 70,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISAI",
+      "display": "工程变更号",
+      "align": "left",
+      "width": 90,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISQuantity",
+      "display": "阶段出库量",
+      "align": "left",
+      "width": 90,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISAVGDay",
+      "display": "均分天数",
+      "align": "left",
+      "width": 70,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  },
+  {
+      "name": "JISAVGQuantity",
+      "display": "预测日均出库量",
+      "align": "left",
+      "width": 100,
+      "hide": false,
+      "type": "String",
+      "editor": null,
+      "frozen": false
+  }
+],
+                url: '/AjaxGridData/SelForecastWareDayStockList',
+                method: 'get',
+                delayLoad: true,
+                dataType: "local",
+                dataAction: 'server',
+                root: 'Data',                       //数据源字段名
+                record: 'Other1',                     //数据源记录数字段名
+                rownumbers: true,
+                //data: AllProductData, 
+                showTitle: false,
+                width: '99.5%',
+                height: '100%',
+                heightDiff: -10,
+                enabledSort: true,
+                onSuccess: function (data, b) {
+                    $.topsErrorDeal(data);
+                },
+                onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                    var idKey = '@(biz.Sqls[0].Key)';
+                    if ($.trim(idKey) == '') return;
+                    var idData = new Object();
+                    idData[idKey] = rowdata[idKey];
+                    f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "/module/modify?" + "ctrl=edit&id=" + escape($.toJSON(idData)) + "&" + Math.random());
+                }
+            });
+
+            //重置分页框
+            //$("select[name=rp]").empty().append('<option value="50">50</option><option value="100">100</option><option value="200">200</option><option value="1000">1000</option><option value="2000">2000</option><option value="5000">5000</option>');
+
+            //绑定按钮事件
+            $("#searchBt").click(function () {
+                //            grid.options.parms = $("form#paramForm").serializeArray();
+                //            grid.loadServerData(grid.options.parms);
+
+                $('select[name=rp]').val($(".l-bar-group,.l-bar-selectpagesize").find("option:selected").val());
+                grid.options.parms = $("form#paramForm").serializeArray();
+                $('select[name=rp]').change();
+            });
+            $("#addBt").click(function () {
+                f_addTab("Add", "添加", "/module/modify?" + "ctrl=add&" + Math.random());
+            });
+            $("#exportBt").click(function () {
+                $("#paramForm").submit();
+            })
+
+            $("#searchBt").click();
+
+        });
+        function f_flushGrid() {
+            grid.loadData();
+        }
+    </script>
+}
+<div id="datagrid">
+</div>

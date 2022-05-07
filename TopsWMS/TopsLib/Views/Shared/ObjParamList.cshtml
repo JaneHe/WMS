@@ -1,0 +1,92 @@
+﻿@using Tops.FRM;
+@{
+    var biz = ViewBag.Biz as Tops.FRM.Biz;
+    var metas = ViewBag.Metas as List<Dictionary<string, Tops.FRM.TopsMeta>>;
+    var ctrl = Model as String;//add|edit
+    List<string> readonlyFields = new List<string>();
+    if (ctrl == "add")
+    {
+        readonlyFields = TopsCommon.FieldsStr2List(biz.ReadOnly4Adds);
+    }
+    else if (ctrl == "edit")
+    {
+        readonlyFields = TopsCommon.FieldsStr2List(biz.ReadOnly4Edits);
+    }
+}
+@foreach (var meta in metas[0])
+{
+    string labelStr = meta.Value.Caption;
+    int width = meta.Value.Width;
+    var lookupField = biz.Lookups.Where(p => p.KeyField == meta.Key);
+    var fieldDisabled = readonlyFields.Contains(meta.Key) ? "true" : "false";
+    <div class="param_item" style="@(meta.Value.Hide ? "display:none;" : "")">
+        @if (lookupField != null && lookupField.ToList().Count > 0)
+        {
+            <table>
+                <tr>
+                    <td>
+                        <label class="plugin_label">@(labelStr):</label></td>
+                    <td>
+                        <input type="text" name="@(meta.Key)"  fieldType="lookup" label="@(labelStr)" fieldWidth="@(width)" fieldDisabled="@(fieldDisabled)" /></td>
+                </tr>
+            </table>
+        }
+        else if (meta.Value.DataList.Count > 0)
+        {
+            <table>
+                <tr>
+                    <td>
+                        <label class="plugin_label">@(labelStr):</label></td>
+                    <td>
+                        <select name="@(meta.Key)" fieldType="select"  fieldDisabled="@(fieldDisabled)">
+                            @foreach (var item in meta.Value.DataList)
+                            {
+                                <option value="@(item.Key)">@(item.Value)</option>
+                            }
+                        </select></td>
+                </tr>
+            </table>
+        }
+        else if (meta.Value.Type == "DateTime")
+        {
+            <input type="text" name="@(meta.Key)"  fieldType="date" label="@(labelStr)" fieldWidth="@(width)"  fieldDisabled="@(fieldDisabled)" />
+        }
+        else if (meta.Value.Type == "Int32")
+        {
+            <table>
+                <tr>
+                    <td>
+                        <label class="plugin_label">@(labelStr):</label></td>
+                    <td>
+                        <input type="text" name="@(meta.Key)"  fieldType="int" label="@(labelStr)"  fieldDisabled="@(fieldDisabled)"/></td>
+                </tr>
+            </table>
+        }
+        else if (meta.Value.Type == "Decimal" || meta.Value.Type == "Double")
+        {
+            <table>
+                <tr>
+                    <td>
+                        <label class="plugin_label">@(labelStr):</label></td>
+                    <td>
+                        <input type="text" name="@(meta.Key)"  fieldType="float" label="@(labelStr)"  fieldDisabled="@(fieldDisabled)"/></td>
+                </tr>
+            </table>
+        }
+        else if (meta.Value.Type == "text")
+        {
+            <table>
+                <tr><td>
+                        <label class="plugin_label">@(labelStr):</label></td>
+                    <td>
+                        <textarea class="l-textarea"  name="@(meta.Key)"  fieldType="textarea" label="@(labelStr)" fieldWidth="@(width)"  fieldDisabled="@(fieldDisabled)" rows="4" cols="100"></textarea></td>
+                </tr>
+            </table>
+        }
+        else
+        {
+            <input type="text" name="@(meta.Key)"  fieldType="textbox" label="@(labelStr)" fieldWidth="@(width)"  fieldDisabled="@(fieldDisabled)"/>
+        }
+    </div>
+}
+<div style="clear: both;"></div>

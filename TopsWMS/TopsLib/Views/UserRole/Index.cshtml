@@ -1,0 +1,56 @@
+﻿@{
+    ViewBag.Title = "Role";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+}
+
+@section Script{
+    <script type="text/javascript">
+    var grid=null;
+    $(function () {
+        $("#searchBt,#addBt").show();
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: [
+                { display: '角色编码', name: 'RoleID' },
+                { display: '角色名称', name: 'RoleName' }
+                ],
+            url: '/AjaxGridData/SelRoles',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                f_addTab(rowdata.RoleID, "维护[" + rowdata.RoleID + "]", "/UserRole/Modify?RoleID=" + rowdata.RoleID + "&RoleName=" +escape(rowdata.RoleName) + "&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+        });
+        $("#addBt").click(function () {
+            f_addTab("Role_Add", "添加角色", "/UserRole/Modify?" + Math.random());
+        });
+    });
+    </script>
+}
+
+@section Params{
+
+}
+
+
+<div id="datagrid">
+</div>

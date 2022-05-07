@@ -1,0 +1,527 @@
+﻿<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+        <title>检具室可视化管控平台</title>
+    <script src="../../TopsLib/Scripts/jquery-1.5.1.min.js"></script>
+    <script src="../../TopsLib/Scripts/jquery.json-2.3.min.js"></script>
+  @*  <script src="../../TopsLib/Scripts/highCharts/V8/highcharts.js"></script>*@
+        <script type="text/javascript">
+            $(function () {
+                var count1 = "";
+                var hege1 = "";
+                var buhege1 = "";
+                var bili = new Array();
+                var pname1 = new Array();
+                var hegedata1 = new Array();
+                var buhegedata1 = new Array();
+                var count2 = "";
+                var hege2 = "";
+                var buhege2 = "";
+                var bili2 = new Array();
+                var pname2 = new Array();
+                var hegedata2 = new Array();
+                var buhegedata2 = new Array();
+                var count3 = "";
+                var hege3 = "";
+                var buhege3 = "";
+                var bili3 = new Array();
+                var pname3 = new Array();
+                var hegedata3 = new Array();
+                var buhegedata3 = new Array();
+                var zhouqi = "";
+                function show() {
+
+                    var now = new Date();
+                    var year = now.getFullYear();//年
+                    var month = now.getMonth();//月
+                    var date = now.getDate();//日
+                    var hour = now.getHours();//时
+                    var minute = now.getMinutes();//分
+                    var second = now.getSeconds();//秒
+                    localStorage.PageIndex = 0;
+                    localStorage.cishu1 = 1;
+                    localStorage.cishu2 = 1;
+                    localStorage.cishu3 = 1;
+                    if (second < 10) {
+                        second = "0" + second;
+                    }
+                    $("#year").html(year + "年" + month + "月" + date + "日");
+                    $("#hours").html(hour + ":" + minute + ":" + second)
+                    t = setTimeout(show, 500);
+                    function checkTime(i) {
+                        if (i < 10) {
+                            i = "0" + i;
+                        }
+                        return i;
+                    }
+                }
+                show();
+                f_GetDataList();
+                var heigth=$(window).height();
+                var width=$(window).width();
+                $("#Main").css("height", heigth);
+                $("#Main").css("width", width);
+
+                //var index = 0;
+                ////5秒轮播一次
+                //var timer = setInterval(function () {
+                //    var length = 0;
+                //    $(".ProductKB").each(function () {
+                //        length += 1;
+                //    })
+                //    if (index >= length - 1) {
+                //        index = 0
+                //        setInterval(window.location.href = '/Submit/SubmitProductPage', 2000)
+                //    } else {
+                //        index = index + 1;
+                //    }
+                //   // 某个div显示，其他的隐藏
+                //    $(".ProductKB").hide()
+
+                //    setTimeout(function () {
+                //        $(".ProductKB").eq(index).show();
+                //        var count = index + 1;
+                //        if (count == 1) {
+                //            $(".container1").highcharts().reflow();
+                //            $(".containers1").highcharts().reflow();
+                //            $(".container2").highcharts().reflow();
+                //            $(".containers2").highcharts().reflow();
+                //            $(".container3").highcharts().reflow();
+                //            $(".containers3").highcharts().reflow();
+                //        } else {
+                //            count += 2;
+                //            $(".container" + count + "").highcharts().reflow();
+                //            $(".containers" + count + "").highcharts().reflow();
+                //        }
+
+
+                //    }, 500);
+
+                //}, 1000 * 5);
+
+                setInterval("f_GetDataList()", 1000 * 10);
+                //setInterval("location.reload();", 1000 * 60 * 1);//十分钟刷新整个页面
+            })
+            function f_GetDataList() {
+                localStorage.PageIndex = (parseInt(localStorage.PageIndex) + 1)
+                $.ajax({
+                    type: "GET",
+                    url: "/AjaxGet/SelMainGreenPage",
+                    data: { "PageIndex": localStorage.PageIndex,
+                        cishus1: localStorage.cishu1,
+                        cishus2: localStorage.cishu2,
+                        cishus3: localStorage.cishu3
+                    },
+                    dealError: false,
+                    success: function (data) {
+                        var data = JSON.parse(data);
+                        if (data.IsSuccess) {
+                            if (data.Data["length"] > 0) {
+                                $(".containers1").html("");
+                                $(".containers2").html("");
+                                $(".containers3").html("");
+                                $("#Temperature").html("");
+                                $("#Humidity").html("");
+                                $("#imgMeasure").attr('src', '');
+                                $("#MeasureName").html("");
+                                $("#Measure").html("");
+                                $("#shift").html("");
+                                $("#imgMonitor").attr('src', '');
+                                $("#MonitorName").html("");
+                                $("#Monitor").html("");
+                                $("#TestTime").html("");
+                                var hift = data.Data[2][0].s_hift;
+                                if (hift == "A") {
+                                    hift = "A班"
+                                }
+                                else {
+                                    hift = "B班";
+                                }
+                                var position1 = data.Data[1][0].s_position;
+                                if (position1 == 1) {
+                                    position1 = "班长"
+                                }
+                                else {
+                                    position1 = "测量员";
+                                }
+                                var position2 = data.Data[2][0].s_position;
+                                if (position2 == 1) {
+                                    position2 = "班长"
+                                }
+                                else {
+                                    position2 = "测量员";
+                                }
+                                if (data.Data[0].length == 0) {
+
+                                    $("#Temperature").append("℃");
+                                    $("#Humidity").append("%");
+                                }
+                                else {
+                                    $("#Temperature").append(data.Data[0][0].n_Temperature + "℃");
+                                    $("#Humidity").append(data.Data[0][0].n_Humidity + "%");
+                                }
+                                $("#imgMeasure").attr('src', data.Data[1][0].s_Imageurl);
+                                $("#MeasureName").append(data.Data[1][0].s_name);
+                                $("#Measure").append(position1);
+                                $("#shift").append(hift);
+                                $("#imgMonitor").attr('src', data.Data[2][0].s_Imageurl);
+                                $("#MonitorName").append(data.Data[2][0].s_name);
+                                $("#Monitor").append(position2);
+                                zhouqi = data.Data[3][0].s_Cycle;
+                                if (zhouqi == 1) {
+                                    zhouqi = '日';
+                                }
+                                else if (zhouqi == 2) {
+                                    zhouqi = '周';
+                                }
+                                else if (zhouqi == 3) {
+                                    zhouqi = '月';
+                                }
+                                else {
+                                    zhouqi = '年'
+                                }
+                                $("#TestTime").append(zhouqi + "测量产品数量统计");
+                                //如果查询不到数据，重新跳转会首页
+                                if (data.Data[4].length == 0 && data.Data[5].length == 0 && data.Data[6].length == 0 && localStorage.PageIndex != 1) {
+                                    localStorage.PageIndex = 0;
+                                    f_GetDataList();
+                                }
+                                //  background:url(../../Images/Submit/红色.png)no-repeat  12%
+
+                                if (data.Data[4].length != 0) {
+                                    var html = "";
+                                    html += "<table  class='table'>"
+                                    html += "<tr>"
+                                    if (data.Data[4][0].n_QualifiedCount > 0) {
+                                        html += "  <td  colspan='9' style='text-align:left'>" + data.Data[4][0].s_ProjectName + "</td>"
+                                    }
+                                    html += "</tr>"
+                                    html += "<tr> <td>产品</td>"
+                                    for (var i = 0; i < 8; i++) {
+                                        if (data.Data[4][i] != undefined) {
+                                            if (data.Data[4][i].n_QualifiedCount > 0) {
+                                                html += "<td>" + data.Data[4][i].s_SubmitName + "</td>"
+                                            } else {
+                                                html += " <td></td>"
+                                            }
+                                        }
+                                        else {
+                                            html += " <td></td>"
+                                        }
+                                    }
+
+                                    html += " </tr>"
+                                    html += " <tr>   <td>数量</td>"
+                                    for (var i = 0; i < 8; i++) {
+
+                                        if (data.Data[4][i] != undefined) {
+                                            html += "<td>" + data.Data[4][i].n_QualifiedCount + "</td>"
+                                        } else {
+                                            html += " <td></td>"
+                                        }
+                                    }
+
+                                    html += "  </tr>"
+                                    html += " <tr> <td >尺寸状态</td>"
+                                    for (var i = 0; i < 8; i++) {
+
+                                        if (data.Data[4][i] != undefined) {
+                                            if (data.Data[4][i].n_QualifiedCount > 0) {
+                                                html += "<td <input style='width:98%;height:98%;background-color:green;font-size:22px;color:white;text-align:center;' value='合格' /></td>"
+                                            }
+                                            else {
+                                                html += "<td <input style='width:98%;height:98%;font-size:22px;color:white;text-align:center;' value='' /></td>"
+                                            }
+                                        } else {
+                                            html += "<td <input style='width:98%;height:98%;font-size:22px;color:white;text-align:center;' value='' /></td>"
+                                        }
+                                    }
+                                    html += " </tr></table>"
+                                    localStorage.cishu1 = data.Data[5][0].cishu;
+                                    $(".containers1").append(html);
+
+                                }
+                                if (data.Data[6].length != 0) {
+                                    var html = "";
+                                    html += "<table  class='table'>"
+                                    html += "<tr>"
+                                    if (data.Data[6][0].n_UnqualifiedCount > 0) {
+                                        html += "  <td  colspan='9' style='text-align:left'>" + data.Data[6][0].s_ProjectName + "</td>"
+                                    }
+                                    html += "</tr>"
+                                    html += "<tr> <td>产品</td>"
+                                    for (var i = 0; i < 8; i++) {
+                                        if (data.Data[6][i] != undefined) {
+                                            if (data.Data[6][i].n_UnqualifiedCount > 0) {
+                                                html += "<td>" + data.Data[6][i].s_SubmitName + "</td>"
+                                            } else {
+                                                html += " <td></td>"
+                                            }
+                                        }
+                                        else {
+                                            html += " <td></td>"
+                                        }
+                                    }
+
+                                    html += " </tr>"
+                                    html += " <tr>   <td>数量</td>"
+                                    for (var i = 0; i < 8; i++) {
+
+                                        if (data.Data[6][i] != undefined) {
+                                            html += "<td>" + data.Data[6][i].n_UnqualifiedCount + "</td>"
+                                        } else {
+                                            html += " <td></td>"
+                                        }
+                                    }
+
+                                    html += "  </tr>"
+                                    html += " <tr> <td >尺寸状态</td>"
+                                    for (var i = 0; i < 8; i++) {
+
+                                        if (data.Data[6][i] != undefined) {
+                                            if (data.Data[6][i].n_UnqualifiedCount > 0) {
+                                                html += "<td <input style='width:98%;height:98%;background-color:green;font-size:22px;color:white;text-align:center;' value='合格' /></td>"
+                                            }
+                                            else {
+                                                html += "<td <input style='width:98%;height:98%;font-size:22px;color:white;text-align:center;' value='' /></td>"
+                                            }
+                                        } else {
+                                            html += "<td <input style='width:98%;height:98%;font-size:22px;color:white;text-align:center;' value='' /></td>"
+                                        }
+                                    }
+                                    html += " </tr></table>"
+                                    localStorage.cishu2 = data.Data[7][0].cishu;
+                                    $(".containers2").append(html);
+
+                                }
+                                if (data.Data[8].length != 0) {
+                                    var html = "";
+                                    html += "<table  class='table'>"
+                                    html += "<tr>"
+                                    if (data.Data[8][0].n_UnqualifiedCount > 0) {
+                                        html += "  <td  colspan='9' style='text-align:left'>" + data.Data[8][0].s_ProjectName + "</td>"
+                                    }
+                                    html += "</tr>"
+                                    html += "<tr> <td>产品</td>"
+                                    for (var i = 0; i < 8; i++) {
+                                        if (data.Data[8][i] != undefined) {
+                                            if (data.Data[8][i].n_UnqualifiedCount > 0) {
+                                                html += "<td>" + data.Data[8][i].s_SubmitName + "</td>"
+                                            } else {
+                                                html += " <td></td>"
+                                            }
+                                        }
+                                        else {
+                                            html += " <td></td>"
+                                        }
+                                    }
+
+                                    html += " </tr>"
+                                    html += " <tr>   <td>数量</td>"
+                                    for (var i = 0; i < 8; i++) {
+
+                                        if (data.Data[8][i] != undefined) {
+                                            html += "<td>" + data.Data[8][i].n_UnqualifiedCount + "</td>"
+                                        } else {
+                                            html += " <td></td>"
+                                        }
+                                    }
+
+                                    html += "  </tr>"
+                                    html += " <tr> <td >尺寸状态</td>"
+                                    for (var i = 0; i < 8; i++) {
+
+                                        if (data.Data[8][i] != undefined) {
+                                            if (data.Data[8][i].n_UnqualifiedCount > 0) {
+                                                html += "<td <input style='width:98%;height:98%;background-color:green;font-size:22px;color:white;text-align:center;' value='合格' /></td>"
+                                            }
+                                            else {
+                                                html += "<td <input style='width:98%;height:98%;font-size:22px;color:white;text-align:center;' value='' /></td>"
+                                            }
+                                        } else {
+                                            html += "<td <input style='width:98%;height:98%;font-size:22px;color:white;text-align:center;' value='' /></td>"
+                                        }
+                                    }
+                                    html += " </tr></table>"
+                                    localStorage.cishu3 = data.Data[9][0].cishu;
+                                    $(".containers3").append(html);
+
+                                }
+                                //$(".ProductKB").hide();
+                                $(".ProductKB").show();
+                            } else {
+                                alert("暂无数据");
+                            }
+
+
+
+                        } else {
+                            alert("失败：" + data.Msgs[0]);
+                        }
+                    }
+                })
+            }
+
+        </script>
+        <style type="text/css">
+.hr-dashed-fixed {
+    border: 0;
+    width:97%;
+    padding-top: 1px;
+    /* for IE浏览器 */
+    background: repeating-linear-gradient(to right, #a2a9b6 0px, #a2a9b6 4px, transparent 0px, transparent 10px);
+}
+.table
+            {
+                /*border:1px;*/
+                color:white;
+                table-layout:fixed;
+                font-size:20px;
+                border-style:dashed;
+                /*border-top:1px solid #999; 
+                border-left:1px solid #999; 
+                border-spacing:0;*/
+                border-collapse: collapse;
+                width:98%;
+                height:98%;
+            }
+             .table,.table tr td { 
+        border:1px solid #ccc; 
+                border-style:dashed;
+                
+    }
+    .table tr td{
+        padding: 5px 10px;
+        height:25%;
+        text-align:center;
+   } 
+        </style>
+    </head>
+    <body >
+       <div id="Main" style="background:url(../../Images/Submit/检具背景.png)no-repeat 12%;  background-size:99.9% 100%;">
+           <div id="title" style="width:100%;height:5%;background:url(../../Images/Submit/顶部.jpg)no-repeat 12%;background-size:100% " > 
+               <div style="background:url(../../Images/Submit/logo.png)no-repeat 12%;width:70%;height:98%;margin-left:30%">
+                   <label style="font-size:30px;color:white;margin-left:16%"> 质量部检具室可视化管控平台</label>
+               </div>
+               
+           </div>
+           <div id="conter" style="width:100%;height:95%">
+               <div id="left" style="width:25%; height:100%;float:left">
+                   @* 时间日期栏 *@
+                      <div id="time" style="background:url(../../Images/Submit/右上角图片.png)no-repeat  0%; height:15%;background-size:100% 100%;margin-top:3%">
+                          <div style="height:35%;width:35%">
+                               <div style="padding-top: 5%;">
+                              <label style="font-size:25px;color:#C9C9CE;margin-left:25%;padding-top:1%;">时间日期</label>
+                                   </div>
+                          </div>
+                          <div id="year" style="font-size:24px;color:#657B97;margin-left:2%;margin-top:6%;float:left"> </div>
+                          <div id="hours" style="font-size:45px;color:#C9C9CE;margin-left:48%;float:left;margin-top:-12%;"> </div>
+               </div>
+                   @* 环境数据栏 *@
+              <div id="" style="background:url(../../Images/Submit/环境数据.png)no-repeat  0%; height:20%;margin-top:2%;background-size:100% 100%;">
+                     <div style="background:url(../../Images/Submit/时间框.png);height:20%;width:35%">
+                             <div style="padding-top: 5%;">
+                              <label style="font-size:25px;color:#C9C9CE;margin-left:25%;padding-top:1%;">环境数据</label>
+                                   </div>
+                          </div>    
+                   <div style=" height:76%;width:35%;background-size:85% 95%;font-size:xxx-large;float:left;">
+                         <div style="float:left;width:40%;height:100%;"> </div>
+                       <div style="float:left; height:100%;width:50%;margin-top: 14%;">
+                           <label id="Temperature" style="font-size:25px;color:#C9C9CE;margin-left:300%"></label>
+                       </div>
+                       
+                   </div>
+                   <div style="height:76%;width:50%;background-size:96% 97%;font-size:xxx-large;float:left;margin-left:15%;display:none ">
+                       <div style="float:left;width:50%;height:100%;"> </div>
+                       <div style="float:left; height:100%;width:50%;margin-top: 10%;">
+                       <label id="Humidity" style="font-size:25px;color:#C9C9CE;margin-left:15%;margin-top: 14%;"></label>
+                       </div>
+                   </div>
+              </div>
+                    @* 当班日期栏 *@
+              <div id="" style="background:url(../../Images/Submit/左下角图片.png)no-repeat  0%; height:58%;margin-top:2%;background-size:100% 100%;">
+                   <div style="background:url(../../Images/Submit/时间框.png);height:5%;width:35%">
+                       <div style="padding-top: 5%;">
+                            <label style="font-size:25px;color:#C9C9CE;margin-left:25%">当班信息</label>
+                       </div>
+                             
+                          </div>   
+                  <div id="shift" style="font-size:50px;color:#C9C9CE;margin-left:60%;margin-top:0%;"></div>
+                  <div id ="images" style="width:95%;height:80%;margin-top:8%;">
+                      <div style="width:100%;height:50%;">
+                          <div style="width:49%;height:100%;float:left">
+                              <img id="imgMonitor" src="xxx"  style="height:100%;width:99%;"/>
+                          </div>
+                          <div style="width:49%;height:100%;float:left">
+                              <img id="imgMeasure" src="xxx"  style="height:100%;width:99%;"/>
+                          </div>
+
+                      </div>
+                      <div style="width:100%;height:50%;">
+                                <table style="font-size:30px;color:white;text-align:center;vertical-align:middle;width: 100%;height: 90%;" >
+                        @*  <tr style="width:100%;">
+                              <td style="width:50%;height:40%"><img id="imgMonitor" src="xxx"  style="height:50%;width:97%;"/></td>
+                              <td style="width:50%;height:40%"><img id="imgMeasure" src="xxx" style="height:50%;width:97%;margin-left:10%"/></td>
+                          </tr>*@
+                           <tr>
+                              <td id="MonitorName" style="color:#657B97;"></td>
+                              <td id="MeasureName" style="color:#657B97;"></td>
+                          </tr>
+                           <tr>
+                              <td id="Monitor" style="color:#C9C9CE;"></td>
+                              <td id="Measure" style="color:#C9C9CE;"></td>
+                          </tr>
+                      </table>
+
+                      </div>
+                
+
+                  </div>
+              </div>
+           </div>
+               <div style="height:100%;width:74%;float:left;">
+
+               
+                <div id="rigth" style="background:url(../../Images/Submit/中间.png)no-repeat  1%; height:94%;width:100%;margin-left:1%;background-size:99% 99%">
+                    <div id="TestTime" style="width:98%;text-align:center;font-size:35px;color:#C9C9CE;margin-top:0.5%;"></div>
+                    <div class="ProductKB" style="width:100%;height:95%;margin-top:1%;">
+                         <div class="" style="height:32%">
+                        <div class="container1"  style="width: 15%;  margin: 0 0;border:1px;margin-left:1%;float:left;text-align:center;margin-top:70px;">
+                            <span style="font-size:50px;color:white;">注塑件</span>
+                    </div>
+                      <div class="containers1"  style="width:80%; height: 98%; border:1px;float:left;overflow:hidden">
+
+                    </div>
+                  </div>
+                        @* 分割线 *@
+                   <hr  class="hr-dashed-fixed  "/>
+                       <div class="" style="height:32%">
+                        <div class="container2"  style="width: 15%;   margin: 0 0;border:1px;margin-left:1%;float:left;text-align:center;margin-top:70px;">
+                            <span style="font-size:50px;color:white;">喷涂件</span>
+                    </div>
+                      <div class="containers2"  style="width: 80%; height: 98%; border:1px;float:left;overflow:hidden">
+
+                    </div>
+                  </div>
+                        @* 分割线 *@
+                   <hr  class="hr-dashed-fixed  "/> 
+                       <div class=""style="height:32%">
+                        <div class="container3"  style="width: 15%;  margin: 0 0;border:1px;margin-left:1%;float:left;text-align:center;margin-top:70px;">
+                            <span style="font-size:50px;color:white;">装配件</span>
+                    </div>
+                      <div class="containers3"  style="width: 80%; height: 98%; border:1px;float:left;overflow:hidden">
+
+                    </div>
+                  </div>
+                </div>
+               <div style="width:100%;height:5%;font-size:15px;color:white;text-align:center">
+                   <span>勤奋，包容，持续改进</span><br />
+                   <span>Diligence,  Toleration,  Continuous Improvement</span>
+               </div>
+</div>
+           </div>
+       </div>
+
+    </body>
+
+</html>

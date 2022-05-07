@@ -1,0 +1,361 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+}
+@section Body{
+    <div class="body">
+        <div v-bind:class="TitleTab_Showed">
+            <table>
+                <tr>
+                    <th>
+                        单据库区<br />
+                        单据编号
+                    </th>
+                    <th>
+                        单据数量
+                    </th>
+                    <th>
+                        单据操作人
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table>
+                <tr v-for="(item,i) in DataList" :index="i" :n_BillStockInOut_Id="item.n_BillStockInOut_Id" :s_BillStockInOut_Code="item.s_BillStockInOut_Code"
+                :f_BillStockInOut_WorkOrderQuantity="item.f_BillStockInOut_WorkOrderQuantity" :s_BillStockInOut_Operator="item.s_BillStockInOut_Operator"
+                :n_Warehouse_Id="item.n_Warehouse_Id" :class="[ item.n_BillStockInOut_IsCheck == true ?'morechecked':'' ]" v-on:click="f_checkline">
+                    <td>{{ item.s_Warehouse_Name }} <br /> {{ item.s_BillStockInOut_Code }}
+                    </td>
+                    <td>{{ item.f_BillStockInOut_WorkOrderQuantity }}
+                    </td>
+                    <td>{{ item.s_BillStockInOut_Operator }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="button_Div_Showed">
+            <div v-on:click="f_AddBillStockInOut">新建单据</div>
+            <div v-on:click="f_checkBillStockInOutDetail">单据明细</div>
+            <div v-on:click="f_DeleteBillStockInOut">删除单据</div>
+            <div v-on:click="f_SelBillStockInOutBarCode" :style="{ display: ShelfForm != 3?'':'none' }">条码扫描</div>
+            <div v-on:click="f_SelBillStockInOutInventory" :style="{ display: ShelfForm == 3?'':'none' }">库位盘点</div>
+            <div></div>
+            <div v-on:click="f_SubmitBillStockInOut">提交单据</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .TitleTab
+        {
+            width: calc(90%);
+            height: 60px;
+            margin: calc(3%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        .TitleTab table, .InfoTab table
+        {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .TitleTab th
+        {
+            width: 20%;
+            border: 1px solid #a5e0a5;
+            background: rgb(200 220 232);
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .TitleTab th:nth-child(1){
+            width: 40%;
+            border:1px solid #a5e0a5;
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        
+        .InfoTab
+        {
+            width: calc(90%);
+            height: 182px;
+            margin: calc(0%) calc(5%);
+            text-align:center; 
+            overflow-y:scroll;
+        }
+        .InfoTab td{
+            width: 20%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        } 
+        .InfoTab td:nth-child(1){
+            width: 40%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        
+        .button_Div div {
+            width: calc(26%);
+            margin: calc(3%) calc(0%) calc(0%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px; 
+
+        }
+        
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax POST对象
+        var ajaxobjSecond = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    TitleTab_Showed: "TitleTab", //结果表格标题样式
+                    InfoTab_Showed: "InfoTab", //结果表格样式
+                    button_Div_Showed: "button_Div", //按钮样式
+                    DataList: new Array(), //结果表格数据
+                    ShelfForm:2 //为展示与隐藏库位盘空做使用，标明单据的盘点类型
+                },
+                methods: {
+                    //加载未提交的盘点单据信息
+                    f_loadDataList: function () {
+
+                        //对象名 查询未提交的新建盘点单据信息
+                        var objectName = "SelPurchasedInventoryOperationBillStockInOut";
+                        //参数
+                        var param = {};
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            //拼装未提交的新建盘点单据信息
+                            vue.DataList = new Array();
+                            if (result.Data[0].length > 0) {
+                                result.Data[0].forEach(function (value, index) {
+                                    value.n_BillStockInOut_IsCheck = false;
+                                    vue.DataList.push(value);
+                                })
+                            }
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("非自制件-异动盘点");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件
+                            window.parent.f_loadEvent("../../../../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+                    },
+                    //选择行事件
+                    f_checkline: function () {
+                        var index = -1;
+                        if ($(event.target).attr("index") == undefined) {
+                            index = $(event.target).parent().attr("index");
+                        } else {
+                            index = $(event.target).attr("index");
+                        }
+
+                        vue.DataList.forEach(function (value, i) {
+                            value.n_BillStockInOut_IsCheck = false;
+                        })
+
+                        vue.ShelfForm = vue.DataList[index].s_Warehouse_ShelfForm;
+
+                        vue.DataList[index].n_BillStockInOut_IsCheck = true;
+                    },
+                    //新增盘点单据点击事件
+                    f_AddBillStockInOut: function () {
+
+                        location.href = "AddBillStockInOut?ParentIds=" + "@(ParentIds)";
+                    },
+                    //单据明细点击事件
+                    f_checkBillStockInOutDetail: function () {
+
+                        //获取需要删除的盘点单据行记录
+                        if (vue.DataList.length == 0) {
+                            return;
+                        }
+
+                        var check_arr = vue.DataList.filter(function (item) {
+                            return item.n_BillStockInOut_IsCheck;
+                        })
+
+                        if (vue.DataList.length >= 1 && check_arr.length == 0) {
+                            f_commonShowMsg("请选择需要查阅明细的盘点单据!");
+                            return;
+                        }
+
+                        location.href = "BillStockInOutDetail?ParentIds=" + "@(ParentIds)" + "&n_BillStockInOut_Id=" + check_arr[0]["n_BillStockInOut_Id"];
+                    },
+                    //删除单据点击事件
+                    f_DeleteBillStockInOut: function () {
+
+                        if (!confirm("请确认是否要删除单据!")) {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjSecond != null) {
+                            ajaxobjSecond.abort();
+                            ajaxobjSecond = null;
+                        }
+
+                        //获取需要删除的盘点单据行记录
+                        if (vue.DataList.length == 0) {
+                            return;
+                        }
+
+                        var check_arr = vue.DataList.filter(function (item) {
+                            return item.n_BillStockInOut_IsCheck;
+                        })
+
+                        if (vue.DataList.length >= 1 && check_arr.length == 0) {
+                            f_commonShowMsg("请选择需要删除的盘点单据!");
+                            return;
+                        }
+
+                        var arr = new Array();
+                        arr.push({
+                            n_BillStockInOut_Id: check_arr[0]["n_BillStockInOut_Id"]
+                        });
+
+                        //对象名称 删除盘点单据记录
+                        var ObjectName = "DelPurchasedInventoryOperationBillStockInOut";
+                        //传递参数
+                        var param = { Dictionarys: arr };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Post(ObjectName, param, function (result) {
+
+                            f_commonShowMsg("删除单据成功!");
+
+                            ajaxobjSecond = null;
+                            //重新加载
+                            vue.f_loadDataList();
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjSecond = null;
+
+                        });
+                    },
+                    //条码扫描点击事件
+                    f_SelBillStockInOutBarCode: function () {
+
+                        //获取需要添加工件的盘点单据行记录
+                        if (vue.DataList.length == 0) {
+                            return;
+                        }
+
+                        var check_arr = vue.DataList.filter(function (item) {
+                            return item.n_BillStockInOut_IsCheck;
+                        })
+
+                        if (vue.DataList.length >= 1 && check_arr.length == 0) {
+                            f_commonShowMsg("请选择需要添加工件的盘点单据!");
+                            return;
+                        }
+
+                        //根据单据的所属仓库,去判定该单据的条码扫描是批量录入[2] 还是 单件录入[1]
+                        if (check_arr[0]["s_Warehouse_ShelfForm"] == "2") {
+                            location.href = "AddBillStockInOutDetail?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + check_arr[0]["n_Warehouse_Id"] + "&n_BillStockInOut_Id=" + check_arr[0]["n_BillStockInOut_Id"];
+                        } else {
+                            location.href = "AddBillStockInOutDetailSingle?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + check_arr[0]["n_Warehouse_Id"] + "&n_BillStockInOut_Id=" + check_arr[0]["n_BillStockInOut_Id"];
+                        }
+
+                    },
+                    //库存盘点点击事件
+                    f_SelBillStockInOutInventory:function (){
+                        //获取需要添加工件的盘点单据行记录
+                        if (vue.DataList.length == 0) {
+                            return;
+                        }
+
+                        var check_arr = vue.DataList.filter(function (item) {
+                            return item.n_BillStockInOut_IsCheck;
+                        })
+
+                        if (vue.DataList.length >= 1 && check_arr.length == 0) {
+                            f_commonShowMsg("请选择需要库位盘空的盘点单据!");
+                            return;
+                        }
+
+                        location.href = "AddBillStockInOutDetailInventory?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + check_arr[0]["n_Warehouse_Id"] + "&n_BillStockInOut_Id=" + check_arr[0]["n_BillStockInOut_Id"] +"&isShowDetail=false";
+
+                    },
+                    //提交单据点击事件
+                    f_SubmitBillStockInOut: function () {
+
+                        //获取需要删除的盘点单据行记录
+                        if (vue.DataList.length == 0) {
+                            return;
+                        }
+
+                        var check_arr = vue.DataList.filter(function (item) {
+                            return item.n_BillStockInOut_IsCheck;
+                        })
+
+                        if (vue.DataList.length >= 1 && check_arr.length == 0) {
+                            f_commonShowMsg("请选择需要提交的盘点单据!");
+                            return;
+                        }
+
+                        location.href = "SubmitBillStockInOutDetail?ParentIds=" + "@(ParentIds)" + "&n_BillStockInOut_Id=" + check_arr[0]["n_BillStockInOut_Id"];
+                    },
+                    //验证所填是否是数字,不是则清空
+                    checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    }
+                }
+            })
+
+            //初始化未提交的盘点单据信息
+            vue.f_loadDataList();
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+
+    </script>
+}

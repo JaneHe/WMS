@@ -1,0 +1,152 @@
+﻿@using Tops.FRM;
+@{
+    ViewBag.Title = "系统参数";
+    ViewBag.ModuleName = "数据查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName = "SelParameters";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+
+    foreach (string key in metas[0].Keys)
+    {
+        metas[0][key].Type = "String";
+    }
+    var cols = ModuleConfig.GetColumns(metas[0], biz.Lookups, biz.Sqls[0], biz);
+    
+    
+}
+@section Params{
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad">
+    <div id="hiddenlist">
+    </div>
+    <div id="paramlist">
+        @for (int i = 0; i < biz.Fields.Count; i++)
+        {
+            string labelStr = string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+            var fieldName = biz.Fields[i].FieldName;
+            var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+            <div class="param_item">
+                @if (lookupField != null && lookupField.ToList().Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <input type="text" name="@(fieldName)"  fieldType="lookup" label="@(labelStr)" />
+                    <script type="text/javascript">
+                            $("input[name=@(fieldName)]")[0].lookup=@Html.Raw(lookupField.First<Lookup>().ToJson());
+                    </script>
+                }
+                else if (biz.Fields[i].DataList.Count > 0)
+                {
+                    <label class="plugin_label">@(labelStr):</label>
+                    <select name="@(fieldName)" fieldType="select" >
+                        @foreach (var item in biz.Fields[i].DataList)
+                        {
+                            <option value="@(item.Key)">@(item.Value)</option>
+                        }
+                    </select>
+                }
+                else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="date" label="@(labelStr)"/>
+                }
+                else
+                {
+                    <input type="text" name="@(fieldName)"  fieldType="textbox" label="@(labelStr)"/>
+                }
+            </div>
+        }
+        <div style="clear: both;">
+        </div>
+    </div>
+    </form>
+}
+@section Script{
+    <script type="text/javascript">
+    var topsRender=null;
+    var grid=null;
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("#searchBt,#addBt").show();
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        
+        $("#delBt").attr("value","停用");
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            //columns: [
+            //        { display: '参数名称', name: 's_SysParameter_Name' }
+            //        , { display: '单位', name: 's_SysParameter_Unit' }
+            //        , { display: '值-1', name: 's_SysParameter_value1' }
+            //        , { display: '值-2', name: 's_SysParameter_value2' }
+            //        , { display: '值-3', name: 's_SysParameter_value3' }
+            //        , { display: '值-4', name: 's_SysParameter_value4' }
+            //        , { display: '值-5', name: 's_SysParameter_value5' }
+            //        , { display: '自定义字段1', name: 's_SysParameter_CustomFields1' }
+            //        , { display: '自定义字段2', name: 's_SysParameter_CustomFields2' }
+            //        , { display: '自定义字段3', name: 's_SysParameter_CustomFields3' }
+            //        , { display: '自定义字段4', name: 's_SysParameter_CustomFields4' }
+            //        , { display: '自定义字段5', name: 's_SysParameter_CustomFields5' }
+            //        , { display: '自定义字段6', name: 's_SysParameter_CustomFields6' }
+            //        , { display: '自定义字段7', name: 's_SysParameter_CustomFields7' }
+            //        , { display: '自定义字段8', name: 's_SysParameter_CustomFields8' }
+            //        , { display: '自定义字段9', name: 's_SysParameter_CustomFields9' }
+            //        , { display: '自定义字段10', name: 's_SysParameter_CustomFields10' }
+            //        , {
+            //            display: '状态', name: 'n_SysParameter_state', type: 'int',
+            //            render: function (item) {
+            //                if (item.n_SysParameter_state === 1) return '可用';
+            //                else if (item.n_SysParameter_state === 2) return '停用';
+            //                else return item.n_SysParameter_state;
+            //            }
+            //        }
+            //    ],
+            columns:@Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/SelParameters',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                var idKey='@(biz.Sqls[0].Key)';
+                //if($.trim(idKey)=='') return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+
+                f_addTab(rowdata.ID, "参数维护[" + rowdata.参数名称 + "]", "/Parameters/ModifyPar?ParID=" + rowdata.ID + "&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+        });
+        $("#addBt").click(function () {
+            f_addTab('', "添加参数", "/Parameters/ModifyPar?ParID=&" + Math.random());
+        });
+
+        $("#toptoolbar").ligerToolBar({
+            items: [
+                     { text: '增加', click: itemclick, icon: 'add' },
+                     { line: true },
+                     { text: '修改', click: itemclick },
+                     { line: true },
+                     { text: '删除', click: itemclick }
+            ]
+        });
+    });
+    </script>
+}
+<div id="datagrid">
+    
+</div>

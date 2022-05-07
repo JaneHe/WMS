@@ -1,0 +1,192 @@
+﻿@{
+    ViewBag.Title = "领队注册";
+    Layout = "~/TopsLib/Views/Shared/_Layout.cshtml";
+}
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title></title>
+</head>
+<style type="text/css">
+       body{
+          margin: 0px;
+          font-family: Verdana, "宋体" , Vrinda, serif;
+          color: #486086;
+          font-size: 12px;
+       }
+       .Register{
+          position:absolute;
+          background-image:url('../TopsLib/Content/login_bg_img.jpg');
+          width:580px; 
+          height:348px;
+          margin-left:50%; 
+          margin-top:50px;
+          left:-290px;
+       }
+       #tbList
+       {
+          text-align:center;
+          position:relative;
+          left: 145px;
+          top: 185px;
+          width: 300px;
+          height: 115px;
+       }
+       .Register_span{
+           color: #7a7a7a; 
+           font-weight: bold
+       }
+       .Register_input
+       {
+           border-bottom: #d1d1d1 1px solid;
+           border-left: #d1d1d1 1px solid;
+           width: 100px;
+           font-family: Arial, Helvetica, sans-serif;
+           height: 18px;
+           border-top: #d1d1d1 1px solid;
+           border-right: #d1d1d1 1px solid;
+       }
+       .title{
+           font-size:18px;
+           position:relative;
+           left: 225px;
+           top: 175px;
+           width:100px;
+           text-align:center;
+           font-weight:bolder;
+           color: #7a7a7a; 
+       }
+       .LoginOut{
+           position:relative; 
+           left: 415px;
+           top: 77px;
+           width: 120px;
+       }
+       .UserNameOut{
+           position:relative; 
+           left: 415px;
+           top: 103px;
+           width: 120px;
+       }
+        .UserNoOut{
+           position:relative; 
+           left: 415px;
+           top: 130px;
+           width: 120px;
+       }
+    </style>
+<body>
+    <div class="Register">
+       <div class="title">
+          <span>领队注册</span>
+       </div>
+       <table id="tbList">
+          <tr>
+             <td><span class="Register_span">用户名:</span></td>
+             <td><input type="text" id="UserNo" class="Register_input" /></td>
+         </tr>
+         <tr>
+             <td><span class="Register_span">&nbsp;&nbsp;姓名:</span></td>
+             <td><input type="text" id="UserName" class="Register_input" /></td>
+         </tr>
+         <tr>
+             <td><span class="Register_span">&nbsp;&nbsp;密码:</span></td>
+             <td><input type="password" id="PassWord" class="Register_input" /></td>
+         </tr>
+         <tr>
+             <td><input src="../TopsLib/Content/register.gif" type="image" class="btnSub"/></td>
+             <td><a href="#" onclick='window.location.replace("../Account/Login");'>返回登录页</a></td>
+         </tr>
+       </table>
+       <div class="LoginOut">
+          
+       </div>
+       <div class="UserNameOut">
+          
+       </div>
+       <div class="UserNoOut">
+
+       </div>
+    </div>
+</body>
+</html>
+
+<script type="text/javascript">
+
+    var $LoginOut = "<label style='color:Red;'>1.*.用户名已经存在</label>";
+    var $UserNoOut = "<label style='color:Red;'>用户名不能为空</label>";
+    var $UserNameOut = "<label style='color:Red;'>姓名不能为空</label>";
+    var $PassWordOut = "<label style='color:Red;'>密码不能为空</label>";
+    $(function () {
+
+    })
+
+    //验证非空事件
+    $("input[type=text],input[type=password]").blur(function () {
+        if ($(this).is("#UserNo")) {
+            if (this.value == "") {
+                $(".LoginOut").append($UserNoOut);
+            }
+        }
+        if ($(this).is("#UserName")) {
+            if (this.value == "") {
+                $(".UserNameOut").append($UserNameOut);
+            }
+        }
+        if ($(this).is("#PassWord")) {
+            if (this.value == "") {
+                $(".UserNoOut").append($PassWordOut);
+            }
+        }
+        setTimeout(function () { $(".LoginOut,.UserNameOut,.UserNoOut").empty(); }, 1000);
+    })
+
+    //提交注册按钮
+    $(".btnSub").click(function () {
+        var UserNo = $("#UserNo").val();
+        var UserName = $("#UserName").val();
+        var PassWord = $("#PassWord").val();
+        if (IsCheck(UserNo, UserName, PassWord)) { return; }
+        var idData = { "UserNo": UserNo, "UserName": UserName, "PassWord": PassWord };
+        $.topsAjax({
+            type: "POST",
+            url: "/Account/AddLeaderUser",
+            data: idData,
+            dealError: false,
+            success: function (data) {
+//                var Data = eval('(' + data + ')');
+                if (data.IsSuccess) {
+                    alert("注册成功！");
+                    window.location.replace("../Account/Login");
+                } else {
+                    $(".LoginOut").append($LoginOut);
+                    setTimeout(function () { $(".LoginOut").empty(); }, 3000);
+                }
+                $("#module_toolbar input").removeAttr("disabled");
+                $("#loading_img").hide();
+            }
+        });
+    })
+
+    //提交注册进行空值判断
+    function IsCheck(UserNo, UserName, PassWord) {
+        if (UserNo == "") {
+            alert("用户名不能为空");
+            return true;
+        } else if (UserName == "") {
+            alert("姓名不能为空");
+            return true;
+        } else if (PassWord == "") {
+            alert("密码不能为空");
+            return true;
+        }
+        return false;
+    }
+
+    $("body").keydown(function (e) {
+        if (e.keyCode == 13) {
+            $(".btnSub").click();
+        }
+    });
+</script>

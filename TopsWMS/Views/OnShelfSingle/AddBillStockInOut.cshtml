@@ -1,0 +1,409 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";  
+
+    string ParentIds = Request.QueryString["ParentIds"];
+
+    //形成下架单据编号
+    string BillStockInOutCode = "CK" + DateTime.Now.ToString("yyyyMMddHHmmssfff"); 
+    
+    //获取当前用户信息
+    string PutOnOffPerson = Tops.FRM.TopsUser.UserName;
+
+    //根据当前账号绑定的库位对应默认优选仓库
+    Tops.FRM.BizResult br = Tops.FRM.Biz.Execute("SelWarehouseForUserNO", new System.Data.SqlClient.SqlParameter[] { new System.Data.SqlClient.SqlParameter("@Operator", Tops.FRM.TopsUser.UserNO) }, Tops.FRM.BizType.Query);
+    List<System.Data.DataTable> list = br.Data as List<System.Data.DataTable>;
+
+    string n_Warehouse_Id = string.Empty;
+    Dictionary<string, string> dic = new Dictionary<string, string>(); 
+    if (list.Count > 0)
+    {
+        if (list[0].Rows.Count > 0)
+        {
+            for (int index = 0; index < list[0].Rows.Count; index++)
+            {
+                n_Warehouse_Id += list[0].Rows[index]["n_Warehouse_Id"].ToString() + ";";
+            }
+        }
+        
+        if (list[1].Rows.Count > 0)
+        {
+            for (int index = 0; index < list[1].Rows.Count; index++)
+            {
+                dic.Add(list[1].Rows[index]["keys"].ToString(), list[1].Rows[index]["value"].ToString());
+            }
+        }
+    }
+}
+@section Body{
+    <div class="body">
+        <div>
+            <input type="text" readonly="readonly" disabled="disabled" v-bind:class="BillStockInOutCode_Showed" placeholder="请输入单据编号" value="@(BillStockInOutCode)" />
+        </div>
+        <div>
+            <input type="hidden" name="n_Warehouse_Id" value="@(n_Warehouse_Id)" />
+            <select v-bind:class="ChangeWarehouse_Showed" v-on:change="changeWarehouseInfo($event)">
+                <option :id="item.n_Warehouse_Id" v-for="(item,i) in WarehouseDataList" :selected="item.n_Warehouse_selected">
+                {{ item.s_Warehouse_Name }}
+                </option>
+            </select>
+        </div>
+        <div> 
+            <select class="n_BusinessTypeInfo_Id" v-on:change="f_changeBusinessType">
+                <option v-for="(item,i) in BusinessTypeInfoData" :index="i" :selected="item.n_BusinessTypeInfo_selected" :n_BusinessTypeInfo_Id="item.n_BusinessTypeInfo_Id" :s_BusinessTypeInfo_OpenAutoLockReceipt="item.s_BusinessTypeInfo_OpenAutoLockReceipt">
+                {{ item.s_BusinessTypeInfo_Name }}
+                </option>
+            </select>
+        </div>
+        <div> 
+            <select class="n_BillStockInOut_QCQualityStatus">
+                @if(dic.Count>0){
+                    foreach(string key in dic.Keys){
+                        <option keys="@(key)">@(dic[key])</option>
+                    }
+                }
+            </select>
+        </div>
+        <div>
+            <input type="text" readonly="readonly" disabled="disabled" v-bind:class="PutOnOffPerson_Showed" placeholder="请输入下架员工" value="@(PutOnOffPerson)" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="BillStockInOutRemark_Showed" placeholder="请输入单据备注" />
+        </div>
+        
+        <div v-bind:class="button_Div_Showed">
+             <div v-on:click="f_SaveBillStockInOut">确认新建</div> 
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .BillStockInOutCode, .PutOnOffPerson, .BillStockInOutRemark
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%);
+            line-height: 22px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .ChangeWarehouse
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .n_BusinessTypeInfo_Id
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        .n_BillStockInOut_QCQualityStatus
+        {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            height: 26px;
+            border: 1px solid lightblue;
+            text-align: center;
+        }
+        
+        
+        .button_Div div {
+            width: calc(90%);
+            margin: calc(2.5%) calc(5%) calc(2.5%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px; 
+
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Post请求变量
+        var ajaxobjFirst = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    BillStockInOutCode_Showed: "BillStockInOutCode", //单据编号文本框样式
+                    PutOnOffPerson_Showed: "PutOnOffPerson",   //下架员工文本框样式
+                    BillStockInOutRemark_Showed: "BillStockInOutRemark",   //单据备注文本框样式
+                    ChangeWarehouse_Showed: "ChangeWarehouse",  //选择仓库下拉框样式
+                    button_Div_Showed: "button_Div", //按钮样式
+                    WarehouseDataList: [],  //拼装仓库选择数据源
+                    WarehouseQCQualityStatusData: new Array(), //库区对应可上架货物状态数据源
+                    BusinessTypeInfoData: new Array() //业务类型基础数据
+                },
+                methods: {
+                    //加载仓库选择数据源
+                    f_loadWarehouseDataList: function () {
+                        //对象名 查询新建单据的可选仓库信息
+                        var objectName = "SelOnShelfSingleWarehouseInfo";
+                        //参数
+                        var param = {};
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            //拼装仓库选择数据源
+                            vue.WarehouseDataList = [];
+                            if (result.Data[0].length > 0) {
+                                var warehouse_Id = $("[name=n_Warehouse_Id]").val();
+                                var warehouse_arr = new Array();
+                                if (warehouse_Id.indexOf(";") != -1) {
+                                    var warehouse_arr = warehouse_Id.split(";");
+                                }
+
+                                //查询库区绑定的可上架货物状态默认绑定
+                                if (result.Data[1].length > 0) {
+                                    vue.WarehouseQCQualityStatusData = result.Data[1];
+
+                                    //默认选中普通上架
+                                    vue.WarehouseQCQualityStatusData.forEach(function (value, index) {
+                                        value.n_BusinessTypeInfo_selected = index == 0 ? true : false;
+                                    })
+                                }
+
+                                //获取业务类型基础数据
+                                if (result.Data[2].length > 0) {
+                                    vue.BusinessTypeInfoData = result.Data[2];
+                                }
+
+                                result.Data[0].forEach(function (value, index) {
+
+                                    var n_Warehouse_selected = false;
+                                    if (warehouse_arr.length > 0) {
+                                        if (warehouse_arr[0] == value.n_Warehouse_Id) {
+                                            n_Warehouse_selected = true;
+                                        }
+                                    }
+                                    vue.WarehouseDataList.push({
+                                        n_Warehouse_Id: value.n_Warehouse_Id,
+                                        s_Warehouse_Name: value.s_Warehouse_Name,
+                                        s_Warehouse_ShelfForm: value.s_Warehouse_ShelfForm,
+                                        n_Warehouse_selected: n_Warehouse_selected
+                                    })
+                                })
+
+
+                                //如果没有员工绑定的对应库区，则默认选中第一个库区
+                                var selected_data = vue.WarehouseDataList.filter(function (item) {
+                                    return item.n_Warehouse_selected;
+                                });
+
+                                if (selected_data.length == 0 && vue.WarehouseDataList.length > 0) {
+                                    vue.WarehouseDataList[0].n_Warehouse_selected = true;
+                                }
+                            }
+
+
+                            //数据加载完之后触发
+                            Vue.nextTick(function () {
+
+                                //获取该页面选中的业务类型
+                                var n_BusinessTypeInfo_Id = $(".n_BusinessTypeInfo_Id").find("option:selected").text().replace(/(^\s*)|(\s*$)/g, "");
+                                if (n_BusinessTypeInfo_Id == undefined || n_BusinessTypeInfo_Id == "") {
+                                    n_BusinessTypeInfo_Id = $(".n_BusinessTypeInfo_Id").find("option:eq(0)").text().replace(/(^\s*)|(\s*$)/g, "");
+                                }
+                                var arr = vue.BusinessTypeInfoData.filter(function (item) {
+                                    return item.s_BusinessTypeInfo_Name == n_BusinessTypeInfo_Id;
+                                })
+                                if (arr.length > 0) {
+                                    //根据业务类型就判定默认选中的可用状态 普通上架 默认选择合格 来料上架 默认选择未判定
+                                    $(".n_BillStockInOut_QCQualityStatus").find("option[keys=" + arr[0]["s_BusinessTypeInfo_CustomFields1"] + "]").attr("selected", "selected");
+                                }
+                            })
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+
+                        //页面初始化
+                        //this.f_reloadPage();
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("新建单据");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../OnShelfSingle/Index?ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../OnShelfSingle/Index?ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+
+                        //结果表格选中样式处理
+                        $(".InfoTab tr").live("click", function () {
+
+                            $(this).siblings().removeClass("morechecked");
+                            $(this).addClass("morechecked")
+                        })
+
+                        //加载仓库选择数据源
+                        vue.f_loadWarehouseDataList();
+                    },
+                    //新增单据记录
+                    f_SaveBillStockInOut: function () {
+
+                        var obj = event.target;
+                        if ($(obj).is("[disabled]")) {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjFirst != null) {
+                            ajaxobjFirst.abort();
+                            ajaxobjFirst = null;
+                        }
+
+                        $(obj).attr("disabled", "disabled");
+
+                        var arr = new Array();
+                        arr.push({
+                            Warehouse_Id: $(".ChangeWarehouse").find("option:selected").attr("id"),
+                            BillStockInOut_Code: $(".BillStockInOutCode").val(),
+                            BillStockInOut_QualityStatus: 1,
+                            BillStockInOut_Remark: $(".BillStockInOutRemark").val(),
+                            BillStockInOut_WorkOrderQuantity: 0,
+                            n_BillStockInOut_QCQualityStatus: $(".n_BillStockInOut_QCQualityStatus").find("option:selected").attr("keys"),
+                            n_BusinessTypeInfo_Id: $(".n_BusinessTypeInfo_Id").find("option:selected").attr("n_BusinessTypeInfo_Id")
+                        })
+
+                        //对象名称
+                        var ObjectName = "InsertOnShelfSingleBillStockInOut";
+                        //参数
+                        var param = { Dictionarys: arr };
+
+                        ajaxobjFirst = ajaxhelper.ajax_Post(ObjectName, param, function (result) {
+
+                            f_commonShowMsg("新建单据成功!");
+                            //清空数据并跳转到下架操作页
+                            ajaxobjFirst = null;
+                            //setTimeout('location.href = "../../../../OnShelfSingle/Index?ParentIds=" + "@(ParentIds)"', 2000);
+
+                            //获取选中的仓库数据
+                            var check_arr = vue.WarehouseDataList.filter(function (item) {
+                                return item.n_Warehouse_selected;
+                            })
+
+                            if (check_arr.length == 0) {
+                                return;
+                            }
+
+                            //根据单据的所属仓库,去判定该单据的条码扫描是批量录入[2] 还是 单件录入[1]
+                            if (check_arr[0]["s_Warehouse_ShelfForm"] == "2") {
+                                //新建完成后，直接跳转到批量录入条码扫描界面
+                                setTimeout('location.href = "AddBillStockInOutDetail?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "' + check_arr[0]["n_Warehouse_Id"] + '" + "&n_BillStockInOut_Id=" + "' + result.OutPut.n_BillStockInOut_Id + '" + "";', 2000); ;
+                            } else {
+                                //新建完成后，直接跳转到单件录入条码扫描界面
+                                setTimeout('location.href = "AddBillStockInOutDetailSingle?ParentIds=" + "@(ParentIds)" + "&n_Warehouse_Id=" + "' + check_arr[0]["n_Warehouse_Id"] + '" + "&n_BillStockInOut_Id=" + "' + result.OutPut.n_BillStockInOut_Id + '" + "";', 2000); ;
+                            }
+
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjFirst = null;
+
+                            $(obj).removeAttr("disabled");
+                        })
+                    },
+                    //验证所填是否是数字,不是则清空
+                    checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    },
+                    //选择仓库下拉框
+                    changeWarehouseInfo: function (event) {
+
+                        //下拉框选中赋值
+                        vue.WarehouseDataList.forEach(function (value, index) {
+                            value.n_Warehouse_selected = false;
+                            if (value.n_Warehouse_Id == $(event.target).find("option:selected").attr("id")) {
+                                value.n_Warehouse_selected = true;
+                            }
+                        })
+
+                        //默认只可选中对应的可用状态选择项
+
+                        //筛选符合条件的库区可上架货物可用状态信息
+                        var arr = vue.WarehouseQCQualityStatusData.filter(function (item) {
+                            return item.n_Warehouse_Id == $(event.target).find("option:selected").attr("id");
+                        });
+
+                        //只显示对应库区的可上架货物可用状态下拉选项
+                        if (arr.length > 0) {
+                            $(".n_BillStockInOut_QCQualityStatus").find("option").hide();
+                            arr.forEach(function (value, index) {
+                                $(".n_BillStockInOut_QCQualityStatus").find("option[keys=" + value.n_Warehouse_QCStatusShelfLimit_QCStatus + "]").show();
+                                //如果绑定多个选项值的话,默认选择第一个选项
+                                if (index == 0) {
+                                    $(".n_BillStockInOut_QCQualityStatus").find("option[keys=" + value.n_Warehouse_QCStatusShelfLimit_QCStatus + "]").attr("selected", "selected");
+                                }
+                            })
+
+                        } else {
+
+                            $(".n_BillStockInOut_QCQualityStatus").find("option").show();
+                            //默认选中第一个选项
+                            if ($(".n_BillStockInOut_QCQualityStatus").find("option").length > 0) {
+                                $(".n_BillStockInOut_QCQualityStatus").find("option:eq(0)").attr("selected", "selected");
+                            }
+                        }
+
+                        //数据加载完之后触发
+                        Vue.nextTick(function () {
+                          
+                            //获取该页面选中的业务类型
+                            var n_BusinessTypeInfo_Id = $(".n_BusinessTypeInfo_Id").find("option:selected").text().replace(/(^\s*)|(\s*$)/g, "");
+                            if (n_BusinessTypeInfo_Id == undefined || n_BusinessTypeInfo_Id == "") {
+                                n_BusinessTypeInfo_Id = $(".n_BusinessTypeInfo_Id").find("option:eq(0)").text().replace(/(^\s*)|(\s*$)/g, "");
+                            }
+                            var arr = vue.BusinessTypeInfoData.filter(function (item) {
+                                return item.s_BusinessTypeInfo_Name == n_BusinessTypeInfo_Id;
+                            })
+
+                            if (arr.length > 0) {
+                                //根据业务类型就判定默认选中的可用状态 普通上架 默认选择合格 来料上架 默认选择未判定
+                                $(".n_BillStockInOut_QCQualityStatus").find("option[keys=" + arr[0]["s_BusinessTypeInfo_CustomFields1"] + "]").attr("selected", "selected");
+                            }
+                        })
+                    },
+                    //业务类型改值事件
+                    f_changeBusinessType: function () {
+                        //根据业务类型就判定默认选中的可用状态 普通上架 默认选择合格 来料上架 默认选择未判定
+                        var index = $(event.target).find("option:selected").attr("index");
+
+                        var s_BusinessTypeInfo_CustomFields1 = vue.BusinessTypeInfoData[index].s_BusinessTypeInfo_CustomFields1;
+                        $(".n_BillStockInOut_QCQualityStatus").find("option[keys=" + s_BusinessTypeInfo_CustomFields1 + "]").attr("selected", "selected");
+                    }
+                }
+            })
+
+            //加载并初始化页面信息
+            vue.f_reloadPage();
+        })
+    </script>
+}

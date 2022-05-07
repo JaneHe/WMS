@@ -1,0 +1,318 @@
+﻿@using Tops.FRM;
+@{
+    //版本：1.2
+    ViewBag.Title = "邮件基础信息管理";
+    ViewBag.ModuleName = "详细资料";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    string QueryName = "SelEmailInfo";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    string ctrl = Request.QueryString["ctrl"];
+    string id = Request.QueryString["id"];
+
+    string n_Id = string.Empty;
+    if(Request.QueryString.AllKeys.Contains("n_Id")){
+        n_Id = Request.QueryString["n_Id"];
+    }
+    
+    ctrl = string.IsNullOrEmpty(ctrl) ? "edit" : ctrl;
+    //公开两台配置参数给分部视图
+    ViewBag.Biz = biz;
+    ViewBag.Metas = metas;
+    var moduleConfig=ModuleConfig.GetModuleConfig(metas, biz.Lookups,biz,ctrl);
+
+    
+}
+
+@section Params{
+    <form id="paramForm">
+        <div class="item_title">详细资料：</div>
+        <div id="paramlist" style="width: 600px;">
+            @Html.Partial("ObjParamList",ctrl)
+            <div class="param_item">
+                <label style="margin-left:40px;">收件人:</label>
+                <input type="text" name="EmailPerson" style="width:130px;" readonly="true" disabled="disabled" v-model="emailpersons"/>
+            </div>
+        </div>
+        @if(metas.Count>1)
+        {
+        <div id="detaillist">
+            @Html.Partial("DetailList",ctrl)
+        </div> 
+        }
+        <div class="title_tab">
+           <table> 
+                 <tr>
+                    <th>收件人</th>
+                    <th>邮箱地址</th>
+                    <th>收件人备注</th>
+                 </tr> 
+            </table>
+        </div>
+        <div class="detail_tab">
+          
+            <table> 
+                 <tr v-for="(item,i) in person_list" :n_Id="item.n_Id" v-on:click="f_checkin(i)" :class=" item.n_IsCheck == 1 ? 'checkin':'' " >
+                    <td>{{ item.s_EmailPerson }}</td>
+                    <td>{{ item.s_EmailAddress }}</td>
+                    <td>{{ item.s_EmailRemark }}</td>
+                 </tr> 
+            </table>
+        </div>
+    </form>
+    
+}
+@section Script{ 
+<style>
+        .detail_tab
+        {
+            width: 505px;
+            height: 30vh; 
+            margin: 0 0 0 2vw;
+            overflow-y:scroll; 
+        }
+        .title_tab
+        { 
+            width: 487px;
+            height: 22px;
+            margin: 2vh 0 0 2vw; 
+        }
+                
+        .detail_tab table,.title_tab table 
+        {
+            width: 100%;
+            height: 22px;
+        }
+         
+
+        .detail_tab td
+        {
+            border: 1px solid #A3C0E8;
+            line-height: 22px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .title_tab th
+        {
+            background:#BED5F3;
+            border: 1px solid #A3C0E8;
+            line-height: 22px;
+            font-size: 12px;
+            text-align: center;
+        }
+        .detail_tab tr td:nth-child(1),.title_tab tr th:nth-child(1)
+        {
+            width:20%;    
+        }
+        .detail_tab tr td:nth-child(2),.title_tab tr th:nth-child(2)
+        ,.detail_tab tr td:nth-child(3),.title_tab tr th:nth-child(3) 
+        {
+            width:40%;    
+        }
+        
+        .checkin
+        {
+            background:#99E485;    
+        }
+         
+</style>
+<script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+<script type="text/javascript">
+    var moduleConfig=@Html.Raw(moduleConfig);
+    var topsRender = null;
+    var detailTab = null;
+
+    var vue = null;
+    
+    //当前时间
+    var nowDate = new Date().getFullYear().toString() +"-"+ (new Date().getMonth() + 1 < 10 ? "0" + (new Date().getMonth() + 1) : (new Date().getMonth() + 1).toString())
+            +"-"+ (new Date().getDate() < 10 ? "0" + new Date().getDate() : new Date().getDate().toString());
+
+
+    $(function(){
+        vue = new Vue({
+             el:"#paramForm",
+             data:{
+                person_list:new Array(),
+                emailpersons:""
+             },
+             methods:{
+                f_loaddata:function(){
+                    $.ajax({
+                        type:"GET",
+                        url:"/AjaxGet/SelEmailInfoPerson",
+                        data:{ n_Id :"@(n_Id)" },
+                        success:function(result){
+                            result = JSON.parse(result);
+                            if(result.IsSuccess){
+                               vue.person_list = result.Data[0];
+                               
+                               vue.emailpersons = "";
+                               vue.person_list.forEach(function(value,index){
+                    
+                                   vue.emailpersons += (value.n_IsCheck == 1 ? value.s_EmailPerson + ";":"");
+                               }) 
+                            }else{
+                               alert(result.Msgs[0]);
+                            }
+                        }
+                    })
+                     
+                },
+                f_checkin:function(index){ 
+                    vue.person_list[index].n_IsCheck = vue.person_list[index].n_IsCheck == 1? 0:1;
+
+                    vue.emailpersons = "";
+                    vue.person_list.forEach(function(value,index){
+                    
+                        vue.emailpersons += (value.n_IsCheck == 1 ? value.s_EmailPerson + ";":"");
+                    }) 
+                }
+             }
+        })
+        
+        vue.f_loaddata();
+    })
+     
+
+</script>
+@if(ctrl=="add")
+{
+<script type="text/javascript">
+
+    $(function () {
+        $("#saveBt").show();
+        //渲染插件
+        topsRender = $("#paramForm *[fieldType]").pluginRender({ moduleConfig: moduleConfig });
+
+        $("#paramlist .param_item:eq(3)").empty().append("<input type='text' name='d_BeginTime' value='" + nowDate + " 08:00" + "' />");
+
+        $("input[name=d_BeginTime]").ligerDateEditor({ showTime: true, label: '触发时间', labelWidth: 80, labelAlign: 'right' });
+        //$("#paramlist .param_item:eq(3)").find(".l-labeltext").css("margin-left", "20px");
+
+        //添加保存
+        $("#saveBt").click(function () {
+            $("#module_toolbar input").attr("disabled", "disabled");
+            $("#loading_img").show();
+            var data = topsRender.serializeData();
+            data.grid1 = new Array();
+            data.d_BeginTime = $("[name=d_BeginTime]").val();
+
+
+            vue.person_list.forEach(function (value, index) {
+                if (value["n_IsCheck"] == "1") {
+                    var obj = new Object();
+                    obj.n_EmailPersonId = value["n_Id"];
+                    obj.UpdateFlag = 'add';
+                    data.grid1.push(obj);
+                }
+
+            })
+
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/AddEmailInfo",
+                data: data,
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功！");
+                        //添加成功后刷新列表并关闭标签
+                        window.parent.f_flushGrid();
+                        window.parent.f_closeTab("Add");
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("保存失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        });
+    });
+</script>
+}else if(ctrl=="edit")
+{
+<script type="text/javascript">
+    var idData =@Html.Raw(Server.UrlDecode(id))
+    $(function () {
+        $("#saveBt").show();
+        //加载数据
+        $.topsAjax({
+            type: "GET",
+            url: "/AjaxGet/SelEmailInfo",
+            data: idData,
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    //渲染插件
+                    topsRender = $("#paramForm *[fieldType]").pluginRender({ data: data.Data,moduleConfig: moduleConfig });
+                 
+                    $("#paramlist .param_item:eq(3)").empty().append("<input type='text' name='d_BeginTime' value='"+ data.Data[0][0].d_BeginTime.substring(0,16) +"' />");
+
+                    $("input[name=d_BeginTime]").ligerDateEditor({ showTime: true, label: '触发时间', labelWidth: 80,labelAlign: 'right' });
+                    //$("#paramlist .param_item:eq(3)").find(".l-labeltext").css("margin-left", "20px");
+         
+                } else {
+                    alert("获取数据失败：" + data.Msgs[0]);
+                }
+            }
+        });
+    
+        //保存修改
+        $("#saveBt").click(function () {
+            $("#module_toolbar input").attr("disabled", "disabled");
+            $("#loading_img").show();
+            var data = topsRender.serializeData();
+            data.grid1 = new Array();
+            data.d_BeginTime = $("[name=d_BeginTime]").val();
+
+            vue.person_list.forEach(function (value, index) {
+                if (value["n_IsCheck"] == "1") {
+                    var obj = new Object();
+                    obj.n_EmailInfoId = data["n_Id"];
+                    obj.n_EmailPersonId = value["n_Id"];
+                    obj.UpdateFlag = 'add';
+                    data.grid1.push(obj);
+                } 
+            })
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/UpdateEmailInfo",
+                data: data,
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存修改成功！");
+                        //刷新列表
+                        window.parent.f_flushGrid();
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("保存修改失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        });
+       
+    });
+</script>   
+}
+<script type="text/javascript">
+    $(function () {
+        detailTab = $("#detaillist").ligerTab({
+            onAfterSelectTabItem: function (tabID) {
+                var $g = $("div[tabid=" + tabID + "] div[fieldtype=grid]", $(this.element));
+                if ($g.length == 0) return;
+                var gIndex = $g.attr("objindex");
+                topsRender.find("grid" + gIndex).obj.grid.setWidth();
+            }
+        });
+    });
+</script>
+}
+
+

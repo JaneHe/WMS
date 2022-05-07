@@ -1,0 +1,646 @@
+﻿@{
+    string Ids = Request.QueryString["Ids"];
+ 
+
+    var UserNo = Tops.FRM.TopsUser.UserNO;
+    
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>print</title>
+    <script src="../../Scripts/jquery-1.4.4.min.js"></script>
+    <script src="../../Scripts/js/jquery.jqprint-0.3.js"></script>
+    <script src="../../Scripts/js/qrcode.js"></script>
+    <script src="../../Scripts/js/JsBarcode.all.min.js"></script>
+    <script src="../../Scripts/QRCodeJs/barcode.js"></script>
+    <script src="../../Scripts/QRCodeJs/printPage.js"></script>
+    <script src="../../TopsLib/Scripts/Tops.js"></script>
+    @*<script src="../../Scripts/js/jquery.min.js"></script>*@ @*<script src="../../Scripts/js/jquery.qrcode.min.js"></script>*@
+    <script>
+        var qrcode = null;
+        $(function () {
+            $("#promt_DY").click(function () {
+                
+                $.topsAjax({
+                    type: "Post",
+                    url: "/AjaxPost/AddPackingListPrintingRecord",
+                    data: {
+                        n_ReportInventoryCurrent_Id: $("#Ids").val()  
+                    },
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            
+                        }
+                    }
+                })
+                setTimeout(function () {
+                    $(".PrintingDame").jqprint(); //传参数指定打印div区域   
+                }, 1500);
+//                setTimeout(function () {
+//                    javascript: window.opener = null; window.open('', '_self'); window.close();
+//                }, 5000);
+            });
+
+        });
+
+        function getQueryString(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+            var r = window.location.search.substr(1).match(reg);
+            if (r != null) return unescape(r[2]); return null;
+        }
+    </script>
+</head>
+<body>
+    <style>
+        *
+        {
+            margin: 0px;
+            padding: 0px;
+        }
+        
+        #promt_DY
+        {
+            width: 135px;
+            cursor: pointer;
+            height: 50px;
+            float: left;
+            font-size: 20px;
+            font-family: Arial;
+            font-weight: bold;
+            border-radius: 5px;
+            background-color: #EAF2FE;
+            border: 4px solid #6495ED;
+            color: #6495ED;
+            margin-left: 20px;
+            display: none;
+        }
+    </style>
+    <input type="hidden" id="Ids" value="@(Ids)">
+    <input type="button" value="Print" id="promt_DY">
+    <div class="PrintingDame" style="width: 140px; height: 300px; /*border: 1px solid #000000*/">
+        <table style="width: 530px; height: 300px; border: 1px solid #000000; margin: 10px;
+            font-size: 10px; font-weight: bold; border-collapse: collapse; border-spacing: 0;
+            text-align: center; font-family: 黑体;" cellpadding="0" cellspacing="0">
+            <tr style="height: 60px">
+                <td style="width: 10%; text-align: center; line-height: 30px; border: 1px solid #000000;
+                    text-align: center;">
+                    <div>
+                        零件</div>
+                    <div>
+                        描述</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center; font-size: 15px;
+                    font-weight: bold" colspan="1" class="MouldName">
+                </td>
+                <td style="width: 10%; text-align: center; border: 1px solid #000000; text-align: center;"
+                    colspan="1">
+                    U9料号
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;" colspan="1">
+                    <svg id="StockCode" />
+                </td>
+            </tr>
+            <tr style="height: 65px">
+                <td style="width: 10%; text-align: center; line-height: 65px; border: 1px solid #000000;
+                    text-align: center;">
+                    零件号
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center;">
+                    <svg id="CustomerNo" />
+                </td>
+                <td style="width: 10%; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <p>
+                        AI号</p>
+                    <span class="AI" style="font-size: 15px"></span>
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto;">
+                        <img id="AI" src="" style="width: 100%; height: 100%;" />
+                    </div>
+                </td>
+            </tr>
+            <tr style="height: 50px">
+                <td style="width: 10%; text-align: center; line-height: 25px; border: 1px solid #000000;
+                    text-align: center;">
+                    <div>
+                        包装</div>
+                    <div>
+                        单号</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center;">
+                    <svg id="BarCode" />
+                </td>
+                <td style="width: 10%; text-align: center; line-height: 50px; border: 1px solid #000000;
+                    text-align: center;">
+                    批次
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;">
+                    <svg id="Batch" />
+                </td>
+            </tr>
+            <tr style="height: 60px" class="data2">
+                <td style="width: 10%; text-align: center; line-height: 30px; border: 1px solid #000000;
+                    text-align: center;">
+                    <div>
+                        零件</div>
+                    <div>
+                        描述</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center; font-size: 15px;
+                    font-weight: bold" colspan="1" class="MouldName2">
+                </td>
+                <td style="width: 10%; border: 1px solid #000000; text-align: center; text-align: center;
+                    line-height: 40px;" colspan="1">
+                    U9料号
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;" colspan="1">
+                    <svg id="StockCode2" />
+                </td>
+            </tr>
+            <tr style="height: 65px" class="data2">
+                <td style="width: 10%; text-align: center; line-height: 65px; border: 1px solid #000000;
+                    text-align: center;">
+                    零件号
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center;">
+                    <svg id="CustomerNo2" />
+                </td>
+                <td style="width: 10%; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <p>
+                        AI号</p>
+                    <span class="AI2"></span>
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto;">
+                        <img id="AI2" src="" style="width: 100%; height: 100%;" />
+                    </div>
+                </td>
+            </tr>
+            @*      <tr style="height: 48px">
+                <td style="width: 10%; text-align: center; line-height: 24px; border: 1px solid #000000; text-align: center;">
+                    <div>创建</div>
+                    <div>时间</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center; font-size: 17px; font-weight: bold; line-height: 48px;" colspan="1" class="time"></td>
+                <td style="width: 10%; border: 1px solid #000000; text-align: center; text-align: center; line-height: 48px;" colspan="1">数量</td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center; line-height: 48px;" colspan="1">
+                    <svg ID="number" />
+                </td>
+            </tr>*@
+            <tr style="height: 48px">
+                <td style="width: 10%; text-align: center; line-height: 24px; border: 1px solid #000000;
+                    text-align: center;">
+                    <div>
+                        包装</div>
+                    <div>
+                        单号</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center;">
+                    <svg id="BarCode21" />
+                </td>
+                <td style="width: 10%; border: 1px solid #000000; text-align: center; text-align: center;
+                    line-height: 48px;" colspan="1">
+                    数量
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center; line-height: 48px;"
+                    colspan="1">
+                    <svg id="number" />
+                </td>
+            </tr>
+        </table>
+        <br id="br" />
+        <table id="table" style="width: 530px; height: 300px; border: 1px solid #000000;
+            margin: -7px 10px 10px 10px; font-size: 10px; font-weight: bold; border-collapse: collapse;
+            border-spacing: 0; text-align: center; font-family: 黑体;" cellpadding="0" cellspacing="0">
+            <tr style="height: 60px; margin-top: 10px;">
+                <td style="width: 10%; text-align: center; line-height: 30px; border: 1px solid #000000;
+                    text-align: center;">
+                    <div>
+                        零件</div>
+                    <div>
+                        描述</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center; font-size: 15px;
+                    font-weight: bold" colspan="1" class="MouldNameb1">
+                </td>
+                <td style="width: 10%; text-align: center; border: 1px solid #000000; text-align: center;
+                    line-height: 30px;" colspan="1">
+                    <div>
+                        U9</div>
+                    <div>
+                        料号</div>
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;" colspan="1">
+                    <svg id="StockCodeb1" />
+                </td>
+            </tr>
+            <tr style="height: 65px">
+                <td style="width: 10%; text-align: center; line-height: 65px; border: 1px solid #000000;
+                    text-align: center;">
+                    零件号
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center;">
+                    <svg id="CustomerNob1" />
+                </td>
+                <td style="width: 10%; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <p>
+                        AI号</p>
+                    <span class="AIb1"></span>
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto;">
+                        <img id="AIb1" src="" style="width: 100%; height: 100%;" />
+                    </div>
+                </td>
+            </tr>
+            <tr style="height: 50px">
+                <td style="width: 10%; text-align: center; line-height: 25px; border: 1px solid #000000;
+                    text-align: center;">
+                    <div>
+                        包装</div>
+                    <div>
+                        单号</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center;">
+                    <svg id="BarCodeb1" />
+                </td>
+                <td style="width: 10%; text-align: center; line-height: 50px; border: 1px solid #000000;
+                    text-align: center;">
+                    批次
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;">
+                    <svg id="Batchb1" />
+                </td>
+            </tr>
+            <tr style="height: 60px" class="data3">
+                <td style="width: 10%; text-align: center; line-height: 30px; border: 1px solid #000000;
+                    text-align: center;">
+                    <div>
+                        零件</div>
+                    <div>
+                        描述</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center; font-size: 15px;
+                    font-weight: bold" colspan="1" class="MouldNameb2">
+                </td>
+                <td style="width: 10%; border: 1px solid #000000; text-align: center; text-align: center;
+                    line-height: 40px; line-height: 30px;" colspan="1">
+                    <div>
+                        U9</div>
+                    <div>
+                        料号</div>
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;" colspan="1">
+                    <svg id="StockCodeb2" />
+                </td>
+            </tr>
+            <tr style="height: 65px" class="data3">
+                <td style="width: 10%; text-align: center; line-height: 65px; border: 1px solid #000000;
+                    text-align: center;">
+                    零件号
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center;">
+                    <svg id="CustomerNob2" />
+                </td>
+                <td style="width: 10%; text-align: center; border: 1px solid #000000; text-align: center;">
+                    <p>
+                        AI号</p>
+                    <span class="AIb2"></span>
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center;">
+                    <div style="width: 64px; height: 64px; margin: 0 auto;">
+                        <img id="AIb2" src="" style="width: 100%; height: 100%;" />
+                    </div>
+                </td>
+            </tr>
+            @*      <tr style="height: 50px">
+                <td style="width: 10%; text-align: center; line-height: 25px; border: 1px solid #000000; text-align: center;">
+                    <div>创建</div>
+                    <div>时间</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center; line-height: 50px; font-size: 15px; font-weight: bold" colspan="1" class="time"></td>
+                <td style="width: 10%; border: 1px solid #000000; text-align: center; text-align: center; line-height: 50px;" colspan="1">数量</td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center; line-height: 50px;" colspan="1">
+                    <svg ID="numberb1" />
+                </td>
+            </tr>*@
+            <tr style="height: 50px">
+                <td style="width: 10%; text-align: center; line-height: 25px; border: 1px solid #000000;
+                    text-align: center;">
+                    <div>
+                        包装</div>
+                    <div>
+                        单号</div>
+                </td>
+                <td style="width: 50%; border: 1px solid #000000; text-align: center;">
+                    <svg id="BarCode22" />
+                </td>
+                <td style="width: 10%; border: 1px solid #000000; text-align: center; text-align: center;
+                    line-height: 50px;" colspan="1">
+                    数量
+                </td>
+                <td style="width: 35%; border: 1px solid #000000; text-align: center; line-height: 50px;"
+                    colspan="1">
+                    <svg id="numberb1" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <script>
+         
+        $(function () {
+
+            $.ajax({
+                type: "GET",
+                url: "/AjaxGET/SelPackingListPrintingInfo?Ids=" + $("#Ids").val(),
+                dataType: "json",
+                async: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        $(".MouldName").text(data.Data[0][0].s_GoodsProductName)
+                        $(".AI").text(data.Data[0][0].s_ECN)
+                        $(".time").text(data.Data[0][0].d_PrintTime)
+                        if (data.Data[0].length == 1) {
+                            $("#StockCode2").hide();
+                            $("#BarCode21").hide();
+                            $("#CustomerNo2").hide();
+                            $("#AI2").hide();
+                        } if (data.Data[0].length == 3) {
+                            $("#StockCodeb2").hide();
+                            $("#CustomerNob2").hide();
+                            $("#AIb2").hide();
+                            $("#BarCode22").hide();
+                        }
+                         
+
+                        JsBarcode("#BarCode", data.Data[0][0].s_GoodsProductCode + data.Data[0][0].s_Batch + data.Data[0][0].s_ShelfNumber, {
+                            format: "code128", //选择要使用的条形码类型
+                            width: 1.2, //设置条之间的宽度
+                            height: 30, //高度
+                            displayValue: true, //是否在条形码下方显示文字
+                            font: "Microsoft YaHei", //设置文本的字体
+                            textMargin: 1, //设置条形码和文本之间的间距
+                            fontSize: 15, //设置文本的大小
+                            lineColor: "#000", //设置条和文本的颜色。
+                            margin: 2//设置条形码周围的空白边距
+                        });
+                        JsBarcode("#CustomerNo", data.Data[0][0].s_GoodsProductCode + '-' + data.Data[0][0].s_ECN, {
+                            format: "code128", //选择要使用的条形码类型
+                            width: 1.2, //设置条之间的宽度
+                            height: 42, //高度
+                            displayValue: true, //是否在条形码下方显示文字
+                            font: "Microsoft YaHei", //设置文本的字体
+                            textMargin: 1, //设置条形码和文本之间的间距
+                            fontSize: 15, //设置文本的大小
+                            lineColor: "#000", //设置条和文本的颜色。
+                            margin: 2//设置条形码周围的空白边距
+
+                        });
+                        JsBarcode("#Batch", data.Data[0][0].s_Batch, {
+                            format: "code128", //选择要使用的条形码类型
+                            width: 1.2, //设置条之间的宽度
+                            height: 30, //高度
+                            displayValue: true, //是否在条形码下方显示文字
+                            font: "Microsoft YaHei", //设置文本的字体
+                            textMargin: 1, //设置条形码和文本之间的间距
+                            fontSize: 15, //设置文本的大小
+                            lineColor: "#000", //设置条和文本的颜色。
+                            margin: 2//设置条形码周围的空白边距
+                        });
+                        JsBarcode("#StockCode", data.Data[0][0].s_ExternalCode, {
+                            format: "code128", //选择要使用的条形码类型
+                            width: 1.2, //设置条之间的宽度
+                            height: 30, //高度
+                            displayValue: true, //是否在条形码下方显示文字
+                            font: "Microsoft YaHei", //设置文本的字体
+                            textMargin: 1, //设置条形码和文本之间的间距
+                            fontSize: 15, //设置文本的大小
+                            lineColor: "#000", //设置条和文本的颜色。
+                            margin: 2//设置条形码周围的空白边距
+
+                        });
+                        JsBarcode("#number", data.Data[0][0].n_PrintNumber, {
+                            format: "code128", //选择要使用的条形码类型
+                            width: 1.2, //设置条之间的宽度
+                            height: 30, //高度
+                            displayValue: true, //是否在条形码下方显示文字
+                            font: "Microsoft YaHei", //设置文本的字体
+                            textMargin: 1, //设置条形码和文本之间的间距
+                            fontSize: 15, //设置文本的大小
+                            lineColor: "#000", //设置条和文本的颜色。
+                            margin: 2//设置条形码周围的空白边距
+                        });
+
+                        ////生成二维码（DM）
+
+                        $.ajax({
+                            type: "post",
+                            url: "/DM/Index",
+                            data: { "CustomerNo": data.Data[0][0].s_GoodsProductCode + '-' + data.Data[0][0].s_ECN },
+                            async: false,
+                            success: function (src) {
+                                $("#AI").attr("src", src)
+                            }
+                        })
+
+
+                        if (data.Data[0].length > 1) {
+
+                            JsBarcode("#BarCode21", data.Data[0][1].s_GoodsProductCode + data.Data[0][1].s_Batch + data.Data[0][1].s_ShelfNumber, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 30, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+                            $(".MouldName2").text(data.Data[0][1].s_GoodsProductName)
+
+                            JsBarcode("#StockCode2", data.Data[0][1].s_ExternalCode, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 30, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+                            JsBarcode("#CustomerNo2", data.Data[0][1].s_GoodsProductCode + '-' + data.Data[0][1].s_ECN, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 42, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+                            $(".AI2").text(data.Data[0][1].s_ECN)
+
+                            //生成二维码（DM）
+
+                            $.ajax({
+                                type: "post",
+                                url: "/DM/Index2",
+                                data: { "CustomerNo": data.Data[0][1].s_GoodsProductCode + '-' + data.Data[0][1].s_ECN },
+                                async: false,
+                                success: function (src) {
+                                    $("#AI2").attr("src", src)
+                                }
+                            })
+
+                        }
+
+                        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                        if (data.Data[0].length > 2) {
+                            $(".MouldNameb1").text(data.Data[0][2].s_GoodsProductName)
+                            $(".AIb1").text(data.Data[0][2].s_ECN)
+                            //$(".time").text(data.Data[0][2].time)
+
+                            JsBarcode("#BarCodeb1", data.Data[0][2].s_GoodsProductCode + data.Data[0][2].s_Batch + data.Data[0][2].s_ShelfNumber, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 30, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+                            JsBarcode("#CustomerNob1", data.Data[0][2].s_GoodsProductCode + '-' + data.Data[0][2].s_ECN, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 42, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+
+                            });
+                            JsBarcode("#Batchb1", data.Data[0][2].s_Batch, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 30, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+                            JsBarcode("#StockCodeb1", data.Data[0][2].s_ExternalCode, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 30, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+
+                            });
+                            JsBarcode("#numberb1", data.Data[0][2].n_PrintNumber, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 30, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+
+                            //生成二维码（DM）
+
+                            $.ajax({
+                                type: "post",
+                                url: "/DM/Index3",
+                                data: { "CustomerNo": data.Data[0][2].s_GoodsProductCode + '-' + data.Data[0][2].s_ECN },
+                                async: false,
+                                success: function (src) {
+                                    $("#AIb1").attr("src", src)
+                                }
+                            })
+
+                        } else {
+                            $("#table").hide();
+                            $("#br").remove();
+                            return;
+                        }
+                        if (data.Data[0].length > 3) {
+
+                            $(".MouldNameb2").text(data.Data[0][3].s_GoodsProductName)
+
+                            JsBarcode("#BarCode22", data.Data[0][3].s_GoodsProductCode + data.Data[0][3].s_Batch + data.Data[0][3].s_ShelfNumber, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 30, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+                            JsBarcode("#StockCodeb2", data.Data[0][3].s_ExternalCode, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 30, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+                            JsBarcode("#CustomerNob2", data.Data[0][3].s_GoodsProductCode + '-' + data.Data[0][3].s_ECN, {
+                                format: "code128", //选择要使用的条形码类型
+                                width: 1.2, //设置条之间的宽度
+                                height: 42, //高度
+                                displayValue: true, //是否在条形码下方显示文字
+                                font: "Microsoft YaHei", //设置文本的字体
+                                textMargin: 1, //设置条形码和文本之间的间距
+                                fontSize: 15, //设置文本的大小
+                                lineColor: "#000", //设置条和文本的颜色。
+                                margin: 2//设置条形码周围的空白边距
+                            });
+                            $(".AIb2").text(data.Data[0][3].s_ECN)
+
+                            //生成二维码（DM）
+
+                            $.ajax({
+                                type: "post",
+                                url: "/DM/Index4",
+                                data: { "CustomerNo": data.Data[0][3].s_GoodsProductCode + '-' + data.Data[0][3].s_ECN },
+                                async: false,
+                                success: function (src) {
+                                    $("#AIb2").attr("src", src)
+                                }
+                            })
+
+                        }
+                    }
+
+                }
+            })
+            //如果选中，则直接打印
+            $("#promt_DY").click();
+
+        }
+
+        )
+    </script>
+</body>
+</html>

@@ -1,0 +1,71 @@
+E:\LianWang\项目\TopsHNAH\TopsBOM\bin\Tops.FRM.dll
+E:\LianWang\项目\TopsHNAH\TopsBOM\bin\Newtonsoft.Json.dll
+E:\LianWang\项目\TopsHNAH\TopsBOM\bin\EncryptCode.dll
+E:\LianWang\项目\TopsHNAH\TopsBOM\bin\Tops.FRM.pdb
+E:\LianWang\项目\TopsHNAH\TopsBOM\obj\Debug\TopsHNAH.csprojResolveAssemblyReference.cache
+E:\LianWang\项目\TopsHNAH\TopsBOM\bin\TopsHNAH.dll
+E:\LianWang\项目\TopsHNAH\TopsBOM\bin\TopsHNAH.pdb
+E:\LianWang\项目\TopsHNAH\TopsBOM\obj\Debug\TopsHNAH.dll
+E:\LianWang\项目\TopsHNAH\TopsBOM\obj\Debug\TopsHNAH.pdb
+E:\LianWang\项目\TopsHNAH\TopsHNAH\bin\TopsHNAH.dll
+E:\LianWang\项目\TopsHNAH\TopsHNAH\bin\TopsHNAH.pdb
+E:\LianWang\项目\TopsHNAH\TopsHNAH\bin\Tops.FRM.dll
+E:\LianWang\项目\TopsHNAH\TopsHNAH\bin\Newtonsoft.Json.dll
+E:\LianWang\项目\TopsHNAH\TopsHNAH\bin\EncryptCode.dll
+E:\LianWang\项目\TopsHNAH\TopsHNAH\bin\Tops.FRM.pdb
+E:\LianWang\项目\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.csprojResolveAssemblyReference.cache
+E:\LianWang\项目\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.dll
+E:\LianWang\项目\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.pdb
+E:\周敏涛\TopsHNAH\TopsHNAH\bin\TopsHNAH.dll
+E:\周敏涛\TopsHNAH\TopsHNAH\bin\TopsHNAH.pdb
+E:\周敏涛\TopsHNAH\TopsHNAH\bin\Tops.FRM.dll
+E:\周敏涛\TopsHNAH\TopsHNAH\bin\Newtonsoft.Json.dll
+E:\周敏涛\TopsHNAH\TopsHNAH\bin\EncryptCode.dll
+E:\周敏涛\TopsHNAH\TopsHNAH\bin\Tops.FRM.pdb
+E:\周敏涛\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.csprojResolveAssemblyReference.cache
+E:\周敏涛\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.dll
+E:\周敏涛\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.pdb
+E:\周敏涛\TopsHNAH\TopsHNAH\bin\NPOI.dll
+E:\周敏涛\TopsHNAH\TopsHNAH\bin\ICSharpCode.SharpZipLib.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\TopsHNAH.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\TopsHNAH.pdb
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\ICSharpCode.SharpZipLib.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\NPOI.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\Tops.FRM.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\Newtonsoft.Json.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\Tops.FRM.pdb
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.csprojResolveAssemblyReference.cache
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.pdb
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\EncryptCode.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\NPOI.OOXML.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\NPOI.OpenXml4Net.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\NPOI.OpenXmlFormats.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\NPOI.xml
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\LitJson.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\rscp4n.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\sapnco.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\sapnco_utils.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\Spire.XLS.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\Spire.License.dll
+E:\LianWang\HWJ 联旺\TopsHNAH\TopsHNAH\bin\Spire.Pdf.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\TopsHNAH.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\TopsHNAH.pdb
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\NPOI.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\NPOI.OOXML.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\NPOI.OpenXml4Net.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\NPOI.OpenXmlFormats.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\Tops.FRM.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\EncryptCode.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\Newtonsoft.Json.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\ICSharpCode.SharpZipLib.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\Spire.License.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\Spire.Pdf.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\Tops.FRM.pdb
+G:\项目\HNAH\TopsHNAH\TopsHNAH\bin\NPOI.xml
+G:\项目\HNAH\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.csprojResolveAssemblyReference.cache
+G:\项目\HNAH\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.dll
+G:\项目\HNAH\TopsHNAH\TopsHNAH\obj\Debug\TopsHNAH.pdb
+G:\项目\HNAH\WMS\TopsHNAH\obj\Debug\TopsHNAH.csprojResolveAssemblyReference.cache
+G:\项目\HNAH\WMS\TopsHNAH\obj\Debug\TopsHNAH.dll
+G:\项目\HNAH\WMS\TopsHNAH\obj\Debug\TopsHNAH.pdb

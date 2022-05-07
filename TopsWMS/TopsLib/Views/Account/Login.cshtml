@@ -1,0 +1,339 @@
+﻿@{
+    ViewBag.Title = "沈阳名华模塑科技有限公司管理系统(广州联旺)-登录";
+    Layout = "~/TopsLib/Views/Shared/_Layout.cshtml";
+    var backUrl = Request.QueryString["backUrl"] + "";
+    backUrl = string.IsNullOrEmpty(backUrl) ? "" : Server.UrlDecode(backUrl); 
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>登录</title>
+    <link href="../../../css/Login/login.css" rel="stylesheet" />
+    <link href="../../../css/Login/selectFilter.css" rel="stylesheet" />
+    <script src="../../../Scripts/ElasticFrame.js"></script>
+    <script type="text/javascript">
+        var backUrl = '@(new MvcHtmlString(backUrl))';
+        $(function () {
+            $('.filter-list li').click(function () {
+                localStorage.Power = $(this).attr("data-value")
+                $(".filter option[value='" + localStorage.Power + "']").attr("selected");
+            })
+
+            $(".filter-title,select[name=filter]").val(localStorage.Power == null ? "仓储管理系统" : localStorage.Power)
+
+            //回车进行点击
+            $(document).keyup(function (event) {
+                if (event.keyCode == 13) {
+                    $("#LoginBtn").click();
+                }
+            });
+
+            //手持端登录页
+            $("#MobileLoginBtn").click(function () {
+                location.href = "../../SiteLogin/Index";
+            })
+
+            $("#LoginBtn").click(function () {
+                var $bt = $(this);
+                $bt.attr("disabled", "disabled")
+
+                var operType = $('select[name=filter] option:checked').val();
+       
+                if (operType == '仓储管理系统') {
+                    $.topsAjax({
+                        type: "POST",
+                        url: "/Account/Login",
+                        data: { UserNO: $("#UserNo").val(), Password: $("#Pwd").val() },
+                        dealError: false,
+                        success: function (data) {
+                            if (data.IsSuccess) {
+                                var userObj = $("#UserNo").val();
+                                 
+                                switch (operType) {
+                                    case "仓储管理系统":
+                                        window.location.href = backUrl == '' ? ("/home/index?" + Math.random()) : backUrl;
+                                        break;
+                                }
+                            } else {
+                                alertN(data.Msgs[0]);
+                            }
+                        }
+                    });
+                     
+                } else {
+                    $.topsAjax({
+                        type: "POST",
+                        url: "/Account/Login",
+                        data: { UserNO: $("#UserNo").val(), Password: $("#Pwd").val() },
+                        dealError: false,
+                        success: function (data) {
+                            if (data.IsSuccess) {
+                                var userObj = $("#UserNo").val();
+                                $.topsAjax({
+                                    type: "Get",
+                                    url: "/AjaxGet/SelUser",
+                                    data: { "UserNO": userObj },
+                                    success: function (data) {
+                                        if (data.IsSuccess) {
+
+                                            if (data.Data[1][0].RoleID != operType) {
+                                                alertN('无权限访问,请咨询IT支持人员.');
+                                                $bt.removeAttr("disabled");
+                                                return;
+                                            }
+                                        }
+                                    }
+                                })
+                            } else {
+                                alertN(data.Msgs[0]);
+                            }
+                        }
+                    });
+
+                }
+            })
+        })
+    </script>
+</head>
+<body>
+    <div class="main">
+        <div class="main0">
+            <div class="main_left">
+               @* <img src="../../../Images/Login/login-image-3.png" class="theimg" />
+                <img src="../../../Images/Login/login-image-2.png" class="secimg" />
+                <img src="../../../Images/Login/login-image-1.png" class="firimg" />*@
+            </div>
+            <div class="main_right">
+                <div class="main_r_up">
+                    @*<img src="../../../Images/Login/user.png" />*@
+                    <img src="../../../Content/logo_20210128.png" style="width:148px;height:74px;" />
+                    <div class="pp" style="font-size: 25px;">沈阳名华生产管理系统</div>
+                </div>
+                <div class="sub">
+                    <p style="visibility: hidden;">修改密码？<a href="zhuce1.html"><span class="blue">跳转修改</span></a></p>
+                </div>
+                <div class="txt">
+                    <span style="letter-spacing: 8px;">用户名:</span>
+                    <input name="" type="text" id="UserNo" class="txtphone" placeholder="请输入注册手机号或用户名" title="UserNo" />
+                </div>
+                <div class="txt">
+                    <span style="letter-spacing: 4px;">登录密码:</span>
+                    <input name="" type="password" id="Pwd" class="txtphone" placeholder="请输入登录密码" title="Pwd" />
+                </div>
+                <div class="txt">
+                    <span style="letter-spacing: 4px;"></span>
+                    <div class="item">
+                        <!-- 这里开始 -->
+                        <div class="filter-box">
+                            <div class="filter-text">
+                                <input class="filter-title" type="text" readonly placeholder="pleace select" />
+                                <i class="icon icon-filter-arrow"></i>
+                            </div>
+                            <select name="filter">
+                                <option value="仓储管理系统" selected>仓储管理系统</option>
+                                @*<option value="注塑QA">注塑QA</option>
+                                <option value="喷涂下线QA">喷涂下线QA</option>
+                                <option value="喷涂误判纠正">喷涂误判纠正</option>*@
+                            </select>
+                        </div>
+                        <!-- 这里结束 -->
+                    </div> 
+                </div>
+                <div class="xiayibu" id="MobileLoginBtn">手持终端</div>
+                <div class="xiayibu" id="LoginBtn" style="margin-left: 10px;">登录</div>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <div class="footer0">
+            <div class="footer_r">©广州联旺网络科技有限公司  技术支持</div>
+        </div>
+    </div>
+    <!-- 虚拟键盘 -->
+    <div id="container" style="font-size: 22px; z-index: 1003; left: 320px; top: 70px;">
+        <div class="letterDiv">
+            <ul class="keyboard">
+                <li class="letter  ">Q</li>
+                <li class="letter  ">W</li>
+                <li class="letter  ">E</li>
+                <li class="letter  ">R</li>
+                <li class="letter  ">T</li>
+                <li class="letter ">Y</li>
+                <li class="letter ">U</li>
+                <li class="letter ">A</li>
+                <li class="letter ">S</li>
+                <li class="letter ">D</li>
+                <li class="letter ">F</li>
+                <li class="letter ">G</li>
+                <li class="letter ">H</li>
+                <li class="letter ">J</li>
+                <li class="letter ">Z</li>
+                <li class="letter ">X</li>
+                <li class="letter ">C</li>
+                <li class="letter ">V</li>
+                <li class="letter ">B</li>
+                <li class="letter ">N</li>
+                <li class="letter ">M</li>
+                <li class="letter ">I</li>
+                <li class="letter ">K</li>
+                <li class="letter ">L</li>
+                <li class="letter ">O</li>
+                <li class="letter ">P</li>
+                <li class="capslock">切换大小写</li>
+            </ul>
+        </div>
+        <div class="symbolDiv">
+            <ul class="keyboard">
+                <li class="symbol">7</li>
+                <li class="symbol">8</li>
+                <li class="symbol">9</li>
+                <li class="symbol">4</li>
+                <li class="symbol">5</li>
+                <li class="symbol">6</li>
+                <li class="symbol">1</li>
+                <li class="symbol">2</li>
+                <li class="symbol">3</li>
+                <li class="symbol">0</li>
+                <li class="delete lastitem">删除</li>
+                <li class="OK">隐藏</li>
+            </ul>
+        </div>
+    </div>
+    <style type="text/css">
+        #container {
+            margin: 0px auto;
+            width: 886px;
+            margin-top: 15px;
+            height: 274px;
+            position: absolute;
+            z-index: 1001;
+            padding: 10px 0px 0px 10px;
+            background: #99CCFF;
+            top: 70px;
+            left: 320px;
+            display: none;
+        }
+
+        .letterDiv {
+            width: 610px;
+            height: 225px;
+            float: left;
+        }
+
+        .keyboard {
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+            .keyboard li {
+                font: 71%/1.5 Verdana, Sans-Serif;
+                font-size: 24px;
+                font-weight: bold;
+                float: left;
+                margin: 0 5px 5px 0;
+                width: 80px;
+                height: 60px;
+                line-height: 60px;
+                text-align: center;
+                background: #eee;
+                border: 1px solid #e6e8eb;
+                -moz-border-radius: 5px;
+                -webkit-border-radius: 5px;
+            }
+
+        #container .keyboard li {
+            font-size: 22px;
+        }
+
+        .symbolDiv {
+            width: 262px;
+            height: 225px;
+            float: left;
+            margin-left: 10px;
+        }
+
+        .keyboard .capslock {
+            width: 167px;
+        }
+
+        .uppercase {
+            text-transform: lowercase;
+        }
+    </style>
+    <!-- 虚拟键盘 -->
+
+    <script src="../../../Scripts/Login/selectFilter.js"></script>
+
+    <script type="text/javascript">
+        //本小插件支持移动端哦
+        //这里是初始化
+        $('.filter-box').selectFilter({
+            callBack: function (val) {
+                //返回选择的值
+                console.log(val + '-是返回的值')
+            }
+        });
+
+        document.body.onselectstart = function () {
+            return false;
+        }
+
+        $(document).bind("contextmenu", function (e) {
+            return false;
+        });
+
+        $(function () {
+            $(document).ready(function () {
+                var height = $(document).height();
+                $('.main').css('height', height);
+            })
+
+            $("#UserNo").focus();
+            localStorage.focusID = $("#UserNo").attr('title');
+
+            $("#container").css({ "top": $('.item').offset().top - 40 - 10 + "px", "left": $('.main0').offset().left + ($('.main0').width() - $("#container").width()) - 10 + "px" })
+
+            $("#UserNo,#Pwd").click(function () {
+                $(this).focus();
+                localStorage.focusID = $(this).attr('title');
+                //$('#container').show();
+            })
+
+            $('#container .keyboard li').click(function () {
+                var writeTitle = localStorage.focusID;
+
+                $("input[title=" + writeTitle + "]").focus();
+                var $write = $('input[title=' + writeTitle + ']'),
+                capslock = false;
+                var $this = $(this),
+                    character = $this.html();
+                // Caps lock
+                if ($this.hasClass('capslock')) {
+                    $('.letter').toggleClass('uppercase');
+                    capslock = false;
+                    return false;
+                }
+                // Caps lock
+                if ($this.hasClass('OK')) {
+                    capslock = false;
+                    //$('#container').hide();
+                    return false;
+                }
+                // Delete
+                if ($this.hasClass('delete')) {
+                    var html = $write.val();
+                    $write.val(html.substr(0, html.length - 1));
+                    $write.change();
+                    return false;
+                }
+                // Uppercase letter
+                if ($this.hasClass('uppercase')) character = character.toLowerCase();
+                // Add the character
+                $write.val($write.val() + character);
+                $write.change();
+            });
+        })
+    </script>
+</body>
+</html>

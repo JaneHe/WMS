@@ -1,0 +1,401 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+
+    string n_Warehouse_Id = Request.QueryString["n_Warehouse_Id"];
+
+    string n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"];
+
+    string n_ReportInventoryCurrentDetail_Id = Request.QueryString["n_ReportInventoryCurrentDetail_Id"];
+
+    string s_ReportInventoryCurrentDetail_Code = Request.QueryString["s_ReportInventoryCurrentDetail_Code"];
+}
+@section Body{
+    <div class="body"> 
+        <div>
+            <table v-bind:class="InfoTab_Showed">
+                <tr>
+                    <td>
+                        储位
+                    </td>
+                    <td>
+                        {{ DataList.s_Space_Code }}
+                    </td>
+                    <td>
+                        器具
+                    </td>
+                    <td>
+                        {{ DataList.s_Bin_Code }}
+                    </td>
+                </tr> 
+                <tr>
+                    <td>
+                        产品名称
+                    </td>
+                    <td colspan="3">
+                        {{ DataList.GoodsProductName }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        产品编码
+                    </td>
+                    <td>
+                        {{ DataList.CustomerCode }}
+                    </td>
+                    <td>
+                        车型
+                    </td>
+                    <td>
+                        {{ DataList.CarSeries }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        颜色
+                    </td>
+                    <td>
+                        {{ DataList.CarColor }}
+                    </td>
+                    <td>
+                        批次
+                    </td>
+                    <td>
+                        {{ DataList.Batch }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        确认数量
+                    </td>
+                    <td>
+                        {{ DataList.SureAmount }}
+                    </td>
+                    <td>
+                        库位数量
+                    </td>
+                    <td>
+                        {{ DataList.SpaceSurplusAmount }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div>
+            <table v-bind:class="SearchTab_Showed"> 
+                <tr>
+                    <td>
+                        数量
+                    </td>
+                    <td colspan="3">
+                        <input type="text" v-bind:class="Amount_Showed" placeholder="请输入数量" v-on:keyup.enter="f_keyupAmount" />
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="button_Div_Showed">
+            <div v-on:click="f_SaveInventoryRecord">
+                确认保存</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .SearchTab
+        {
+            width: calc(90%);
+            margin: calc(5%) calc(5%);
+            font-size: 13px;
+        }
+        .SearchTab td:nth-child(odd)
+        {
+            width: 10%;
+            text-align: center;
+            line-height: 26px;
+        }
+        .SearchTab td:nth-child(even)
+        {
+            width: 40%;
+            line-height: 26px;
+            text-align: center;
+        }
+        .SpaceBarCode, .BinBarCode, .BarCode
+        {
+            width: 90%;
+            border: 1px solid lightblue;
+            line-height: 25px;
+            margin: 0 10% 0 0;
+        }
+        .BarCode
+        {
+            width: 95.7%;
+            border: 1px solid lightblue;
+            line-height: 25px;
+        }
+        .Amount
+        {
+            width: 95.8%;
+            border: 1px solid lightblue;
+            line-height: 25px;
+            float: left;
+        }
+        
+        .InfoTab
+        {
+            width: calc(90%);
+            line-height: 26px;
+            border-collapse: collapse;
+            margin: calc(2%) calc(5%);
+            font-size: 13px;
+        }
+        .InfoTab td:nth-child(odd)
+        {
+            width: 25%;
+            text-align: center;
+            line-height: 26px;
+            border: 1px solid green;
+        }
+        .InfoTab td:nth-child(even)
+        {
+            width: 25%;
+            line-height: 26px;
+            text-align: center;
+            border: 1px solid green;
+        }
+        
+        .button_Div div
+        {
+            width: calc(90%);
+            margin: calc(0%) calc(5%) calc(2%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 30px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Post对象
+        var ajaxobjFirst = null;
+
+        //ajax Get对象
+        var ajaxobjSecond = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    SearchTab_Showed: "SearchTab", //输入表格的样式
+                    SpaceBarCode_Showed: "SpaceBarCode", //储位二维码的样式
+                    BinBarCode_Showed: "BinBarCode",  //器具二维码的样式
+                    BarCode_Showed: "BarCode", //条码的样式
+                    Amount_Showed: "Amount", //数量的样式
+                    InfoTab_Showed: "InfoTab",  //信息表格的样式
+                    button_Div_Showed: "button_Div", //按钮的样式
+                    DataList: {
+                        GoodsProductCode: "", //产品编码
+                        GoodsProductName: "", //产品名称
+                        CustomerCode: "", //客户料号
+                        SpecificationModel: "", //规格型号
+                        CarSeries: "", //车型
+                        CarColor: "", //颜色
+                        QualityStatus: 1, //质量状态
+                        n_Warehouse_Id: "@(n_Warehouse_Id)",
+                        n_BillStockInOut_Id: "@(n_BillStockInOut_Id)",
+                        n_ReportInventoryCurrent_Id: "", //在储位信息表外键ID
+                        n_ReportInventoryCurrentDetail_Id: "", //在储位信息明细表外键ID
+                        Batch: "", //批次
+                        SureAmount: "", //确认数量
+                        SpaceSurplusAmount: "---", //剩余库位数量
+                        s_Space_Code: "", //储位二维码
+                        s_Bin_Code: "" //器具条码
+                    }
+                },
+                methods: {
+                    //保存盘点操作记录
+                    f_SaveInventoryRecord: function () {
+
+                        var obj = event.target;
+                        if ($(obj).is("[disabled]")) {
+                            return;
+                        }
+
+                        //数量为空逻辑判定 如果数量为空则驳回，填写数量
+                        if ($(".Amount").val() == "") {
+
+                            f_commonShowMsg("请输入数量");
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjFirst != null) {
+                            ajaxobjFirst.abort();
+                            ajaxobjFirst = null;
+                            return;
+                        }
+
+                        $(obj).attr("disabled", "disabled");
+
+                        //自动触发
+                        if (vue.DataList.SureAmount == "") {
+                            vue.f_keyupAmount();
+                        }
+                         
+                        //对象名 新增异动盘点信息记录
+                        var objectName = "InsertRecordInventoryNewMoveDifferenceCount";
+
+                        //拼接数组
+                        var arr = new Array();
+                        arr.push({
+                            BarCode: vue.DataList.BarCode, //条码二维码
+                            GoodsProductCode: vue.DataList.GoodsProductCode, //产品编码
+                            GoodsProductName: vue.DataList.GoodsProductName, //产品名称 
+                            CustomerCode: vue.DataList.s_CustomerCode, //客户料号
+                            QualityStatus: vue.DataList.QualityStatus, //质量状态 
+                            n_ReportInventoryCurrent_Id: vue.DataList.n_ReportInventoryCurrent_Id, //在储位信息表外键ID
+                            n_ReportInventoryCurrentDetail_Id: vue.DataList.n_ReportInventoryCurrentDetail_Id, //在储位信息明细表外键ID
+                            n_BillStockInOut_Id: vue.DataList.n_BillStockInOut_Id,
+                            Batch: vue.DataList.Batch, //批次
+                            SureAmount: vue.DataList.SureAmount, //确认数量
+                            SpaceSurplusAmount: vue.DataList.SpaceSurplusAmount, //剩余库位数量 
+                            s_Space_Code: vue.DataList.s_Space_Code, //储位二维码
+                            s_Bin_Code: vue.DataList.s_Bin_Code //器具条码
+                        })
+
+                        var param = { Dictionary: arr };
+
+                        ajaxobjFirst = ajaxhelper.ajax_Post(objectName, param, function (result) {
+                            f_commonShowMsg("保存成功!");
+                            //重新聚焦
+                            $(".SpaceBarCode").val("").focus();
+
+                            vue.DataList.BarCode = ""; //条码二维码
+                            vue.DataList.GoodsProductCode = ""; //产品编码
+                            vue.DataList.GoodsProductName = ""; //产品名称
+                            vue.DataList.CustomerCode = ""; //客户料号
+                            vue.DataList.SpecificationModel = ""; //规格型号
+                            vue.DataList.CarSeries = ""; //车型
+                            vue.DataList.CarColor = ""; //颜色
+                            vue.DataList.QualityStatus = 1; //质量状态 
+                            vue.DataList.n_ReportInventoryCurrent_Id = ""; //在储位信息表外键ID
+                            vue.DataList.n_ReportInventoryCurrentDetail_Id = ""; //在储位信息明细表外键ID
+                            vue.DataList.Batch = ""; //批次
+                            vue.DataList.SureAmount = ""; //确认数量
+                            vue.DataList.SpaceSurplusAmount = "---"; //剩余库位数量 
+                            vue.DataList.s_Space_Code = ""; //储位二维码
+                            vue.DataList.s_Bin_Code = ""; //器具条码
+
+                            location.href = "/InventoryOperationNew/AddBillStockInOutDetail?ParentIds=" + "@ParentIds" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)" + "&n_ReportInventoryCurrentDetail_Id=" + "" + "&s_ReportInventoryCurrentDetail_Code=" + ""
+
+                            ajaxobjFirst = null;
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjFirst = null;
+
+                            $(obj).removeAttr("disabled");
+
+                        })
+                    },
+                    //条码二维码改值事件
+                    f_keyupBarCode: function () {
+
+                        vue.DataList.BarCode = $(".BarCode").val();
+                        $(".BarCode").val("");
+
+                        //自动聚焦于数量文本框
+                        $(".Amount").val("").select();
+
+                        //对象名 根据在储位信息表ID查询到相应的货物信息
+                        var objectName = "SelInventoryNewGoodsInfo";
+                        //传递参数
+                        var param = {
+                            n_ReportInventoryCurrentDetail_Id: "@(n_ReportInventoryCurrentDetail_Id)",
+                            n_BillStockInOut_Id: "@(n_BillStockInOut_Id)"
+                        };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            if (result.Data[0].length > 0) {
+                                vue.DataList.GoodsProductCode = result.Data[0][0].s_CustomerCode;
+                                vue.DataList.GoodsProductName = result.Data[0][0].s_Mother_Desc;
+                                vue.DataList.CustomerCode = result.Data[0][0].s_CustomerCode;
+                                vue.DataList.SpecificationModel = "---";
+                                vue.DataList.CarSeries = result.Data[0][0].s_CarSeries;
+                                vue.DataList.CarColor = result.Data[0][0].s_CarColor;
+                                vue.DataList.Batch = result.Data[0][0].s_Batch;
+                                vue.DataList.SpaceSurplusAmount = result.Data[0][0].s_SurplusAmount;
+                                vue.DataList.n_ReportInventoryCurrent_Id = result.Data[0][0].n_ReportInventoryCurrent_Id;
+                                vue.DataList.n_ReportInventoryCurrentDetail_Id = result.Data[0][0].n_ReportInventoryCurrentDetail_Id;
+                                vue.DataList.s_Space_Code = result.Data[0][0].s_Space_Code;
+                                vue.DataList.s_Bin_Code = result.Data[0][0].s_Bin_Code;
+                            } else {
+
+                                f_commonShowMsg("该条码在该储位无对应批次的货物信息,请重新确认!");
+                            }
+
+                            vue.DataList.SpaceBarCode = "";
+                            vue.DataList.BinBarCode = "";
+                            vue.DataList.BarCode = "";
+
+                            //自动聚焦于储位二维码文本框
+                            $(".SpaceBarCode").val("").select();
+
+                        }, function (result) {
+
+                            f_commonShowMsg(result.Msgs[0]);
+
+                        })
+                    },
+                    //数量二维码改值事件
+                    f_keyupAmount: function () {
+
+                        vue.DataList.SureAmount = $(".Amount").val();
+                        $(".Amount").val("");
+
+                        //自动聚焦于储位二维码文本框
+                        $(".SpaceBarCode").val("").select();
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("WMS-异动盘点操作(新)");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                            //加载返回事件 
+                            window.parent.f_loadEvent("../../../../InventoryOperationNew/AddBillStockInOutDetail?ParentIds=" + "@ParentIds" + "&n_Warehouse_Id=" + "@(n_Warehouse_Id)" + "&n_BillStockInOut_Id=" + "@(n_BillStockInOut_Id)" + "&n_ReportInventoryCurrentDetail_Id=" + "@(n_ReportInventoryCurrentDetail_Id)" + "&s_ReportInventoryCurrentDetail_Code=" + "@(s_ReportInventoryCurrentDetail_Code)");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../InventoryOperationNew/AddBillStockInOutDetail?ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+
+                        //自动焦点
+                        $(".Amount").val("").focus();
+
+                        //条码二维码改值事件
+                        vue.f_keyupBarCode();
+                    }
+                }
+            })
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+ 
+    </script>
+}

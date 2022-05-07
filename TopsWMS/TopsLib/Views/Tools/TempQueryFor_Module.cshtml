@@ -1,0 +1,135 @@
+﻿@using Tops.FRM;
+@{
+    Layout = null;
+    Tops.FRM.CodeFactory cf = Model as Tops.FRM.CodeFactory;
+    var modifyUrl = cf.ModifyUrl;
+    modifyUrl = modifyUrl.IndexOf("?") > 0 ? modifyUrl + "&" : modifyUrl + "?";
+    var btStr = "";
+    btStr += cf.IsAdd ? "#addBt" : "";
+    btStr += cf.IsExport ? ",#exportBt" : "";
+    btStr += cf.IsCancel ? ",#cancelBt" : "";
+    btStr += cf.IsCheck ? ",#checkBt" : "";
+    btStr += cf.IsDel ? ",#delBt" : "";
+    btStr += cf.IsEdit ? ",#editBt" : "";
+    btStr += cf.IsPrint ? ",#printBt" : "";
+    btStr += cf.IsSave ? ",#saveBt" : "";
+    btStr += cf.IsSearch ? ",#searchBt" : "";  
+}
+@@using Tops.FRM;
+@("@{")
+    ViewBag.Title = "@(cf.Title)";
+    ViewBag.ModuleName = "资料查询";
+    Layout = "~/TopsLib/Views/Shared/_Module.cshtml";
+    string QueryName="@(cf.QueryName)";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas=Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    var cols =  ModuleConfig.GetColumns(metas[0], biz.Lookups,biz.Sqls[0], biz);
+@("}")
+
+@("@section Params{")
+    <form id="paramForm" method="post" action="/ExcelHelp/DownLoad" > 
+    <div id="hiddenlist"> 
+        @if(btStr.IndexOf("exportBt") != -1){
+            <input type="hidden" name="exportdata" value="@(cf.QueryName+"_Data")" />
+            <input type="hidden" name="exportcolumn" value="@(cf.QueryName + "_Column")" />
+            <input type="hidden" name="exportsheetname" value="@(cf.Title)" /> 
+            <input type="hidden" name="exportcondition" value="" />
+        }
+    </div>
+    <div id="paramlist"> 
+        @@for (int i = 0; i < biz.Fields.Count; i++)
+        {
+        string labelStr=string.IsNullOrEmpty(biz.Fields[i].Title) ? biz.Fields[i].FieldName : biz.Fields[i].Title;
+        var fieldName = biz.Fields[i].FieldName;
+        var lookupField = biz.Lookups.Where(p => p.KeyField == fieldName);
+        <div class="param_item">
+            @@if (lookupField != null && lookupField.ToList().Count > 0)
+                    {
+                        <label class="plugin_label">@@(labelStr):</label>
+                        <input type="text" name="@@(fieldName)"  fieldType="lookup" label="@@(labelStr)" />
+                        <script type="text/javascript">
+                            $("input[name=@@(fieldName)]")[0].lookup=@@Html.Raw(lookupField.First<Lookup>().ToJson());
+                        </script>
+                    }
+            else if (biz.Fields[i].DataList.Count > 0)
+            {
+                <label class="plugin_label">@@(labelStr):</label>
+                <select name="@@(fieldName)" fieldType="select" >
+                    @@foreach(var item in biz.Fields[i].DataList){
+                    <option value="@@(item.Key)">@@(item.Value)</option>
+                    }
+            </select>
+            }else if (biz.Fields[i].FieldType.EndsWith("DateTime"))
+            {
+                <input type="text" name="@@(fieldName)"  fieldType="date" label="@@(labelStr)"/>
+            }
+            else
+            {
+            <input type="text" name="@@(fieldName)"  fieldType="textbox" label="@@(labelStr)"/>
+            }
+        </div>
+        }
+        <div style=" clear:both;"></div>
+    </div>
+    </form>
+    
+@("}")
+@("@section Script{")
+<script type="text/javascript">
+    var topsRender=null;
+    var grid =null;
+    $(function () {
+        $("#module_toolbar input").hide();
+        $("@(btStr)").show();
+        //渲染插件
+        topsRender=$("#paramlist *[fieldType]").pluginRender();
+        //初始化表格
+        grid = $("#datagrid").ligerGrid({
+            columns: @@Html.Raw(cols.ToJson(true)),
+            url: '/AjaxGridData/@(cf.QueryName)',
+            method: 'get',
+            delayLoad: true,
+            dataType: "local",
+            dataAction: 'server',
+            root: 'Data',                       //数据源字段名
+            record: 'Other1',                     //数据源记录数字段名
+            rownumbers: true,
+            //data: AllProductData, 
+            showTitle: false,
+            width: '99.5%',
+            height: '100%',
+            heightDiff: -10,
+            enabledSort:false,
+            onSuccess: function (data, b) {
+                $.topsErrorDeal(data);
+            },
+            onDblClickRow: function (rowdata, rowindex, rowDomElement) {
+                var idKey='@@(biz.Sqls[0].Key)';
+                if($.trim(idKey)=='')return;
+                var idData=new Object();
+                idData[idKey]=rowdata[idKey];
+                f_addTab(rowdata[idKey], "维护[" + rowdata[idKey] + "]", "@Html.Raw(modifyUrl)"+"ctrl=edit&id=" +escape($.toJSON(idData)) + "&" + Math.random());
+            }
+        });
+        //绑定按钮事件
+        $("#searchBt").click(function () {
+            grid.options.parms = $("form#paramForm").serializeArray();
+            grid.loadServerData(grid.options.parms);
+        });
+        $("#addBt").click(function () {
+            f_addTab("Add", "添加", "@Html.Raw(modifyUrl)"+"ctrl=add&" + Math.random());
+        }); 
+        $("#exportBt").click(function(){
+            $("#paramForm").submit();
+        })
+        
+    });
+    function f_flushGrid()
+    {
+        grid.loadData();
+    }
+</script>
+@("}")
+<div id="datagrid"></div>
+
+

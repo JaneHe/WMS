@@ -1,0 +1,535 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+}
+@section Body{
+    <div class="body">
+        <div> 
+            <input type="text" v-bind:class="WorkOrderQrCode_Class" placeholder="请输入储位二维码" v-on:keyup.enter="f_checkWorkOrderQrCode" />
+            <input type="hidden" name="n_Space_Id" />
+        </div>
+         
+        <div v-bind:class="QrCodeTab_Showed" >
+           <table>
+               <tr>
+                  <th>
+                      储位二维码
+                  </th>
+                  <th>
+                      储位信息
+                  </th>
+               </tr>
+               <tr>
+                  <td>---
+                  </td>
+                  <td>---
+                  </td>
+               </tr>
+           </table>
+        </div>
+
+        <div>
+            <input type="text" v-bind:class="WorkOrderCode_Class" placeholder="请输入货物标识编码" v-on:keyup.enter="f_checkWorkOrderCode" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="WorkOrderAmount_Class" placeholder="请输入上架数量" v-on:keyup.enter="f_checkWorkOrderAmount" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="WorkOrderReason_Class" placeholder="请输入上架原因" v-on:keyup.enter="f_changeReason" />
+        </div>
+
+        <div v-bind:class="TitleTab_Showed">
+            <table>
+                <tr> 
+                    <th>
+                        货物编码
+                    </th>
+                    <th>
+                        货物名称
+                    </th>
+                    <th>
+                        数量
+                    </th> 
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table>
+                <tr v-for="(item,i) in InfoDataList"  :n_BillStockInOutDetail_Id="item.n_BillStockInOutDetail_Id" :s_LaunchReason_Name="item.s_LaunchReason_Name" :index="i" :s_ListPutOnOff_GoodsProductCode="item.s_ListPutOnOff_GoodsProductCode" :s_LaunchReason_Name="" >
+                    <td>
+                    {{ item.s_ListPutOnOff_GoodsProductCode }}
+                    </td>
+                    <td> 
+                    {{ item.s_ListPutOnOff_GoodsProductName }}
+                    </td>
+                    <td> 
+                    {{ item.f_ListPutOnOff_WorkOrderQuantity }} 
+                    </td> 
+                </tr>
+            </table>
+        </div> 
+        <div>
+            <div v-bind:class="Save_Div_Showed" v-on:click="f_saveData">
+                上架</div>
+            <div v-bind:class="Delete_Div_Showed" v-on:click="f_delData">
+                删除</div>
+        </div>
+    </div>
+}
+@section Script{
+<style type="text/css">
+        .Warehouse
+        { 
+            width:calc(90%);
+            margin:calc(2%) calc(5%) calc(0%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderAmount
+        {
+            width:calc(90%);
+            margin:calc(0%) calc(5%) calc(1%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderReason
+        {
+            width:calc(90%);
+            margin:calc(0%) calc(5%) calc(1%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px; 
+        }
+        .WorkOrderCode
+        {
+            width:calc(90%);
+            margin:calc(0%) calc(5%) calc(1%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderQrCode
+        {
+            width:calc(90%);
+            margin:calc(0.5%) calc(5%) calc(0.5%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        
+         .TitleTab{
+            width: calc(90%);
+            height: 30px; 
+            margin: calc(0%) calc(5%) calc(0%) calc(5%);
+            text-align:center;
+        }
+        .TitleTab table,.InfoTab table,.QrCodeTab table{
+            width: 100%;
+            border-collapse:collapse;
+        }
+        .TitleTab th{
+            width: 43%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .TitleTab tr th:nth-child(3){
+            width: 14%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        } 
+        .InfoTab
+        {
+            width: calc(90%);
+            height: 92px;
+            margin: calc(0%) calc(5%);
+            text-align:center;
+            overflow-y:scroll;
+        }
+        .InfoTab td{
+            width: 43%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .InfoTab tr td:nth-child(3){
+            width: 14%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        } 
+        
+        
+        .QrCodeTab
+        {
+            width: calc(90%);
+            height: 52px; 
+            text-align:center; 
+            margin:calc(0.5%) calc(5%) calc(0.5%) calc(5%);
+        } 
+        .QrCodeTab tr th:nth-child(1){
+            width: 30%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeTab tr th:nth-child(2){
+            width: 68%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeTab tr td:nth-child(1){
+            width: 30%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        .QrCodeTab tr td:nth-child(2){
+            width: 68%;
+            border:1px solid #a5e0a5;
+            line-height:20px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 13px;
+        }
+        
+        .Save_Div
+        {
+            width: calc(35%);
+            margin: calc(5%) calc(2%) calc(15%) calc(10%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑; 
+            font-size: 20px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        .Delete_Div
+        {
+            width: calc(35%);
+            margin: calc(5%) calc(0%) calc(15%) calc(7%);
+            background: #f69797;
+            color: white;
+            font-family: 微软雅黑; 
+            font-size: 20px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        
+        .checked
+        {
+            background:#e9e9ac;
+        }
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Get请求变量
+        var ajaxobjFirst = null;
+
+        //ajax Post请求变量
+        var ajaxobjSecond = null;
+
+        $(function () {
+
+            //内容容器
+            var body = new Vue({
+                el: ".body",
+                data: {
+                    WorkOrderQrCode_Class: { //储位编码文本框样式
+                        WorkOrderQrCode:true,
+                    },
+                    WorkOrderCode_Class: { //货物标识编码文本框样式
+                        WorkOrderCode: true
+                    },
+                    WorkOrderAmount_Class: { //上架数量文本框样式
+                        WorkOrderAmount: true
+                    },
+                    WorkOrderReason_Class: { //上架原因文本框样式
+                        WorkOrderReason: true
+                    },
+                    Warehouse_Class: { //仓库选择框样式
+                        Warehouse: true
+                    }, 
+                    QrCodeTab_Showed:{ //储位二维码样式
+                        QrCodeTab:true
+                    },
+                    TitleTab_Showed: { //标题表格样式
+                        TitleTab: true
+                    },
+                    InfoTab_Showed: { //结果表格样式
+                        InfoTab: true
+                    },
+                    InfoDataList: [], //结果表格数据
+                    Save_Div_Showed: { //上架按钮样式
+                        Save_Div: true
+                    },
+                    Delete_Div_Showed: { //删除按钮样式
+                        Delete_Div: true
+                    }
+                },
+                methods: {
+                    //根据储位二维码查询相应信息
+                    f_checkWorkOrderQrCode:function(event){ 
+                        if ($(event.target).val() == "") {
+                            return;
+                        }
+                        
+                        if(event.keyCode == 13){
+                           
+                            //对象名 查询上架操作的所需可选仓库信息
+                            var objectName = "SelPutOnOffQrCodeInfo";
+                            //参数
+                            var param = { s_Space_BarCode: $(event.target).val() };
+
+                            ajaxobjFirst = ajaxhelper.ajax_Get(objectName, param, function (result) {
+                                
+                                if(result.Data[0].length>0){
+                                   $(".QrCodeTab").find("td:eq(0)").text(result.Data[0][0].s_Space_BarCode);
+                                   $(".QrCodeTab").find("td:eq(1)").text(result.Data[0][0].s_Space_Description);  
+                                   $("[name=n_Space_Id]").val(result.Data[0][0].n_Space_Id); 
+                                }
+                                
+                                //清空
+                                $(".WorkOrderQrCode").val("");
+                                $(".WorkOrderCode").focus().select();
+                            }, function (result) {
+                                f_commonShowMsg(result.Msgs[0]);
+                                //清空
+                                $(".WorkOrderQrCode").val("").focus().select(); 
+                            })
+                        }
+
+                    },
+                    //根据货物标识编码查询相应信息
+                    f_checkWorkOrderCode: function (event) {
+                        if ($(event.target).val() == "") {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjFirst != null) {
+                            ajaxobjFirst.abort();
+                            ajaxobjFirst = null;
+                        }
+
+                        //对象名 查询上架操作的所需可选仓库信息
+                        var objectName = "SelPutOnOffWorkOrderInfo";
+                        //参数
+                        var param = { s_BillStockInOutDetail_GoodsProductCode: $(event.target).val(), s_Space_BarCode: $(".QrCodeTab").find("td:eq(0)").text() };
+
+                        ajaxobjFirst = ajaxhelper.ajax_Get(objectName, param, function (result) {
+
+                            if (result.Data[0].length > 0) {
+
+                                //拼装结果表格数据源
+                                var arr = body.InfoDataList.slice();
+                                body.InfoDataList = [];
+
+                                $.each(result.Data[0], function (index, value) {
+                                    //获取是否已存在的该行记录
+                                    var len = $(".InfoTab table tr[n_BillStockInOutDetail_Id=" + value.n_BillStockInOutDetail_Id + "]").length;
+                                    debugger;
+                                    if (len == 0) {
+                                        body.InfoDataList.push({
+                                            n_BillStockInOutDetail_Id: value.n_BillStockInOutDetail_Id,
+                                            s_ListPutOnOff_GoodsProductCode: value.s_BillStockInOutDetail_GoodsProductCode,
+                                            s_ListPutOnOff_GoodsProductName: value.s_BillStockInOutDetail_GoodsProductName,
+                                            f_ListPutOnOff_WorkOrderQuantity: value.f_BillStockInOutDetail_WorkOrderQuantity,
+                                            s_LaunchReason_Name: ""
+                                        })
+                                        return false;
+                                    }else{
+                                        //删除已有的该行记录
+                                        var InfoDataList_index = 0;
+                                        arr.forEach(function(v,i){
+                                            if(v.s_ListPutOnOff_GoodsProductCode == value.s_BillStockInOutDetail_GoodsProductCode){
+                                                InfoDataList_index = i;
+                                                return false;
+                                            }
+                                        })
+                                        arr.splice(InfoDataList_index,1); 
+                                        
+                                        body.InfoDataList.push({
+                                            n_BillStockInOutDetail_Id: value.n_BillStockInOutDetail_Id,
+                                            s_ListPutOnOff_GoodsProductCode: value.s_BillStockInOutDetail_GoodsProductCode,
+                                            s_ListPutOnOff_GoodsProductName: value.s_BillStockInOutDetail_GoodsProductName,
+                                            f_ListPutOnOff_WorkOrderQuantity: value.f_BillStockInOutDetail_WorkOrderQuantity,
+                                            s_LaunchReason_Name: ""
+                                        }) 
+                                        return false;
+                                    }
+                                })
+
+                                body.InfoDataList = body.InfoDataList.concat(arr);
+                                //焦点
+                                $(".WorkOrderAmount").focus().select();
+
+                                $(event.target).val("");
+                                ajaxobjFirst = null;
+
+                            } else {
+                                f_commonShowMsg("入库单中无该货物信息,请重新输入!");
+                                //清空
+                                $(event.target).val("").focus().select();
+                                ajaxobjFirst = null;
+                            }
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            //清空
+                            $(event.target).val("").focus().select();
+                        })
+
+                    },
+                    //修正数量信息
+                    f_checkWorkOrderAmount: function () {
+                        if ($(event.target).val() == "") {
+
+                            //货物标识编码焦点事件
+                            $(".WorkOrderCode").focus().select();
+                            return;
+                        }
+
+                        //遍历所有结果记录行.如果记录表里有该记录，则进行选中标识操作 
+                        body.InfoDataList.forEach(function (value, index) {
+                            if (index == 0) {
+                                value.f_ListPutOnOff_WorkOrderQuantity = $(event.target).val();
+                            }
+                        })
+                        //清空
+                        $(event.target).val("");
+                        //焦点
+                        $(".WorkOrderCode").val("").focus().select();
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("WMS-上架操作");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //加载返回事件
+                        parent.f_loadEvent("../../../../SiteLogin/Layout");
+
+                        $(".WorkOrderCode").focus();
+                        
+                        //行点击事件
+                        $(".InfoTab table tr").live("click", function () {
+                            $(this).addClass("checked");
+                            $(this).siblings().removeClass("checked");
+                            $(".WorkOrderCode").val("").focus().select();
+                        })
+                    },
+                    //上架
+                    f_saveData: function () {
+
+                        //重复请求处理
+                        if (ajaxobjSecond != null) {
+                            ajaxobjSecond.abort();
+                            ajaxobjSecond = null;
+                        }
+
+                        //参数集合
+                        var param = new Array();
+                        var arr = new Array();
+
+                        //遍历获取当前行的数据
+                        $(".InfoTab table tr").each(function (index, value) {
+
+                            arr.push({
+                                n_BillStockInOutDetail_Id: $(value).attr("n_BillStockInOutDetail_Id"),
+                                s_ListPutOnOff_GoodsProductCode: $(value).find("td:eq(0)").text().trim(),
+                                s_ListPutOnOff_GoodsProductName: $(value).find("td:eq(1)").text().trim(),
+                                f_ListPutOnOff_WorkOrderQuantity: $(value).find("td:eq(2)").text().trim(),
+                                s_LaunchReason_Name: $(value).attr("s_LaunchReason_Name"),
+                                n_LaunchReason_Id: "",
+                                n_Space_Id:$("[name=n_Space_Id]").val(),
+                                s_ListPutOnOff_Code:$(".QrCodeTab").find("td:eq(0)").text()
+                            })
+                        })
+
+                        //对象名 新增上架操作记录
+                        var objectName = "InsertPutOnOffListStockInOut";
+                        //参数
+                        var param = { Dictionarys: arr };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Post(objectName, param, function (result) {
+                            f_commonShowMsg("上架成功!");
+                            //清空数据
+                            $(".InfoTab table tr").remove();
+                            //焦点
+                            $(".WorkOrderCode").val("").focus().select();
+                            ajaxobjSecond = null;
+                            
+                            body.InfoDataList = [];
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjSecond = null;
+                        })
+                    },
+                    //删除行记录
+                    f_delData: function () {
+                        var temp = new Array();
+                        //遍历数据行删除对应的记录
+                        body.InfoDataList.forEach(function (value, index) {
+                            if (value.s_ListPutOnOff_GoodsProductCode != $(".InfoTab").find("tr[class=checked]").attr("s_ListPutOnOff_GoodsProductCode")) {
+                                temp.push(value);
+                            }
+                        })
+                        
+                        body.InfoDataList = [];
+                        body.InfoDataList = temp;
+
+                        $(".InfoTab table tr[class=checked]").remove();
+                        $(".WorkOrderCode").val("").focus().select();
+
+                    },
+                    //上架原因记录
+                    f_changeReason: function (event) {
+
+                        //遍历所有结果记录行.如果记录表里有该记录，则进行选中标识操作 
+                        body.InfoDataList.forEach(function (value, index) {
+                            if (index == 0) {
+                                value.s_LaunchReason_Name = $(event.target).val();
+                            }
+                        })
+                        //清空
+                        $(event.target).val("");
+                        $(".WorkOrderCode").val("").focus().select();
+                    }
+                }
+            })
+            
+            body.f_reloadPage();
+        })
+
+    </script>
+}

@@ -1,0 +1,220 @@
+﻿@{
+    string bizName = string.Empty;
+    if (Request.QueryString.AllKeys.Contains("bizName"))
+    {
+        bizName = Request.QueryString["bizName"].ToString();
+    }
+     
+}
+<!DOCTYPE html>
+<script src="../../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+<link href="/TopsLib/Content/Site.css" rel="stylesheet" type="text/css" />
+<link href="/TopsLib/Scripts/ligerUI/skins/Aqua/css/ligerui-all.css" rel="stylesheet" />
+@*<link href="/TopsLib/Scripts/ligerUI/skins/Silvery/css/all.css" rel="stylesheet" />*@
+<link href="/TopsLib/Content/layout.css" rel="stylesheet" type="text/css" />
+<script src="/TopsLib/Scripts/ligerUI/js/ligerui.all.js" type="text/javascript"></script>
+<script src="/TopsLib/Scripts/Tops.js" type="text/javascript"></script>
+<script src="/TopsLib/Scripts/jquery.json-2.3.min.js" type="text/javascript"></script>
+<script src="../../../Scripts/vue/vue.js" type="text/javascript"></script>
+<style type="text/css">
+    #VersionDataList
+    {
+        height: 545px;
+        overflow-y: scroll;
+    }
+    .tableClass
+    {
+        width: 800px;
+        height: 30px;
+        font-family: 微软雅黑;
+        text-align: center !important;
+        margin: 0px auto;
+    }
+    .tableClass thead tr:nth-child(odd)
+    {
+        width: 100%;
+        background: #D0E4FE;
+        text-align: center !important;
+    }
+    
+    .tableClass tbody tr:nth-child(odd)
+    {
+        width: 100%;
+        text-align: center !important;
+        background: #FFFFFF;
+    }
+    .tableClass tbody tr:nth-child(even)
+    {
+        width: 100%;
+        text-align: center !important;
+        background: #F5F5F5;
+    }
+    
+    .tableClass th, .tableClass td
+    {
+        width: 16.5%;
+        border: 1px solid black;
+        line-height: 30px;
+        text-align: center !important;
+    }
+</style>
+<html>
+<head>
+    <title>查看对象的历史版本记录</title>
+</head>
+<body>
+    <div id="VersionList">
+        <div id="VersionDataList">
+            <table v-bind:class="tableClass" cellspacing="0" cellpadding="0">
+                <thead>
+                    <tr v-bind:class="thClass">
+                        <th>
+                            对象名称
+                        </th>
+                        <th>
+                            创建人
+                        </th>
+                        <th>
+                            创建时间
+                        </th>
+                        <th style="width: 10%;">
+                            创建版本
+                        </th>
+                        <th>
+                            备注
+                        </th>
+                        <th>
+                            操作
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(DataVersion,key,index) in DataVersionList" v-bind:class="thClass">
+                        <td>
+                            {{DataVersion.Name}}
+                        </td>
+                        <td>
+                            {{DataVersion.CreatePerson}}
+                        </td>
+                        <td>
+                            {{DataVersion.CreateTime}}
+                        </td>
+                        <td style="width: 10%;">
+                            {{DataVersion.CreateVersion}}
+                        </td>
+                        <td>
+                            {{DataVersion.Remark}}
+                        </td>
+                        <td style="width: 22%;">
+                            <input type="button" class="CheckDetail" value="查看详细信息" v-on:click="CheckDatailList($event)" />
+                            <input type="button" class="ComparativeDifferences" value="比较差异" v-on:click="ComparativeDifferences($event)" />
+                            <input type="hidden" class="Id" v-model="DataVersion.Id" />
+                            <input type="hidden" class="Name" v-model="DataVersion.Name" />
+                            <input type="hidden" class="CreateVersion" v-model="DataVersion.CreateVersion" />
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+<script type="text/javascript">
+    var bizName = "@(bizName)";
+
+    var VueVersionDataList = new Vue({
+        el: "#VersionDataList",
+        data: {
+            DataVersion: { "Name": "", "CreatePerson": "", "CreateTime": "", "CreateVersion": "", "Remark": "", "Id": "" },
+            DataVersionList: [],
+            tableClass: {
+                "tableClass": true
+            },
+            thClass: {
+                "thClass": true
+            },
+            tdClass: {
+                "tdClass": true
+            }
+        },
+        methods: {
+            showData: function () {
+                var param = new Object();
+                param.type = "GET";
+                param.url = "AjaxGet/SelDataVersionList";
+                param.params = { bizName: bizName };
+                param.collback = function (result) {
+                    var DataVersionList = new Array();
+                    if (result.Data[0].length > 0) {
+                        result.Data[0].forEach(function (value, index) {
+                            var obj = new Object();
+                            obj.Name = value.s_BizName;
+                            obj.CreatePerson = value.s_Creator;
+                            obj.CreateTime = value.d_CreateTime;
+                            obj.CreateVersion = value.s_AI;
+                            obj.Remark = value.s_Remark;
+                            obj.Id = value.n_Id;
+                            DataVersionList.push(obj);
+                        })
+                    } else {
+                        alert("暂无数据!");
+                    }
+
+                    VueVersionDataList.DataVersionList = DataVersionList;
+                }
+
+                SelCommonAjax(param);
+            },
+            CheckDatailList: function (event) {
+
+                //获取DOM元素
+                var input = $(event.srcElement);
+                var Id = input.next().next().val();
+                var Name = input.next().next().next().val();
+
+                $.ligerDialog.open({
+                    title: "历史版本信息",
+                    width: 700,
+                    height: 580,
+                    url: "/tools/QueryManagerCtx?bizid=" + Id + "&id=" + Name + "&oldversion=1"
+                })
+            },
+            ComparativeDifferences: function (event) {
+                //获取DOM元素
+                var input = $(event.srcElement);
+                var Id = input.next().val(); CreateVersion
+                var Name = input.next().next().val();
+                var CreateVersion = input.next().next().next().val();
+
+                //                $.ligerDialog.open({
+                //                    title: "比较差异",
+                //                    width: 700,
+                //                    height: 580,
+                //                    url: "/tools/ComparativeDifferences?bizid=" + Id + "&id=" + Name + "&CreateVersion=" + CreateVersion 
+                //                })
+                window.open("/tools/ComparativeDifferences?bizid=" + Id + "&id=" + Name + "&CreateVersion=" + CreateVersion);
+            }
+        }
+    })
+
+    VueVersionDataList.showData();
+
+
+
+    //查询对象或业务对象调用方法
+    function SelCommonAjax(param) {
+        $.ajax({
+            type: param.type,
+            url: param.url,
+            data: param.params,
+            success: function (result) {
+                result = JSON.parse(result);
+                if (result.IsSuccess) {
+                    param.collback(result);
+                } else {
+                    alert(result.Msgs[0]);
+                }
+            }
+        })
+    }
+</script>
+</html>

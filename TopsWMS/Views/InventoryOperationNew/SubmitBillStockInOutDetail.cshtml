@@ -1,0 +1,290 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+
+    string ParentIds = Request.QueryString["ParentIds"];
+
+    string n_BillStockInOut_Id = Request.QueryString["n_BillStockInOut_Id"];
+}
+@section Body{
+    <div class="body">
+        <div v-bind:class="TitleTab_Showed">
+            <table>
+                <tr> 
+                    <th>
+                        储位码/<br />
+                        产品编码/<br />
+                        器具条码
+                    </th>
+                    <th>
+                        产品名称
+                    </th>
+                    <th>
+                        盘点数/<br />
+                        库存数
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table>
+                <tr v-for="(item,i) in DataList" :index="i"  n_BillStockInOut_Id="@(n_BillStockInOut_Id)" :RecordInventoryMoveDifferenceCount_Id="item.RecordInventoryMoveDifferenceCount_Id" v-on:click="f_CheckRecord">
+                    
+                    <td>
+                    {{ item.RecordInventoryMoveDifferenceCount_Code }} / {{ item.RecordInventoryMoveDifferenceCount_GoodsProductCode }} / {{ item.RecordInventoryMoveDifferenceCount_BinCode  }}
+                    </td>
+                    <td>
+                    {{ item.RecordInventoryMoveDifferenceCount_GoodsProductName }}
+                    </td>
+                    <td>
+                    {{ item.RecordInventoryMoveDifferenceCount_Number }} / {{ item.ReportInventoryCurrent_Number }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="button_Div_Showed"> 
+             <div v-on:click="f_SubmitBillStockInOut">提交单据</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .TitleTab
+        {
+            width: calc(90%);
+            height: 90px;
+            margin: calc(3%) calc(5%) calc(0%) calc(5%);
+            text-align: center;
+        }
+        .TitleTab table, .InfoTab table
+        {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .TitleTab th
+        {
+            width: 30%;
+            border: 1px solid #a5e0a5;
+            background: rgb(200 220 232);
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .TitleTab th:nth-child(2)
+        {
+            width: 45%;
+            border: 1px solid #a5e0a5;
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .TitleTab th:nth-child(3)
+        {
+            width: 25%;
+            border: 1px solid #a5e0a5;
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        
+        .InfoTab
+        {
+            width: calc(90%);
+            height: 182px;
+            margin: calc(0%) calc(5%);
+            text-align: center;
+            overflow-y: scroll;
+        }
+        .InfoTab td
+        {
+            width: 30%;
+            border: 1px solid #a5e0a5;
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .InfoTab td:nth-child(2)
+        {
+            width:45%;
+            border: 1px solid #a5e0a5;
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        .InfoTab td:nth-child(3)
+        {
+            width: 25%;
+            border: 1px solid #a5e0a5;
+            line-height: 30px;
+            font-family: 微软雅黑;
+            font-weight: normal;
+            font-size: 12px;
+        }
+        
+        
+        .button_Div div
+        {
+            width: calc(90%);
+            margin: calc(2%) calc(5%) calc(2%) calc(5%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑;
+            font-size: 12px;
+            line-height: 45px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax POST请求变量
+        var ajaxFirst = null;
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    TitleTab_Showed: "TitleTab", //结果表格标题样式
+                    InfoTab_Showed: "InfoTab", //结果表格样式 
+                    button_Div_Showed: "button_Div", //按钮样式 
+                    DataList: [] //结果表格数据
+                },
+                methods: {
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("单据明细");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+
+                        //判定是否存在父窗口
+                        if (window.top == window.self) {
+                           //加载返回事件 
+                           window.parent.f_loadEvent("../../../../InventoryOperationNew/Index?ParentIds=" + "@ParentIds");
+                        } else {
+
+                            //返回
+                            $("#btnBotton").click(function () {
+
+                                location.href = "../../../../InventoryOperationNew/Index?ParentIds=" + "@ParentIds";
+                            })
+                        }
+
+                        //加载单据明细数据
+                        vue.f_loadBillStockInOutDetailData();
+                    },
+                    //加载单据明细数据
+                    f_loadBillStockInOutDetailData: function () {
+                        var n_BillStockInOut_Id = "@(n_BillStockInOut_Id)";
+
+                        //对象名称 查询需提交的盘点单据的单据明细记录
+                        var ObjectName = "SelInventoryOperationSubmitBillStockInOutDetails";
+
+                        var param = { n_BillStockInOut_Id: n_BillStockInOut_Id };
+
+                        ajaxhelper.ajax_Get(ObjectName, param, function (result) {
+                            //拼装仓库选择数据源
+                            vue.DataList = [];
+                            if (result.Data[0].length > 0) {
+                                result.Data[0].forEach(function (value, index) {
+                                    vue.DataList.push({
+                                        BillStockInOutDetail_Id: value.BillStockInOutDetail_Id,
+                                        
+                                        RecordInventoryMoveDifferenceCount_Id: value.RecordInventoryMoveDifferenceCount_Id,
+                                        RecordInventoryMoveDifferenceCount_Code: value.RecordInventoryMoveDifferenceCount_Code,
+                                        RecordInventoryMoveDifferenceCount_GoodsProductCode: value.RecordInventoryMoveDifferenceCount_GoodsProductCode,
+                                        RecordInventoryMoveDifferenceCount_GoodsProductName: value.RecordInventoryMoveDifferenceCount_GoodsProductName,
+                                        RecordInventoryMoveDifferenceCount_Operator: value.RecordInventoryMoveDifferenceCount_Operator,
+                                        RecordInventoryMoveDifferenceCount_Time: value.RecordInventoryMoveDifferenceCount_Time,
+                                        RecordInventoryMoveDifferenceCount_Number: value.RecordInventoryMoveDifferenceCount_Number,
+                                        RecordInventoryMoveDifferenceCount_BinCode: value.RecordInventoryMoveDifferenceCount_BinCode,
+                                        ReportInventoryCurrent_Number: value.ReportInventoryCurrent_Number,
+                                        IsCheckRecord: false
+                                    })
+                                })
+                            }
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+                    },
+                    //提交单据保存到数据库
+                    f_SubmitBillStockInOut: function () {
+
+                        if (!confirm("请确认是否要提交单据!")) {
+                            return;
+                        }
+
+                        var obj = event.target;
+                        if ($(obj).is("[disabled]")) {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if(ajaxFirst != null){
+                            ajaxFirst.abort();
+                            ajaxFirst = null;
+                            return;
+                        }
+
+                        $(obj).attr("disabled", "disabled");
+
+                        //对象名 提交单据信息
+                        var objectName = "UpdateInventoryOperationNewListStockInOut";
+
+                        var arr = new Array();
+                        arr.push({
+                            n_BillStockInOut_Id : "@(n_BillStockInOut_Id)"
+                        })
+                        //传递参数
+                        var param = { Dictionarys : arr };
+
+                        ajaxFirst = ajaxhelper.ajax_Post(objectName, param, function (result) {
+                            
+                            f_commonShowMsg("提交单据成功!");
+
+                            setTimeout('location.href = "/InventoryOperationNew/Index?ParentIds=" + "@ParentIds"', 2000);
+                            ajaxFirst = null;
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxFirst = null;
+
+                            $(obj).removeAttr("disabled");
+                        })
+
+                    },
+                    //验证所填是否是数字,不是则清空
+                    f_checkNum: function () {
+                        //检查是否是非数字值
+                        if (isNaN($(event.target).val())) {
+                            $(event.target).val("");
+                        }
+                    },
+                    //选择行事件
+                    f_CheckRecord: function () {
+                        var index = $(event.target).parent().attr("index");
+                        //先清除状态
+                        vue.DataList.forEach(function (value, index) {
+                            value.IsCheckRecord = false;
+                        })
+                        //标记选中行
+                        vue.DataList[index].IsCheckRecord = true;
+                    }
+                }
+            });
+
+            //加载页面后执行
+            vue.f_reloadPage();
+        })
+    </script>
+}

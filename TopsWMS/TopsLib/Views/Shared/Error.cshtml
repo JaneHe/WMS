@@ -1,0 +1,20 @@
+﻿@{
+    Layout = null;
+    
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>页面出现错误</title>
+</head>
+<body>
+    <center>
+    <h2>
+        <img src="/TopsLib/Content/error.png" /><b>页面出现错误！</b></h2>
+        <p>@(ViewBag.ErrorMsg??(Model+""))</p>
+        <a href="/home/index">返回主页</a>
+
+    </center>
+</body>
+</html>

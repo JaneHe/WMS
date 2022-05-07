@@ -1,0 +1,214 @@
+﻿@using Tops.FRM;
+@{
+    //版本：1.2
+    ViewBag.Title = "模块名称";
+    ViewBag.ModuleName = "详细资料";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    string QueryName = "SelsubmitDataEntrybyid";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    string ctrl = Request.QueryString["ctrl"];
+    string id = Request.QueryString["id"];
+    ctrl = string.IsNullOrEmpty(ctrl) ? "edit" : ctrl;
+    //公开两台配置参数给分部视图
+    ViewBag.Biz = biz;
+    ViewBag.Metas = metas;
+    var moduleConfig=ModuleConfig.GetModuleConfig(metas, biz.Lookups,biz,ctrl);
+
+
+}
+
+@section Params{
+    <form id="paramForm">
+        <div class="item_title">详细资料：</div>
+        <div id="paramlist" style="width: 600px;">
+            @Html.Partial("ObjParamList",ctrl)
+        </div>
+        @if(metas.Count>1)
+        {
+        <div id="detaillist">
+            @Html.Partial("DetailList",ctrl)
+        </div> 
+        }
+    </form>
+    
+}
+@section Script{
+<script type="text/javascript">
+    var moduleConfig=@Html.Raw(moduleConfig);
+    var topsRender = null;
+    var detailTab = null;
+    $(function () {
+        $(",#saveBt").show();
+        //$("input[name='s_PlastivPartsDesc']").click(function (){
+        //    debugger
+        //    var PlastivPartsDesc= $("input[name='s_PlastivPartsDesc']").val();
+        //    var PartNo= $("input[name='s_PartNo']").val();
+
+        //    $.ligerDialog.open({
+        //        title: "产品选择",
+        //        width: '700',
+        //        height: '550', 
+        //        url: '/submit/SelBOM?PlastivPartsDesc='+PlastivPartsDesc+'&PartNo='+PartNo+'',
+        //        onClosed: function() {
+        //            $("#searchBt").click();
+        //        }
+        //    });
+        //})
+    });
+</script>
+@if(ctrl=="add")
+{
+<script type="text/javascript">
+
+    $(function () {
+        $("#saveBt").show();
+        //渲染插件
+        topsRender = $("#paramForm *[fieldType]").pluginRender({ moduleConfig: moduleConfig });
+
+        //添加保存
+        $("#saveBt").click(function () {
+            var data = topsRender.serializeData();
+            data.n_Category=$("select[name='n_Category'] option:selected").val()
+            data.s_PlastivPartsDesc=$("select[name='s_PlastivPartsDesc'] option:selected").val()
+            if(data.n_QualifiedCount>data.n_MeasurCount){
+                alert("合格数量不能大于测量数量");
+            }
+            else{
+                $("#module_toolbar input").attr("disabled", "disabled");
+                $("#loading_img").show();
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/AddsubmitDataEntry",
+                data: data,
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存成功！");
+                        //添加成功后刷新列表并关闭标签
+                        window.parent.f_flushGrid();
+                        window.parent.f_closeTab("Add");
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("保存失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        }
+        });
+    });
+</script>
+}else if(ctrl=="edit")
+{
+<script type="text/javascript">
+    var idData =@Html.Raw(Server.UrlDecode(id))
+    $(function () {
+        $("#saveBt,#delBt").show();
+        //加载数据
+        $.topsAjax({
+            type: "GET",
+            url: "/AjaxGet/SelsubmitDataEntrybyid",
+            data: {id :'@id'},
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    //渲染插件
+                   
+                    topsRender = $("#paramForm *[fieldType]").pluginRender({ data: data.Data,moduleConfig: moduleConfig });
+                    $("select[name='n_Category']").get(0).selectedIndex=(data.Data[0][0].n_Category-1)
+                    $("select[name='s_PlastivPartsDesc']").get(0).selectedIndex=(data.Data[0][0].s_PlastivPartsDesc-1)
+                } else {
+                    alert("获取数据失败：" + data.Msgs[0]);
+                }
+            }
+        });
+    
+        //保存修改
+        $("#saveBt").click(function () {
+           
+            var data = topsRender.serializeData();
+            data.n_Category=$("select[name='n_Category'] option:selected").val()
+            data.s_PlastivPartsDesc=$("select[name='s_PlastivPartsDesc'] option:selected").val()
+            data.id='@id';
+            if(data.n_QualifiedCount>data.n_MeasurCount){
+                alert("合格数量不能大于测量数量");
+            }
+            else{
+                $("#module_toolbar input").attr("disabled", "disabled");
+                $("#loading_img").show();
+                $.topsAjax({
+                    type: "POST",
+                    url: "/AjaxPost/UpdatesubmitDataEntry",
+                    data: data,
+                    dealError: false,
+                    success: function (data) {
+                        if (data.IsSuccess) {
+                            alert("保存修改成功！");
+                            //刷新列表
+                            window.parent.f_flushGrid();
+                        } else {
+                            if (data.Other1 != null)
+                                topsRender.setError(data.Other1);
+                            alert("保存修改失败：" + data.Msgs[0]);
+                        }
+                        $("#module_toolbar input").removeAttr("disabled");
+                        $("#loading_img").hide();
+                    }
+                });
+            }
+
+           
+        });
+        //删除
+        $("#delBt").click(function () {
+            if(!confirm("确定要删除？")) return;
+            $("#module_toolbar input").attr("disabled", "disabled");
+            $("#loading_img").show();
+            var data = topsRender.serializeData();
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/DelsubmitDateEntry",
+                data: {id:'@id'},
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("删除成功！");
+                        var tid=null;
+                        $.each(idData,function(index){
+                            tid=idData[index];
+                            return false;
+                        });
+                        //刷新列表
+                        window.parent.f_flushGrid();
+                        window.parent.f_closeTab(tid);
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("删除失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        });
+    });
+</script>   
+}
+<script type="text/javascript">
+    $(function () {
+        detailTab=$("#detaillist").ligerTab({
+            onAfterSelectTabItem:function(tabID){
+                var $g=$("div[tabid="+tabID+"] div[fieldtype=grid]",$(this.element));
+                if($g.length==0)return;
+                var gIndex=$g.attr("objindex");
+                topsRender.find("grid"+gIndex).obj.grid.setWidth();
+            }
+        });
+    });
+</script>
+}
+
+

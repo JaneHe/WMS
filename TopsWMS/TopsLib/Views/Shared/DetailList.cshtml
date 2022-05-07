@@ -1,0 +1,23 @@
+﻿
+@using Tops.FRM;
+@{
+    var biz=ViewBag.Biz as Tops.FRM.Biz;
+    var metas=ViewBag.Metas as List<Dictionary<string,Tops.FRM.TopsMeta>>;
+    var ctrl = Model as String;//add|edit
+    List<string> readonlyFields = new List<string>();
+    if (ctrl == "add")
+    {
+        readonlyFields = TopsCommon.FieldsStr2List(biz.ReadOnly4Adds);
+    }
+    else if (ctrl == "edit")
+    {
+        readonlyFields = TopsCommon.FieldsStr2List(biz.ReadOnly4Edits);
+    }
+    }
+@for (int i = 1; i < metas.Count; i++)
+            {
+            <div  title="@(biz.Sqls[i].Name)" >
+                <div id="grid_@(i)" keyField="@(biz.Sqls[i].Key)" fieldType="grid" objIndex="@(i)"  style="margin: 3px;"></div>
+            </div>
+                
+             }

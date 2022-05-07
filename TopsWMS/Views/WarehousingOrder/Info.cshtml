@@ -1,0 +1,193 @@
+﻿@{  
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml"; 
+    
+    string ParentIds = Request.QueryString["ParentIds"];
+}
+}
+@section Body{
+    <div class="body">
+        <div>
+            <select v-bind:class="IsApprovedSelect_Class" v-on:change="f_loadTablist">
+                 <option v-for="(item,i) in IsApprovedDataList" :index="item.index" >
+                      {{ item.Name }}
+                 </option>
+            </select>
+        </div>
+        <div v-bind:class="TitleTab_Class">
+            <table>
+                <tr>
+                    <th>
+                        货物编码
+                    </th>
+                    <th>
+                        货物名称
+                    </th>
+                    <th>
+                        数量
+                    </th>
+                    <th>
+                        申请时间
+                    </th>
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Class">
+            <table>
+                <tr v-for="(item,i) in InfoTab_Datalist">
+                    <td>{{ item.s_BillStockInOutDetail_BarCode }}
+                    </td>
+                    <td>{{ item.s_BillStockInOutDetail_ExternalName }}
+                    </td>
+                    <td>{{ item.f_BillStockInOutDetail_WorkOrderQuantity }}
+                    </td>
+                    <td>{{ item.d_BillStockInOutDetail_OperateTime }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .body
+        {
+            margin:calc(5%) calc(5%) calc(5%) calc(5%);
+        }
+        .TitleTab{
+            width: calc(96%);
+            height: 30px; 
+            margin: calc(0%) calc(2%) calc(0%) calc(2%);
+            text-align:center; 
+        }
+        .TitleTab table,.InfoTab table{
+            width: 100%;
+            border-collapse:collapse;
+        }
+        .TitleTab th{
+            width: 30%;
+            border:1px solid lightblue;
+            background:#a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .TitleTab tr th:nth-child(3){
+            width: 18%;
+            border:1px solid lightblue;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .TitleTab tr th:nth-child(4){
+            width: 22%;
+            border:1px solid lightblue;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
+        .InfoTab td{
+            width: 30%;
+            border:1px solid lightblue;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .InfoTab tr td:nth-child(3){
+            width: 18%;
+            border:1px solid lightblue;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .InfoTab tr td:nth-child(4){
+            width: 22%;
+            border:1px solid lightblue;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        
+        .InfoTab
+        {
+            width: calc(96%);
+            height: 252px;
+            margin: calc(0%) calc(2%);
+            text-align:center;
+            overflow-y:scroll;
+        }
+        
+        .IsApprovedSelect
+        { 
+            width: calc(96%);
+            margin: calc(0%) calc(2%) calc(2%) calc(2%);
+            line-height:30px;
+            font-family:微软雅黑;
+            font-size: 14px;
+            text-align:center
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxHelper = new ajaxHelper();
+
+        $(function () {
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    TitleTab_Class: { //标题表格样式
+                        TitleTab: true
+                    },
+                    InfoTab_Class: { //结果表格样式
+                        InfoTab: true
+                    },
+                    IsApprovedSelect_Class: { //接收状态选择样式
+                        IsApprovedSelect: true
+                    },
+                    InfoTab_Datalist: [], //结果表格数据
+                    IsApprovedDataList: [{ index: 0, Name: "未接收的入库单申请" },
+                    { index: 1, Name: "已接收的入库单申请" },
+                    { index: 2, Name: "驳回的入库单申请"}] //接收状态下拉框
+                },
+                methods: {
+                    //加载表格信息
+                    f_loadTablist: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("未经确认的入库单申请");
+
+                        //加载返回事件
+                        parent.f_loadEvent("../../../../WarehousingOrder/ItemOption?ParentIds=" + "@ParentIds");
+
+                        //对象名称 查询已申请未确认的入库单信息
+                        var objectName = "SelWarehousingOrderApplyList";
+
+                        ajaxHelper.ajax_Get(objectName, { n_IsApproved: $(".IsApprovedSelect").find("option:selected").attr("index") }, function (result) {
+
+                            vue.InfoTab_Datalist = [];
+                            if (result.Data[0].length > 0) {
+                                //加载填充结果表格数据 
+                                result.Data[0].forEach(function (value, index) {
+                                    vue.InfoTab_Datalist.push(value);
+                                })
+                            }
+
+                        }, function (result) {
+                            alert(result.Msgs[0]);
+                        })
+                    }
+                }
+
+            })
+
+            //默认选中第一个并触发加载
+            $(".IsApprovedSelect").find("option:eq(0)").attr("selected", true);
+            vue.f_loadTablist();
+        })
+    </script>
+}

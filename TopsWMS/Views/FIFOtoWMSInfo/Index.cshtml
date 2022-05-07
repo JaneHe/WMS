@@ -1,0 +1,474 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FIFO与WMS实时库存比对</title>
+    <script src="../../Scripts/jquery-1.8.0.min.js" type="text/javascript"></script>
+    <script src="../../Scripts/vue/vue.js" type="text/javascript"></script>
+    <style type="text/css">
+        .body
+        {
+            font-family: 微软雅黑;
+            font-size: 14px;
+            position: relative;
+            width: 1100px;
+            height: 500px;
+        }
+        .optionItem
+        {
+            width: calc(100%);
+            position: absolute;
+            top: calc(1%);
+            left: calc(1%);
+        }
+        .option
+        {
+            width: 250px;
+            margin: 5px 5px;
+            display: inline-block;
+        }
+        .option input
+        {
+            width: 120px;
+        }
+        .option select
+        {
+            height: 24px;
+        }
+        
+        .FIFOInfo
+        {
+            width: calc(46%);
+            display: inline-block;
+            font-size: 12px;
+            position: absolute;
+            top: 70px;
+            left: calc(1%);
+        }
+        .WMSInfo
+        {
+            width: calc(46%);
+            display: inline-block;
+            margin: 0 calc(1%);
+            font-size: 12px;
+            position: absolute;
+            top: 70px;
+            left: calc(50%);
+        }
+        .FIFOInventory
+        {
+            width: calc(46%);
+            display: inline-block;
+            font-size: 12px;
+            position: absolute;
+            top: 360px;
+            left: calc(1%);
+        }
+        .MESInventory
+        {
+            width: calc(46%);
+            display: inline-block;
+            margin: 0 calc(1%);
+            font-size: 12px;
+            position: absolute;
+            top: 360px;
+            left: calc(50%);
+        }
+        .FIFOInfo table, .WMSInfo table, .FIFOInventory table, .MESInventory table
+        {
+            border-collapse: collapse;
+        }
+        
+        .FIFOInfo div:nth-child(2), .WMSInfo div:nth-child(2)
+        {
+            overflow-y: scroll;
+            height: 250px;
+        }
+        .FIFOInventory div:nth-child(2), .MESInventory div:nth-child(2)
+        {
+            overflow-y: scroll;
+            height: 150px;
+        }
+        .FIFOInfo div:nth-child(2) tr:nth-child(even), .WMSInfo div:nth-child(2) tr:nth-child(even), .FIFOInventory div:nth-child(2) tr:nth-child(even), .MESInventory div:nth-child(2) tr:nth-child(even)
+        {
+            background: #ffffff;
+        }
+        .FIFOInfo div:nth-child(2) tr:nth-child(odd), .WMSInfo div:nth-child(2) tr:nth-child(odd), .FIFOInventory div:nth-child(2) tr:nth-child(odd), .MESInventory div:nth-child(2) tr:nth-child(odd)
+        {
+            background: #f5f5f5;
+        }
+        .FIFOInfo div:nth-child(1) tr, .WMSInfo div:nth-child(1) tr, .FIFOInventory div:nth-child(1) tr, .MESInventory div:nth-child(1) tr
+        {
+            background: #c1dbfa;
+        }
+        .FIFOInfo td, .WMSInfo td
+        {
+            border: 1px solid #c1dbfa;
+            line-height: 25px;
+            width: 120px;
+            text-align: center;
+        }
+        .FIFOInventory td, .MESInventory td
+        {
+            border: 1px solid #c1dbfa;
+            line-height: 25px;
+            width: 160px;
+            text-align: center;
+        }
+        
+        
+        .shadow
+        {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            z-index: 998;
+            background-color: #000;
+            opacity: 0.6;
+            display: none;
+        }
+    </style>
+    <script type="text/javascript">
+
+        //当前时间
+        var nowDate = new Date().getFullYear().toString() + "-" + (new Date().getMonth() + 1 < 10 ? "0" + (new Date().getMonth() + 1) : (new Date().getMonth() + 1).toString())
+            + "-" + (new Date().getDate() < 10 ? "0" + new Date().getDate() : new Date().getDate().toString());
+
+        var ajaxget = null;
+
+        $(function () {
+
+            //            $(".body").css({ "width": window.screen.width });
+            //            $(".body").css({ "height": window.screen.height });
+
+            //            $(".FIFOInfo div:eq(1)").css({ "height": window.screen.height - 300 });
+            //            $(".WMSInfo div:eq(1)").css({ "height": window.screen.height - 300 });
+
+            var vue = new Vue({
+                el: ".body",
+                data: {
+                    nowDate: "", //时间选择框值
+                    ProductCode: "", //产品料号输入值
+                    TrayCode: "", //器具编码输入值
+                    FIFOLocation: "", //FIFO储位指定
+                    MESLocation: "", //MES储位指定
+                    FIFOData: new Array(),
+                    WMSData: new Array(),
+                    FIFOData_show: new Array(),
+                    WMSData_show: new Array(),
+                    FIFOInventoryData: new Array(),
+                    MESInventoryData: new Array(),
+                    FIFOInventoryData_show: new Array(),
+                    MESInventoryData_show: new Array()
+                },
+                methods: {
+                    //加载数据
+                    f_loadData: function () {
+                        vue.showShadow();
+
+                        if (ajaxget != null) {
+                            ajaxget.abort();
+                            return;
+                        }
+                        //获取选择的时间点
+                        var index = $(".option select").find("option:selected").attr("index");
+
+                        //汇总时间
+                        var nowTime = vue.nowDate + ' 10:00:00';
+
+                        if (index == 9) {
+                            nowTime = vue.nowDate + ' 10:00:00';
+                        } else {
+                            nowTime = vue.nowDate + ' 22:00:00'; 
+                        }
+
+                        ajaxget = $.ajax({
+                            type: "GET",
+                            url: "/AjaxGet/SelFIFOvsWMSInfo",
+                            data: { NowDates: nowTime },
+                            success: function (result) {
+                                result = JSON.parse(result);
+                                if (result.IsSuccess) {
+                                    vue.FIFOData = result.Data[0];
+                                    vue.WMSData = result.Data[1];
+
+                                    vue.FIFOInventoryData = result.Data[2];
+                                    vue.MESInventoryData = result.Data[3];
+
+                                    vue.f_loadDataByCol();
+                                } else {
+                                    alert(result.Msgs[0]);
+                                }
+
+                                vue.hideShadow();
+                                ajaxget = null;
+                            }
+                        })
+                    },
+                    //根据字段加载对应的信息
+                    f_loadDataByCol: function () { 
+
+                        var ProductCode = $("[name=ProductCode]").val();
+                        var TrayCode = $("[name=TrayCode]").val();
+                        var FIFOLocation = $("[name=FIFOLocation]").val();
+                        var MESLocation = $("[name=MESLocation]").val();
+
+                        vue.FIFOData_show = new Array();
+                        vue.WMSData_show = new Array();
+                        vue.FIFOInventoryData_show = new Array();
+                        vue.MESInventoryData_show = new Array();
+
+                        vue.FIFOData.forEach(function (value, index) {
+
+                            if (((ProductCode != "" && value["ProductCode"] == ProductCode) || ProductCode == "") &&
+                            ((TrayCode != "" && value["TrayCode"] == TrayCode) || TrayCode == "") &&
+                            ((FIFOLocation != "" && value["FIFOLocation"] == FIFOLocation) || FIFOLocation == "") &&
+                            ((MESLocation != "" && value["MESLocation"] == MESLocation) || MESLocation == "")) {
+                                vue.FIFOData_show.push(value);
+                            }
+                        })
+
+                        vue.WMSData.forEach(function (value, index) {
+                            if (((ProductCode != "" && value["ProductCode"] == ProductCode) || ProductCode == "") &&
+                            ((TrayCode != "" && value["TrayCode"] == TrayCode) || TrayCode == "") &&
+                            ((FIFOLocation != "" && value["FIFOLocation"] == FIFOLocation) || FIFOLocation == "") &&
+                            ((MESLocation != "" && value["MESLocation"] == MESLocation) || MESLocation == "")) {
+                                vue.WMSData_show.push(value);
+                            }
+                        })
+
+                        vue.FIFOInventoryData.forEach(function (value, index) {
+
+                            if (((ProductCode != "" && value["ProductCode"] == ProductCode) || ProductCode == "") &&
+                            ((TrayCode != "" && value["TrayCode"] == TrayCode) || TrayCode == "") &&
+                            ((FIFOLocation != "" && value["FIFOLocation"] == FIFOLocation) || FIFOLocation == "") &&
+                            ((MESLocation != "" && value["MESLocation"] == MESLocation) || MESLocation == "")) {
+                                vue.FIFOInventoryData_show.push(value);
+                            }
+                        })
+
+                        vue.MESInventoryData.forEach(function (value, index) {
+                            if (((ProductCode != "" && value["ProductCode"] == ProductCode) || ProductCode == "") &&
+                            ((TrayCode != "" && value["TrayCode"] == TrayCode) || TrayCode == "") &&
+                            ((FIFOLocation != "" && value["FIFOLocation"] == FIFOLocation) || FIFOLocation == "") &&
+                            ((MESLocation != "" && value["MESLocation"] == MESLocation) || MESLocation == "")) {
+                                vue.MESInventoryData_show.push(value);
+                            }
+                        })
+                         
+                    },
+                    //显示遮罩层
+                    showShadow: function () {
+                        $(".shadow").css({ 'display': 'block' });
+                    },
+                    //隐藏遮罩层
+                    hideShadow: function () {
+                        $(".shadow").css({ 'display': 'none' });
+                    }
+                }
+            })
+            //为时间赋值
+            vue.nowDate = nowDate;
+
+            //加载数据
+            vue.f_loadData();
+        })
+    </script>
+</head>
+<body>
+    <div class="shadow">
+    </div>
+    <div class="body">
+        <div class="optionItem">
+            <div class="option">
+                <label>
+                    汇总日期:</label>
+                <input type="date" name="nowdate" v-model="nowDate" v-on:change="f_loadData" />
+                <select v-on:change="f_loadData">
+                    <option index="9">9时</option>
+                    <option index="21">21时</option>
+                </select>
+            </div>
+            <div class="option">
+                <label>
+                    产品料号:</label>
+                <input type="text" name="ProductCode" v-model="ProductCode" />
+            </div>
+            <div class="option">
+                <label>
+                    器具编码:</label>
+                <input type="text" name="TrayCode" v-model="TrayCode" />
+            </div>
+            <div class="option">
+                <label>
+                    FIFO储位编码:</label>
+                <input type="text" name="FIFOLocation" v-model="FIFOLocation" />
+            </div>
+            <div class="option">
+                <label>
+                    MES储位编码:</label>
+                <input type="text" name="MESLocation" v-model="MESLocation" />
+            </div>
+            <div class="option">
+                <input type="button" value="查询" v-on:click="f_loadData" />
+            </div>
+        </div>
+        <div class="FIFOInfo">
+            <div>
+                <table>
+                    <tr>
+                        <td>
+                            操作类型
+                        </td>
+                        <td>
+                            产品料号
+                        </td>
+                        <td>
+                            批次
+                        </td>
+                        <td>
+                            数量
+                        </td>
+                        <td>
+                            FIFO储位指定
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table>
+                    <tr v-for="(item,i) in FIFOData_show">
+                        <td>
+                            {{ item.BiilType }}
+                        </td>
+                        <td>
+                            {{ item.ProductCode }}
+                        </td>
+                        <td>
+                            {{ item.Batch }}
+                        </td>
+                        <td>
+                            {{ item.Qty }}
+                        </td>
+                        <td>
+                            {{ item.FIFO_LocationCode }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="WMSInfo">
+            <div>
+                <table>
+                    <tr>
+                        <td>
+                            操作类型
+                        </td>
+                        <td>
+                            产品料号
+                        </td>
+                        <td>
+                            批次
+                        </td>
+                        <td>
+                            数量
+                        </td>
+                        <td>
+                            MES储位指定
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table>
+                    <tr v-for="(item,i) in WMSData_show">
+                        <td>
+                            {{ item.BiilType }}
+                        </td>
+                        <td>
+                            {{ item.ProductCode }}
+                        </td>
+                        <td>
+                            {{ item.Batch }}
+                        </td>
+                        <td>
+                            {{ item.Qty }}
+                        </td>
+                        <td>
+                            {{ item.MES_LocationCode }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="FIFOInventory">
+            <div>
+                <table>
+                    <tr>
+                        <td>
+                            产品料号
+                        </td>
+                        <td>
+                            批次
+                        </td>
+                        <td>
+                            库存数量
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table>
+                    <tr v-for="(item,i) in FIFOInventoryData_show">
+                        <td>
+                            {{ item.ProductCode }}
+                        </td>
+                        <td>
+                            {{ item.Batch }}
+                        </td>
+                        <td>
+                            {{ item.Qty }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="MESInventory">
+            <div>
+                <table>
+                    <tr>
+                        <td>
+                            产品料号
+                        </td>
+                        <td>
+                            批次
+                        </td>
+                        <td>
+                            库存数量
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div>
+                <table>
+                    <tr v-for="(item,i) in MESInventoryData_show">
+                        <td>
+                            {{ item.ProductCode }}
+                        </td>
+                        <td>
+                            {{ item.Batch }}
+                        </td>
+                        <td>
+                            {{ item.Qty }}
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

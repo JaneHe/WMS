@@ -1,0 +1,96 @@
+﻿@{
+    string UserName = Tops.FRM.TopsUser.UserName;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>手持终端</title>
+    <meta name="viewport" content="width=device-width,minimum-scale=1.0,user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="full-screen" content="yes">
+    <script src="../../../Scripts/jquery-1.4.4.js" type="text/javascript"></script>
+    <script src="../../../Scripts/Mask.js" type="text/javascript"></script>
+    <script src="../../../Scripts/Jane/Common.js?@DateTime.Now.ToString()" type="text/javascript"></script>
+    <script src="../../../Content/vue.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(function () {  
+            
+        })
+
+        //加载事件
+        function f_loadEvent(url) {
+
+            //返回
+            $("#btnBotton").click(function () {
+                location.href = url;
+                //location.href = "../../../../SiteLogin/Layout";
+            })
+        }
+    </script>
+    @RenderSection("Script")
+    <style type="text/css">
+        body
+        {
+            margin: 0px;
+        }
+        
+        .top
+        {
+            background-color: rgb(6, 137, 213);
+            color: White;
+            font-family: 微软雅黑;
+            text-align: center;
+            line-height: 40px;
+            font-size: 14px;
+            width: calc(100%);
+        } 
+        .top a
+        { 
+            text-decoration:none;
+            color:White;
+        }
+        
+        .bottom
+        {
+            background-color: rgb(6, 137, 213);
+            color: White;
+            font-family: 微软雅黑;
+            text-align: center;
+            line-height: 40px;
+            font-size: 16px;
+            width: calc(100%);
+            position: fixed;
+            bottom: 0px;
+            cursor: pointer;
+        }
+        
+        
+        .left {
+            float: left;
+            color: white;
+            text-decoration: inherit;
+        }
+
+        .right {
+            float: right;
+            color: white;
+            text-decoration: inherit;
+        }
+         
+    </style>
+</head>
+<body>
+    <div class="top">
+        <a href="../QRCodeLogin/Index" class="left">二维码</a>
+        <label>模块
+        </label> 
+        <a href="/SiteLogin/Index" class="right">@(UserName)</a>
+    </div>
+    <div class="content">
+        @RenderSection("Body")
+    </div>
+    <div class="bottom" id="btnBotton">
+        <span>返回</span>
+    </div>
+</body>
+</html>

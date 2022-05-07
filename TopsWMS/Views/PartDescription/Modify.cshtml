@@ -1,0 +1,566 @@
+﻿@using Tops.FRM;
+@{
+    //版本：1.2
+    ViewBag.Title = "存货基础信息管理";
+    ViewBag.ModuleName = "详细资料";
+    Layout = "~/TopsLib/Views/Shared/_DataObject.cshtml";
+    string QueryName = "SelPartDescription";
+    Tops.FRM.Biz biz = Tops.FRM.Biz.GetBiz(QueryName, Tops.FRM.BizType.Query);
+    var metas = Tops.FRM.TopsMeta.LoadMetas(QueryName);
+    string ctrl = Request.QueryString["ctrl"];
+    string id = Request.QueryString["id"];
+    string Sel_Id = Request.QueryString["Sel_Id"];
+    ctrl = string.IsNullOrEmpty(ctrl) ? "edit" : ctrl;
+    //公开两台配置参数给分部视图
+    ViewBag.Biz = biz;
+    ViewBag.Metas = metas;
+    var moduleConfig = ModuleConfig.GetModuleConfig(metas, biz.Lookups, biz, ctrl);
+
+    //重组显示字段配置
+    foreach (string key in metas[0].Keys)
+    {
+        if (!metas[0][key].Hide)
+        {
+            //宽度大于300的string类型文本默认给文本域
+            if (metas[0][key].Width >= 300)
+            {
+                metas[0][key].Type = "Textarea";
+            }
+        }
+    }
+     
+}
+@section Params{
+    <form id="paramForm">
+    <div class="item_title">
+        详细资料：</div>
+    <input type="hidden" name="Sel_Id" value="@(Sel_Id)" />
+    <div id="paramlist" style="width: 1000px;">
+        @foreach (string key in metas[0].Keys)
+        {
+            if (!metas[0][key].Hide)
+            {
+                if (metas[0][key].Type.Equals("String") || metas[0][key].Type.Equals("Int32") || metas[0][key].Type.Equals("Float"))
+                {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span><input type="text" list="@(metas[0][key].Field)" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" />
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("DateTime") || metas[0][key].Type.Equals("BeginDateTime") || metas[0][key].Type.Equals("EndDateTime"))
+                {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span><input type="datetime" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" />
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("Textarea"))
+                {
+            <div class="param_items" style="width:@(metas[0][key].Width + 180)px;display:block;">
+                <span>@(metas[0][key].Caption):</span><textarea rows="3" cols="3" name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" ></textarea>
+            </div>
+                }
+                else if (metas[0][key].Type.Equals("Int"))
+                {
+            <div class="param_items">
+                <span>@(metas[0][key].Caption):</span>
+                <select name="@(metas[0][key].Field)" style="width:@(metas[0][key].Width)px;" >
+                    @foreach (string dkey in metas[0][key].DataList.Keys)
+                    { 
+                        <option key="@(dkey)">@(metas[0][key].DataList[dkey])</option>
+                    }
+                </select>
+            </div>
+                }
+            }
+        }
+    </div>
+    @if (metas.Count > 1)
+    { 
+        <div id="detaillist">
+            @Html.Partial("DetailList", ctrl)
+        </div> 
+    }
+    </form>
+}
+@section Script{
+    <style type="text/css">
+        .param_items
+        {
+            display: inline-block;
+            width: 280px;
+            line-height: 30px;
+            text-align: right;
+            margin: 2px;
+        }
+        
+        .param_items input, .param_items textarea
+        {
+            border: 1px solid skyblue;
+            margin-left: 5px;
+        }
+    </style>
+    <script type="text/javascript">
+    var moduleConfig=@Html.Raw(moduleConfig);
+    var topsRender = null;
+    var detailTab = null;
+
+    //Bom信息
+    var detail_bomInfo = new Array();
+     
+    //Bom信息
+    var partdescription_stockinfo = new Array();
+
+    $(function () {
+        $(",#saveBt").show();  
+
+        f_loadBomData();
+    });
+
+    //提前加载所有的BOM信息
+    function f_loadBomData(){
+        $.ajax({
+            type:"GET",
+            url:"/AjaxGet/SelPartDescription_BOMInfo",
+            success:function(result){
+                result = JSON.parse(result);
+                if(result.IsSuccess){
+                   detail_bomInfo = result.Data[0]; 
+                   
+                   $("[name=s_PartDescription_Code]").attr("list","s_PartDescription_Code");
+                   $("[name=s_PartDescription_CustomFields1]").attr("list","s_PartDescription_CustomFields1");
+                   $("[name=s_PartDescription_Name]").attr("list","s_PartDescription_Name");
+                   $("[name=s_PartDescription_Model]").attr("list","s_PartDescription_Model");
+                   $("[name=s_PartDescription_Unit]").attr("list","s_PartDescription_Unit");
+                    
+                   if(detail_bomInfo.length > 0){
+                      var s_PartDescription_Code = '<datalist id="s_PartDescription_Code">';
+                      result.Data[1].forEach(function(value,index){
+                           s_PartDescription_Code += '<option label="'+ value.s_CustomerCode +'" value="'+ value.s_CustomerCode + '" />';
+                      })
+                      s_PartDescription_Code += '</datalist>';
+                      
+                      var s_PartDescription_CustomFields1 = '<datalist id="s_PartDescription_CustomFields1">';
+                      result.Data[2].forEach(function(value,index){
+                           s_PartDescription_CustomFields1 += '<option label="'+ value.s_MotherCode +'" value="'+ value.s_MotherCode + '" />';
+                      })
+                      s_PartDescription_CustomFields1 += '</datalist>';
+                      
+                      var s_PartDescription_Name = '<datalist id="s_PartDescription_Name">';
+                      result.Data[3].forEach(function(value,index){
+                           s_PartDescription_Name += '<option label="'+ value.s_Mother_Desc +'" value="'+ value.s_Mother_Desc + '" />';
+                      })
+                      s_PartDescription_Name += '</datalist>';
+                      
+                      var s_PartDescription_Model = '<datalist id="s_PartDescription_Model">';
+                      result.Data[4].forEach(function(value,index){
+                           s_PartDescription_Model += '<option label="'+ value.s_Series +'" value="'+ value.s_Series + '" />';
+                      })
+                      s_PartDescription_Model += '</datalist>';
+                      
+                      var s_PartDescription_Unit = '<datalist id="s_PartDescription_Unit">';
+                      result.Data[5].forEach(function(value,index){
+                           s_PartDescription_Unit += '<option label="'+ value.s_Unit_Code +'" value="'+ value.s_Unit_Code + '" />';
+                      })
+                      s_PartDescription_Model += '</datalist>';
+                   } 
+
+                   $(s_PartDescription_Code).insertAfter($("[name=s_PartDescription_Code]"));
+                   $(s_PartDescription_CustomFields1).insertAfter($("[name=s_PartDescription_CustomFields1]"));
+                   $(s_PartDescription_Name).insertAfter($("[name=s_PartDescription_Name]"));
+                   $(s_PartDescription_Model).insertAfter($("[name=s_PartDescription_Model]"));
+                   $(s_PartDescription_Unit).insertAfter($("[name=s_PartDescription_Unit]"));
+
+                }else{
+                   alert(result.Msgs[0]);
+                }
+            }
+        })
+    }
+    
+    //获取添加或修改所需要的数组
+    function f_getData(){
+        var obj = new Object();
+        $("#paramForm").find(".param_items").each(function(index,value){
+             if($(value).find("input").length > 0 ){
+                obj[$(value).find("input").attr("name")] = $(value).find("input").val();
+             }else if($(value).find("textarea").length > 0 ){
+                obj[$(value).find("textarea").attr("name")] = $(value).find("textarea").val(); 
+             }else if($(value).find("select").length > 0 ){
+                obj[$(value).find("select").attr("name")] = $(value).find("option:selected").attr("key"); 
+             }
+        })
+        obj.Sel_Id = $("[name=Sel_Id]").val();
+        //库区代码
+        obj.s_PartDescription_StockCode = $("[name=s_PartDescription_StockCode]").val();
+
+        //库区代码各自的上下限
+        obj.grid1 = new Array(); 
+        var warehouseId = $("[name=s_PartDescription_StockCode]").attr("WarehouseId");
+        if(obj.s_PartDescription_StockCode.indexOf(";")!=-1){
+            var stock_arr = obj.s_PartDescription_StockCode.split(";");
+            var warehouseId_arr = warehouseId.split(";"); 
+            for(var index = 0;index < stock_arr.length - 1;index++ ){
+            
+                if(stock_arr[index] != ""){
+                 
+                   var stock = new Object();
+                   stock.s_PartDescription_Code = obj.s_PartDescription_Code;
+                   stock.s_PartDescription_Name = obj.s_PartDescription_Name;
+                   stock.s_PartDescription_U9Code = obj.s_PartDescription_CustomFields1;
+                   stock.n_Warehouse_Id = warehouseId_arr[index];
+                   stock.s_PartDescription_StockCodes = stock_arr[index];
+                   stock.f_PartDescription_StorageBentUpperLimit = $("input[name=f_PartDescription_StorageBentUpperLimit][WarehouseId="+ warehouseId_arr[index] +"]").val();
+                   stock.f_PartDescription_StorageBentLowerLimit = $("input[name=f_PartDescription_StorageBentLowerLimit][WarehouseId="+ warehouseId_arr[index] +"]").val();
+                   stock.f_PartDescription_StorageBayerstUpperLimit = $("input[name=f_PartDescription_StorageBayerstUpperLimit][WarehouseId="+ warehouseId_arr[index] +"]").val();
+                   stock.f_PartDescription_StorageBayerstLowerLimit = $("input[name=f_PartDescription_StorageBayerstLowerLimit][WarehouseId="+ warehouseId_arr[index] +"]").val();
+                   stock.f_PartDescription_StorageLayerstUpperLimit = $("input[name=f_PartDescription_StorageLayerstUpperLimit][WarehouseId="+ warehouseId_arr[index] +"]").val();
+                   stock.f_PartDescription_StorageLayerstLowerLimit = $("input[name=f_PartDescription_StorageLayerstLowerLimit][WarehouseId="+ warehouseId_arr[index] +"]").val();
+                   stock.UpdateFlag = "modify";  //必须加的一个标识
+                   stock.Sel_Id = obj.Sel_Id;
+                   obj.grid1.push(stock);
+                }    
+            }
+        }
+
+        return obj;
+    }
+
+     //加载数据
+    function f_setData(data,stockdata){
+        for(var d in data){
+            if($("[name="+d+"]").attr("type") == "text" || $("[name="+d+"]").attr("type") == "datetime" || $("[name="+d+"]").attr("type") == "textarea"){ 
+               $("[name="+d+"]").val(data[d]);
+            }else{  
+               $("[name="+d+"]").find("option[key="+data[d]+"]").attr("selected","selected");  
+            }
+        }
+         
+        f_loadStockInfo(stockdata);
+
+        for(var index = 0;index<stockdata.length;index++){ 
+            $("input[name=f_PartDescription_StorageBentUpperLimit][WarehouseId="+ stockdata[index].n_Warehouse_Id +"]").val(stockdata[index].f_PartDescription_StorageBentUpperLimit);
+            $("input[name=f_PartDescription_StorageBentLowerLimit][WarehouseId="+ stockdata[index].n_Warehouse_Id +"]").val(stockdata[index].f_PartDescription_StorageBentLowerLimit);
+            $("input[name=f_PartDescription_StorageBayerstUpperLimit][WarehouseId="+ stockdata[index].n_Warehouse_Id +"]").val(stockdata[index].f_PartDescription_StorageBayerstUpperLimit);
+            $("input[name=f_PartDescription_StorageBayerstLowerLimit][WarehouseId="+ stockdata[index].n_Warehouse_Id +"]").val(stockdata[index].f_PartDescription_StorageBayerstLowerLimit);
+            $("input[name=f_PartDescription_StorageLayerstUpperLimit][WarehouseId="+ stockdata[index].n_Warehouse_Id +"]").val(stockdata[index].f_PartDescription_StorageLayerstUpperLimit);
+            $("input[name=f_PartDescription_StorageLayerstLowerLimit][WarehouseId="+ stockdata[index].n_Warehouse_Id +"]").val(stockdata[index].f_PartDescription_StorageLayerstLowerLimit);
+        }
+    }
+
+    //是否是小数
+    function checkSmallNum() {
+        //检查是否是非数字值
+        if (isNaN(this.value)) {
+            this.value = "";
+        }
+        if (this != null) {
+            //检查小数点后是否对于两位
+            if (this.value.toString().split(".").length > 1 && this.value.toString().split(".")[1].length > 2) {
+                alert("所填的结果小数点后最多只能两位，请重新输入！");
+                this.value = "";
+            }
+        }
+    }
+    
+    //是否是数字
+    function checkNum() {
+        //检查是否是非数字值
+        if (isNaN(this.value)) {
+            this.value = "";
+        } 
+    }
+
+    //加载库区代码相关信息
+    function f_loadStockInfo(rows){
+    
+        var warehousecode_str = "";
+        var warehousename_str = "";
+        var warehouseid_str = "";
+
+        $("#paramlist input[ope=add]").parent().remove();
+
+            if (rows.length > 0) {
+                rows.forEach(function (value, index) {
+                     warehousecode_str += value.s_Warehouse_Code + ";";
+                     warehousename_str += value.s_Warehouse_Name + ";"; 
+                     warehouseid_str += value.n_Warehouse_Id + ";"; 
+
+                     var BenUpper = $(".param_items:eq(15)").clone(true);
+                     var BayUpper = $(".param_items:eq(16)").clone(true);
+                     var LayUpper = $(".param_items:eq(17)").clone(true);
+                     var BenLower = $(".param_items:eq(18)").clone(true);
+                     var BayLower = $(".param_items:eq(19)").clone(true);
+                     var LayLower = $(".param_items:eq(20)").clone(true); 
+                                          
+                     if (index == 0) {
+
+                         $(".param_items:eq(15)").find("input").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(".param_items:eq(16)").find("input").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(".param_items:eq(17)").find("input").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(".param_items:eq(18)").find("input").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(".param_items:eq(19)").find("input").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(".param_items:eq(20)").find("input").attr("WarehouseId", value.n_Warehouse_Id);
+
+                         $(".param_items:eq(15)").find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放排数上限:");
+                         $(".param_items:eq(16)").find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放节数上限:");
+                         $(".param_items:eq(17)").find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放层数上限:");
+                         $(".param_items:eq(18)").find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放排数下限:");
+                         $(".param_items:eq(19)").find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放节数下限:");
+                         $(".param_items:eq(20)").find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放层数下限:");
+                     } else {
+                         $(BenUpper).find("input").attr("ope", "add").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(BenLower).find("input").attr("ope", "add").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(BayUpper).find("input").attr("ope", "add").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(BayLower).find("input").attr("ope", "add").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(LayUpper).find("input").attr("ope", "add").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(LayLower).find("input").attr("ope", "add").attr("WarehouseId", value.n_Warehouse_Id);
+                         $(BenUpper).css("margin-right", "6px");
+                         $(BenLower).css("margin-right", "6px");
+                         $(BayUpper).css("margin-right", "6px");
+                         $(BayLower).css("margin-right", "6px");
+
+                         $(BenUpper).find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放排数上限:");
+                         $(BenLower).find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放排数下限:");
+                         $(BayUpper).find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放节数上限:");
+                         $(BayLower).find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放节数下限:");
+                         $(LayUpper).find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放层数上限:");
+                         $(LayLower).find("span:eq(1)").text("[" + value.s_Warehouse_Code + "]存放层数下限:");
+                     
+                         $(LayLower).insertAfter($(".param_items:eq(" + (20 + (index - 1) * 6) + ")"));
+                         $(BayLower).insertAfter($(".param_items:eq(" + (20 + (index - 1) * 6) + ")"));
+                         $(BenLower).insertAfter($(".param_items:eq(" + (20 + (index - 1) * 6) + ")"));
+                         $(LayUpper).insertAfter($(".param_items:eq(" + (20 + (index - 1) * 6) + ")"));
+                         $(BayUpper).insertAfter($(".param_items:eq(" + (20 + (index - 1) * 6) + ")"));
+                         $(BenUpper).insertAfter($(".param_items:eq(" + (20 + (index - 1) * 6) + ")"));
+                     }
+                })
+            }
+                                    
+            $("[name=s_PartDescription_StockCode]").attr("WarehouseId",warehouseid_str);
+            $("[name=s_PartDescription_StockCode]").val(warehousecode_str);
+
+            $("input[name=f_PartDescription_StorageBentUpperLimit]").val("");
+            $("input[name=f_PartDescription_StorageBentLowerLimit]").val("");
+            $("input[name=f_PartDescription_StorageBayerstUpperLimit]").val("");
+            $("input[name=f_PartDescription_StorageBayerstLowerLimit]").val("");
+            $("input[name=f_PartDescription_StorageLayerstUpperLimit]").val("");
+            $("input[name=f_PartDescription_StorageLayerstLowerLimit]").val("");
+            
+            for(var index = 0;index<partdescription_stockinfo.length;index++){ 
+                $("input[name=f_PartDescription_StorageBentUpperLimit][WarehouseId="+ partdescription_stockinfo[index].n_Warehouse_Id +"]").val(partdescription_stockinfo[index].f_PartDescription_StorageBentUpperLimit);
+                $("input[name=f_PartDescription_StorageBentLowerLimit][WarehouseId="+ partdescription_stockinfo[index].n_Warehouse_Id +"]").val(partdescription_stockinfo[index].f_PartDescription_StorageBentLowerLimit);
+                $("input[name=f_PartDescription_StorageBayerstUpperLimit][WarehouseId="+ partdescription_stockinfo[index].n_Warehouse_Id +"]").val(partdescription_stockinfo[index].f_PartDescription_StorageBayerstUpperLimit);
+                $("input[name=f_PartDescription_StorageBayerstLowerLimit][WarehouseId="+ partdescription_stockinfo[index].n_Warehouse_Id +"]").val(partdescription_stockinfo[index].f_PartDescription_StorageBayerstLowerLimit);
+                $("input[name=f_PartDescription_StorageLayerstUpperLimit][WarehouseId="+ partdescription_stockinfo[index].n_Warehouse_Id +"]").val(partdescription_stockinfo[index].f_PartDescription_StorageLayerstUpperLimit);
+                $("input[name=f_PartDescription_StorageLayerstLowerLimit][WarehouseId="+ partdescription_stockinfo[index].n_Warehouse_Id +"]").val(partdescription_stockinfo[index].f_PartDescription_StorageLayerstLowerLimit);
+            }
+    }
+
+    </script>
+    @if (ctrl == "add")
+    {
+        <script type="text/javascript">
+
+            $(function () {
+                $("#saveBt").show();
+                //渲染插件
+                topsRender = $("#paramForm *[fieldType]").pluginRender({ moduleConfig: moduleConfig });
+
+                //小数验证
+                $("[name=s_PartDescription_MinimumStock],input[name=s_PartDescription_MaximumStock],input[name=s_PartDescription_SafetyStock],input[name=s_PartDescription_PullInventory]").keyup(checkSmallNum);
+                //数字验证
+                $("[name=f_PartDescription_StorageBentLowerLimit],[name=f_PartDescription_StorageBentUpperLimit],[name=f_PartDescription_StorageLayerstLowerLimit],[name=f_PartDescription_StorageLayerstUpperLimit]").keyup(checkNum);
+
+                //存货编码填写完毕，自动带出名称，车型等信息
+                $("[name=s_PartDescription_Code]").change(function () {
+                    var obj = this;
+                    var arr = detail_bomInfo.filter(function (item) {
+                        return item.s_CustomerCode == $(obj).val();
+                    })
+
+                    if (arr.length > 0) {
+                        $("[name=s_PartDescription_CustomFields1]").val(arr[0].s_MotherCode);
+                        $("[name=s_PartDescription_Name]").val(arr[0].s_Mother_Desc);
+                        $("[name=s_PartDescription_Model]").val(arr[0].s_Series);
+                    }
+                })
+
+
+
+                //库位代码点击事件
+                $("[name=s_PartDescription_StockCode]").click(function () {
+                    $.ligerDialog.open({
+                        title: '选择库位代码',
+                        url: "/PartDescription/ChooseWarehouseCode?WarehouseCode=" + $("[name=s_PartDescription_StockCode]").val(),
+                        height: 450,
+                        width: 700,
+                        buttons: [{
+                            text: "确定", onclick: function (item, dialog) {
+                                var rows = dialog.frame.f_getcheckData(); 
+
+                                f_loadStockInfo(rows); 
+
+                                dialog.close();
+                            }
+                        }, {
+                            text: "取消", onclick: function (item, dialog) {
+                                dialog.close();
+                            }
+                        }]
+                    })
+                })
+
+                //添加保存
+                $("#saveBt").click(function () {
+                    $("#module_toolbar input").attr("disabled", "disabled");
+                    $("#loading_img").show();
+                    //var data = topsRender.serializeData(); 
+                    var data = f_getData();
+
+                    $.topsAjax({
+                        type: "POST",
+                        url: "/AjaxPost/AddPartDescription",
+                        data: data,
+                        dealError: false,
+                        success: function (data) {
+                            if (data.IsSuccess) {
+                                alert("保存成功！");
+                                //添加成功后刷新列表并关闭标签
+                                window.parent.f_flushGrid();
+                                window.parent.f_closeTab("Add");
+                            } else {
+                                if (data.Other1 != null)
+                                    topsRender.setError(data.Other1);
+                                alert("保存失败：" + data.Msgs[0]);
+                            }
+                            $("#module_toolbar input").removeAttr("disabled");
+                            $("#loading_img").hide();
+                        }
+                    });
+                });
+            });
+        </script>
+    }
+    else if (ctrl == "edit")
+    {
+        <script type="text/javascript">
+    var idData =@Html.Raw(Server.UrlDecode(id))
+    $(function () {
+        $("#saveBt").show();
+        //加载数据
+        $.topsAjax({
+            type: "GET",
+            url: "/AjaxGet/SelPartDescription",
+            data: idData,
+            dealError: false,
+            success: function (data) {
+                if (data.IsSuccess) {
+                    //渲染插件
+                    topsRender = $("#paramForm *[fieldType]").pluginRender({ data: data.Data,moduleConfig: moduleConfig });
+                     
+                    //小数验证
+                    $("[name=s_PartDescription_MinimumStock],input[name=s_PartDescription_MaximumStock],input[name=s_PartDescription_SafetyStock],input[name=s_PartDescription_PullInventory]").keyup(checkSmallNum);
+                    //数字验证
+                    $("[name=f_PartDescription_StorageBentLowerLimit],[name=f_PartDescription_StorageBentUpperLimit],[name=f_PartDescription_StorageLayerstLowerLimit],[name=f_PartDescription_StorageLayerstUpperLimit]").keyup(checkNum);
+                    
+                    partdescription_stockinfo = data.Data[2];
+
+                    //库位代码点击事件
+                    $("[name=s_PartDescription_StockCode]").click(function () {
+                        $.ligerDialog.open({
+                            title: '选择库位代码',
+                            url: "/PartDescription/ChooseWarehouseCode?WarehouseCode=" + $("[name=s_PartDescription_StockCode]").val(),
+                            height: 450, 
+                            width: 700,
+                            buttons: [{
+                                text: "确定", onclick: function (item, dialog) {
+                                    var rows = dialog.frame.f_getcheckData(); 
+                                       
+                                    f_loadStockInfo(rows);
+                                        
+                                    dialog.close();
+                                }
+                            }, {
+                                text: "取消", onclick: function (item, dialog) {
+                                    dialog.close();
+                                }
+                            }]
+                        })
+                    })
+
+                    if(data.Data[0].length>0){
+                       f_setData(data.Data[0][0],data.Data[2]);
+                    }  
+
+                } else {
+                    alert("获取数据失败：" + data.Msgs[0]);
+                }
+            }
+        });
+    
+        //保存修改
+        $("#saveBt").click(function () {
+            $("#module_toolbar input").attr("disabled", "disabled");
+            $("#loading_img").show();
+            //var data = topsRender.serializeData();
+            var data = f_getData();
+             
+
+            $.topsAjax({
+                type: "POST",
+                url: "/AjaxPost/UpdatePartDescription",
+                data:data,
+                dealError: false,
+                success: function (data) {
+                    if (data.IsSuccess) {
+                        alert("保存修改成功！");
+                        //刷新列表
+                        window.parent.f_flushGrid();
+                        window.parent.f_closeTab("Modify");
+                    } else {
+                        if (data.Other1 != null)
+                            topsRender.setError(data.Other1);
+                        alert("保存修改失败：" + data.Msgs[0]);
+                    }
+                    $("#module_toolbar input").removeAttr("disabled");
+                    $("#loading_img").hide();
+                }
+            });
+        });
+  
+    });
+     
+        </script>   
+    }
+    <script type="text/javascript">
+        $(function () {
+            detailTab = $("#detaillist").ligerTab({
+                onAfterSelectTabItem: function (tabID) {
+                    var $g = $("div[tabid=" + tabID + "] div[fieldtype=grid]", $(this.element));
+                    if ($g.length == 0) return;
+                    var gIndex = $g.attr("objindex");
+                    topsRender.find("grid" + gIndex).obj.grid.setWidth();
+                }
+            });
+
+
+            //必填项标示
+            var s = '<span style="color:red;">*</span>'
+            $(s).insertBefore($("[name=n_PartDescription_Classification]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_Code]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_CustomFields1]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_Name]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_SpecificationAndModel]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_Unit]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_Model]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_Color]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_PullInventory]").prev());
+            $(s).insertBefore($("[name=s_PartDescription_StockCode]").prev());
+            $(s).insertBefore($("[name=f_PartDescription_StorageBentUpperLimit]").prev());
+            $(s).insertBefore($("[name=f_PartDescription_StorageBentLowerLimit]").prev());
+            $(s).insertBefore($("[name=f_PartDescription_StorageBayerstUpperLimit]").prev());
+            $(s).insertBefore($("[name=f_PartDescription_StorageBayerstLowerLimit]").prev());
+            $(s).insertBefore($("[name=f_PartDescription_StorageLayerstUpperLimit]").prev());
+            $(s).insertBefore($("[name=f_PartDescription_StorageLayerstLowerLimit]").prev()); 
+        });
+    </script>
+}

@@ -1,0 +1,1606 @@
+
+**************************************************************************************************************------>2020/12/29 9:29:39
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"null"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:30:16
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"null"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:30:18
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"null"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:30:25
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"null"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:31:39
+类型：Business 业务对象：UserToolsLogin 
+说明：执行业务检查：1.*.用户不存在
+***************************************************************************************************************
+SQL:
+select 1 from [TopsWMS_FRM].[dbo].[FRM_Developer] where s_UserNO = @:UserNO and n_state = 1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"heweijian"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+（2）ParameterName:"@Password" DbType:"AnsiString" Value:"F7D46DABEE7173DB"
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:31:39
+类型：Business 业务对象：UserToolsLogin 
+说明：执行业务检查：2.*.用户密码错误
+***************************************************************************************************************
+SQL:
+select 1 from [TopsWMS_FRM].[dbo].[FRM_Developer] where s_UserNO = @UserNO and s_EncryptionCipher = @:Password and n_state = 1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"heweijian"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:""
+（2）ParameterName:"@Password" DbType:"AnsiString" Value:"F7D46DABEE7173DB"
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:""
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:31:40
+类型：Business 业务对象：UserToolsLogin 
+说明：执行业务过程[1]：0.查询用户名
+***************************************************************************************************************
+SQL:
+select UserName = s_UserName from [TopsWMS_FRM].[dbo].[FRM_Developer] where s_UserNO = @UserNO and n_state = 1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"heweijian"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:""
+（2）ParameterName:"@Password" DbType:"AnsiString" Value:"F7D46DABEE7173DB"
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:06
+类型：Business 业务对象：UserLogin 
+说明：执行业务检查：1.*.用户不存在
+***************************************************************************************************************
+SQL:
+select 1 from tUser where s_UserNO=@:UserNO
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"127.0.0.1"
+（1）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:"null"
+（4）ParameterName:"@Password" DbType:"AnsiString" Value:"D63901D9A1C3CC97"
+（5）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:06
+类型：Business 业务对象：UserLogin 
+说明：执行业务检查：2.*.用户密码错误
+***************************************************************************************************************
+SQL:
+select 1 from tUser where s_UserNO=@:UserNO and s_Password=@:Password
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"127.0.0.1"
+（1）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:""
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:""
+（4）ParameterName:"@Password" DbType:"AnsiString" Value:"D63901D9A1C3CC97"
+（5）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:06
+类型：Business 业务对象：UserLogin 
+说明：执行业务过程[1]：0.查询用户名
+***************************************************************************************************************
+SQL:
+select UserName = s_UserName from tUser where s_UserNO=@UserNO
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"127.0.0.1"
+（1）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:""
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:"null"
+（4）ParameterName:"@Password" DbType:"AnsiString" Value:"D63901D9A1C3CC97"
+（5）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:08
+类型：Business 业务对象：UpdateSessionState 
+说明：执行业务过程[1]：0.更新最新的Session状态
+***************************************************************************************************************
+SQL:
+
+if not exists(select 1 from tSessionStateRecord where [s_IPAddress] = @IPAddress and [s_UserAgent] = @UserAgent and s_UserNO = @UserNO)
+begin
+
+INSERT INTO [tSessionStateRecord]
+           ([s_IPAddress]
+           ,[s_UserAgent]
+           ,s_UserNO
+           ,[d_LoginTime]
+           ,n_HoldingTime)
+     VALUES
+           (@IPAddress
+           ,@UserAgent
+           ,@UserNO
+           ,GETDATE()
+           ,30) 
+
+end
+else
+begin
+
+update [tSessionStateRecord] set [d_LoginTime] = GETDATE(),n_HoldingTime = 30
+where [s_IPAddress] = @IPAddress and [s_UserAgent] = @UserAgent
+and s_UserNO = @UserNO
+
+
+
+end
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Password" DbType:"AnsiString" Value:"D63901D9A1C3CC97"
+（2）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"127.0.0.1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+（4）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:10
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:11
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:12
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:15
+类型：Query 查询对象：SelBoardModule 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select s_ModuleID,s_ModuleName,s_Url from tModule where s_ModuleName like '%看板%' and n_IsLeaf = 1
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"" DbType:"String" Value:"null"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:16
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:17
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:18
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:19
+类型：Query 查询对象：SelAllChildServerModule 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select s_ModuleID,s_ModuleName,s_PDFFileUrl from tModuleFileInfo 
+where n_state = 1 and s_ParentModuleID <> '0'
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:20
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"0"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:21
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"cfjcxxgl"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:22
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wmshcqkcgl"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:23
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wms-kcgl"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:24
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wms-crkgl"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:25
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wmskb"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:26
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wms-pdgl"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:27
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wms-ywcz"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:28
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wmstjbb"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:29
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wmssczdcrkgl"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:30
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"wms-bqdygl"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:33:31
+类型：Query 查询对象：SelModules 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+
+declare @pID varchar(50)
+select @pID=@ParentID
+create table #t1(RoleID varchar(50),PowerID varchar(50))
+if @pID ='0' or @IsCheckPower=0
+begin
+	insert into #t1(PowerID)
+	select PowerID='1'
+end 
+else
+begin
+	insert into #t1(RoleID,PowerID)
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@Operator
+/*
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  
+	from tPower where n_Type=1
+*/
+--防止与默认权限重复2016-12-07 rolin
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=p.s_PowerID  
+	from tPower p
+	right join #t1 t on p.s_PowerID=t.PowerID
+	where p.n_Type=1
+	and p.s_PowerID is null
+end
+
+
+
+SELECT
+ModuleID=s_ModuleID,
+ModuleName=s_ModuleName,
+Tag=n_Tag,
+ParentID=s_ParentID,
+--Controller=(select top 1 Value from SplitString(s_Url,'/',1)),
+IsCom=b_IsCom,
+Url=s_Url,
+IconUrl=s_IconUrl,
+IsLeaf=n_IsLeaf
+FROM tModule m
+right join #t1 t on t.PowerID=case 
+								when @pID  ='0' then t.PowerID
+								when @IsCheckPower=0 then t.PowerID
+								else (select top 1 Value from SplitString(s_Url,'/',1))
+						end
+where s_ParentID=@pID 
+AND n_Tag&1=0    --位运算1为删除
+AND (
+	select COUNT(1) from tModulePower mp 
+	join #t1 rp on mp.s_PowerID=rp.PowerID 
+	where mp.s_ModuleID=m.s_ModuleID)> 
+		case when m.n_IsLeaf=1 and @IsCheckPower=1 then 0
+		else -1
+    end
+ORDER BY n_No
+
+
+drop table #t1
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@ParentID" DbType:"AnsiString" Value:"SysMg"
+（1）ParameterName:"@IsCheckPower" DbType:"Boolean" Value:"1"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:36:26
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:36:36
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:36:37
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:36:38
+类型：Query 查询对象：SelNeedLabelPrintInfoList 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+ 
+select * from ( select RowNumber=row_number() over(order by d_BillStockInOutDetail_OperateTime asc),* from (
+SELECT 
+--[Columns]
+      [n_BillStockInOutDetail_Id]
+      ,[s_BillStockInOutDetail_Code]
+      ,s_Space_BarCode
+      ,[s_BillStockInOutDetail_BarCode] 
+      ,[s_BillStockInOutDetail_GoodsProductCode]
+      ,[s_BillStockInOutDetail_GoodsProductName] 
+	  ,[s_PartDescription_Code]
+	  ,[s_PartDescription_Name]
+      ,[s_BillStockInOutDetail_ECN]  
+      ,[s_BillStockInOutDetail_Operator] = tUser.s_UserName
+      ,[d_BillStockInOutDetail_OperateTime] = CONVERT(varchar(20),getdate(),120) 
+      ,[s_BillStockInOutDetail_WhetherToSubmit] = (case isnull(s_BillStockInOutDetail_WhetherToSubmit,0) when 0 then '否' when 1 then '是' else '' end) 
+      ,[f_BillStockInOutDetail_WorkOrderQuantity]
+      ,[f_BillStockInOutDetail_OKProductCou]
+      ,[f_BillStockInOutDetail_UnOKProductCou]
+      ,[f_BillStockInOutDetail_ReworkProductCou]
+      ,[f_BillStockInOutDetail_FinishWorkOrderQuantity]  
+      ,[n_BillStockInOutDetail_IsPrintingState] = (case isnull(n_BillStockInOutDetail_IsPrintingState,0) when 0 then '否' when 1 then '是' else '' end) 
+--[/Columns]
+  FROM [dbo].[tBillStockInOutDetail] with(nolock) 
+  left join [dbo].[tSpace] with(nolock) on tSpace.n_Space_Id = tBillStockInOutDetail.n_Space_Id
+  left join [dbo].[tPartDescription] with(nolock) on tPartDescription.n_PartDescription_Id = tBillStockInOutDetail.n_PartDescription_Id
+  left join tUser tUser with(nolock) on tUser.s_UserNO = tBillStockInOutDetail.s_BillStockInOutDetail_Operator
+  where isnull(n_BillStockInOutDetail_IsPrintingState,0) = 0
+  and n_BillStockInOutDetail_state = 1
+  and n_BillStockInOutDetail_QualityStatus = 
+  (case when isnull(@n_BillStockInOutDetail_QualityStatus,0) = 0 then n_BillStockInOutDetail_QualityStatus else @n_BillStockInOutDetail_QualityStatus end) 
+  and d_BillStockInOutDetail_OperateTime >= (case when isnull(@BeginTime,'1900-01-01') = '1900-01-01' then d_BillStockInOutDetail_OperateTime else @BeginTime end)
+  and d_BillStockInOutDetail_OperateTime <= (case when isnull(@EndTime,'2900-01-01') = '2900-01-01' then d_BillStockInOutDetail_OperateTime else @EndTime end)
+  and s_BillStockInOutDetail_GoodsProductCode like (case when isnull(@s_BillStockInOutDetail_GoodsProductCode,'') = '' then s_BillStockInOutDetail_GoodsProductCode else '%'+@s_BillStockInOutDetail_GoodsProductCode+'%' end)
+  and s_BillStockInOutDetail_GoodsProductName like (case when isnull(@s_BillStockInOutDetail_GoodsProductName,'') = '' then s_BillStockInOutDetail_GoodsProductName else '%'+@s_BillStockInOutDetail_GoodsProductCode+'%' end)
+  and isnull(s_BillStockInOutDetail_WhetherToSubmit,'0') = (case when isnull(@s_BillStockInOutDetail_WhetherToSubmit,0) = 0 then s_BillStockInOutDetail_WhetherToSubmit else @s_BillStockInOutDetail_WhetherToSubmit end)
+  and s_BillStockInOutDetail_Operator  like (case when isnull(@s_BillStockInOutDetail_Operator,'') = '' then s_BillStockInOutDetail_Operator else '%'+@s_BillStockInOutDetail_Operator+'%' end)
+  and s_Space_BarCode like (case when isnull(@s_Space_BarCode,'') = '' then s_Space_BarCode else '%'+@s_Space_BarCode+'%' end)
+and s_BillStockInOutDetail_Code like 'RK%'
+) T_pagenation  ) TT_pagenation  where RowNumber between @beginIndex and @endIndex 
+ 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@BeginTime" DbType:"DateTime" Value:"2020/12/29 8:00:00"
+（1）ParameterName:"@EndTime" DbType:"DateTime" Value:"9999/12/31 23:59:59"
+（2）ParameterName:"@s_Space_BarCode" DbType:"AnsiString" Value:""
+（3）ParameterName:"@s_BillStockInOutDetail_GoodsProductCode" DbType:"AnsiString" Value:""
+（4）ParameterName:"@s_BillStockInOutDetail_GoodsProductName" DbType:"AnsiString" Value:""
+（5）ParameterName:"@n_BillStockInOutDetail_QualityStatus" DbType:"Int32" Value:"0"
+（6）ParameterName:"@s_BillStockInOutDetail_Operator" DbType:"AnsiString" Value:""
+（7）ParameterName:"@s_BillStockInOutDetail_WhetherToSubmit" DbType:"Int32" Value:"0"
+（8）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（9）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+（10）ParameterName:"@beginIndex" DbType:"Int32" Value:"1"
+（11）ParameterName:"@endIndex" DbType:"Int32" Value:"20"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:36:39
+类型：Query 查询对象：SelNeedLabelPrintInfoList 
+说明：执行查询对象查询(合计查询)
+***************************************************************************************************************
+SQL:
+ 
+ select RowsCount=COUNT(1) from ( 
+SELECT 
+ R=1 
+  FROM [dbo].[tBillStockInOutDetail] with(nolock) 
+  left join [dbo].[tSpace] with(nolock) on tSpace.n_Space_Id = tBillStockInOutDetail.n_Space_Id
+  left join [dbo].[tPartDescription] with(nolock) on tPartDescription.n_PartDescription_Id = tBillStockInOutDetail.n_PartDescription_Id
+  left join tUser tUser with(nolock) on tUser.s_UserNO = tBillStockInOutDetail.s_BillStockInOutDetail_Operator
+  where isnull(n_BillStockInOutDetail_IsPrintingState,0) = 0
+  and n_BillStockInOutDetail_state = 1
+  and n_BillStockInOutDetail_QualityStatus = 
+  (case when isnull(@n_BillStockInOutDetail_QualityStatus,0) = 0 then n_BillStockInOutDetail_QualityStatus else @n_BillStockInOutDetail_QualityStatus end) 
+  and d_BillStockInOutDetail_OperateTime >= (case when isnull(@BeginTime,'1900-01-01') = '1900-01-01' then d_BillStockInOutDetail_OperateTime else @BeginTime end)
+  and d_BillStockInOutDetail_OperateTime <= (case when isnull(@EndTime,'2900-01-01') = '2900-01-01' then d_BillStockInOutDetail_OperateTime else @EndTime end)
+  and s_BillStockInOutDetail_GoodsProductCode like (case when isnull(@s_BillStockInOutDetail_GoodsProductCode,'') = '' then s_BillStockInOutDetail_GoodsProductCode else '%'+@s_BillStockInOutDetail_GoodsProductCode+'%' end)
+  and s_BillStockInOutDetail_GoodsProductName like (case when isnull(@s_BillStockInOutDetail_GoodsProductName,'') = '' then s_BillStockInOutDetail_GoodsProductName else '%'+@s_BillStockInOutDetail_GoodsProductCode+'%' end)
+  and isnull(s_BillStockInOutDetail_WhetherToSubmit,'0') = (case when isnull(@s_BillStockInOutDetail_WhetherToSubmit,0) = 0 then s_BillStockInOutDetail_WhetherToSubmit else @s_BillStockInOutDetail_WhetherToSubmit end)
+  and s_BillStockInOutDetail_Operator  like (case when isnull(@s_BillStockInOutDetail_Operator,'') = '' then s_BillStockInOutDetail_Operator else '%'+@s_BillStockInOutDetail_Operator+'%' end)
+  and s_Space_BarCode like (case when isnull(@s_Space_BarCode,'') = '' then s_Space_BarCode else '%'+@s_Space_BarCode+'%' end)
+and s_BillStockInOutDetail_Code like 'RK%'
+ ) T_RowsCount 
+ 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@BeginTime" DbType:"DateTime" Value:"2020/12/29 8:00:00"
+（1）ParameterName:"@EndTime" DbType:"DateTime" Value:"9999/12/31 23:59:59"
+（2）ParameterName:"@s_Space_BarCode" DbType:"AnsiString" Value:""
+（3）ParameterName:"@s_BillStockInOutDetail_GoodsProductCode" DbType:"AnsiString" Value:""
+（4）ParameterName:"@s_BillStockInOutDetail_GoodsProductName" DbType:"AnsiString" Value:""
+（5）ParameterName:"@n_BillStockInOutDetail_QualityStatus" DbType:"Int32" Value:"0"
+（6）ParameterName:"@s_BillStockInOutDetail_Operator" DbType:"AnsiString" Value:""
+（7）ParameterName:"@s_BillStockInOutDetail_WhetherToSubmit" DbType:"Int32" Value:"0"
+（8）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（9）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+（10）ParameterName:"@beginIndex" DbType:"Int32" Value:"1"
+（11）ParameterName:"@endIndex" DbType:"Int32" Value:"20"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/12/29 9:37:12
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^

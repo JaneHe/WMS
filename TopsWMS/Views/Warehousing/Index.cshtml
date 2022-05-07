@@ -1,0 +1,434 @@
+﻿@{
+    Layout = "~/TopsLib/Views/Shared/_MobileTemplate.cshtml";
+    
+    string ParentIds = Request.QueryString["ParentIds"];
+}
+@section Body{
+    <div class="body">
+        <div>
+            <select v-bind:class="Warehouse_Class" >
+                <option :id="item.n_Warehouse_Id" v-for="(item,i) in WarehouseDataList">
+                {{ item.s_Warehouse_Name }}
+                </option>
+            </select>
+        </div>
+        <div>
+            <input type="text" v-bind:class="WorkOrderCode_Class" placeholder="请输入货物标识编码" v-on:keyup.enter="f_checkWorkOrderCode" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="WorkOrderAmount_Class" placeholder="请输入入库数量" v-on:keyup.enter="f_checkWorkOrderAmount" />
+        </div>
+        <div>
+            <input type="text" v-bind:class="WorkOrderReason_Class" placeholder="请输入入库原因" v-on:keyup.enter="f_changeReason" />
+        </div>
+
+        <div v-bind:class="TitleTab_Showed">
+            <table>
+                <tr>
+                    <th>
+                        货物编码
+                    </th>
+                    <th>
+                        货物名称
+                    </th>
+                    <th>
+                        数量
+                    </th> 
+                </tr>
+            </table>
+        </div>
+        <div v-bind:class="InfoTab_Showed">
+            <table>
+                <tr v-for="(item,i) in InfoDataList"  :n_BillStockInOutDetail_Id="item.n_BillStockInOutDetail_Id" :s_WarehousingReason_Name="item.s_WarehousingReason_Name" :index="i" :s_BillStockInOutDetail_GoodsProductCode="item.s_BillStockInOutDetail_GoodsProductCode" :s_WarehousingReason_Name="" >
+                    <td>
+                    {{ item.s_BillStockInOutDetail_GoodsProductCode }}
+                    </td>
+                    <td> 
+                    {{ item.s_BillStockInOutDetail_GoodsProductName }}
+                    </td>
+                    <td> 
+                    {{ item.f_BillStockInOutDetail_WorkOrderQuantity }}
+
+                    </td> 
+                </tr>
+            </table>
+        </div> 
+        <div>
+            <div v-bind:class="Save_Div_Showed" v-on:click="f_saveData">
+                入库</div>
+            <div v-bind:class="Delete_Div_Showed" v-on:click="f_delData">
+                删除</div>
+        </div>
+    </div>
+}
+@section Script{
+    <style type="text/css">
+        .Warehouse
+        { 
+            width:calc(90%);
+            margin:calc(2%) calc(5%) calc(0%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderAmount
+        {
+            width:calc(90%);
+            margin:calc(0%) calc(5%) calc(2%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderReason
+        {
+            width:calc(90%);
+            margin:calc(0%) calc(5%) calc(2%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        .WorkOrderCode
+        {
+            width:calc(90%);
+            margin:calc(2%) calc(5%) calc(2%) calc(5%);
+            border:1px solid lightblue;
+            line-height:30px;
+        }
+        
+         .TitleTab{
+            width: calc(90%);
+            height: 30px; 
+            margin: calc(0%) calc(5%) calc(0%) calc(5%);
+            text-align:center;
+            font
+        }
+        .TitleTab table,.InfoTab table{
+            width: 100%;
+            border-collapse:collapse;
+        }
+        .TitleTab th{
+            width: 43%;
+            border:1px solid #a5e0a5;
+            background:rgb(80, 182, 248);
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .TitleTab tr th:nth-child(3){
+            width: 14%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        } 
+        .InfoTab
+        {
+            width: calc(90%);
+            height: 92px;
+            margin: calc(0%) calc(5%);
+            text-align:center;
+            overflow-y:scroll;
+        }
+        .InfoTab td{
+            width: 43%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        }
+        .InfoTab tr td:nth-child(3){
+            width: 14%;
+            border:1px solid #a5e0a5;
+            line-height:30px;
+            font-family:微软雅黑;
+            font-weight: normal;
+            font-size: 14px;
+        } 
+        
+        .Save_Div
+        {
+            width: calc(35%);
+            margin: calc(5%) calc(2%) calc(15%) calc(10%);
+            background: rgb(80, 182, 248);
+            color: white;
+            font-family: 微软雅黑; 
+            font-size: 20px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        .Delete_Div
+        {
+            width: calc(35%);
+            margin: calc(5%) calc(0%) calc(15%) calc(7%);
+            background: #f69797;
+            color: white;
+            font-family: 微软雅黑; 
+            font-size: 20px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-block;
+            letter-spacing: 2px;
+        }
+        
+        .checked
+        {
+            background:#e9e9ac;
+        }
+        .morechecked
+        {
+            background:#a5e0a5;
+        }
+    </style>
+    <script type="text/javascript">
+        var ajaxhelper = new ajaxHelper();
+
+        //ajax Get请求变量
+        var ajaxobjFirst = null;
+
+        //ajax Post请求变量
+        var ajaxobjSecond = null;
+
+        $(function () {
+
+            //内容容器
+            var body = new Vue({
+                el: ".body",
+                data: {
+                    WorkOrderCode_Class: { //货物标识编码文本框样式
+                        WorkOrderCode: true
+                    },
+                    WorkOrderAmount_Class: { //入库数量文本框样式
+                        WorkOrderAmount: true
+                    },
+                    WorkOrderReason_Class: { //入库原因文本框样式
+                        WorkOrderReason: true
+                    },
+                    Warehouse_Class: { //仓库选择框样式
+                        Warehouse: true
+                    },
+                    WarehouseDataList: [], //仓库选择数据源
+                    TitleTab_Showed: { //标题表格样式
+                        TitleTab: true
+                    },
+                    InfoTab_Showed: { //结果表格样式
+                        InfoTab: true
+                    },
+                    InfoDataList: [], //结果表格数据
+                    Save_Div_Showed: { //入库按钮样式
+                        Save_Div: true
+                    },
+                    Delete_Div_Showed: { //删除按钮样式
+                        Delete_Div: true
+                    }
+                },
+                methods: {
+                    //加载仓库选择数据源
+                    f_loadWarehouseDataList: function () {
+                        //对象名 查询入库操作的所需可选仓库信息
+                        var objectName = "SelWarehousingWarehouseInfo";
+                        //参数
+                        var param = {};
+
+                        ajaxhelper.ajax_Get(objectName, param, function (result) {
+                            //拼装仓库选择数据源
+                            body.WarehouseDataList = [];
+                            if (result.Data[0].length > 0) {
+                                result.Data[0].forEach(function (value, index) {
+                                    body.WarehouseDataList.push({
+                                        n_Warehouse_Id: value.n_Warehouse_Id,
+                                        s_Warehouse_Name: value.s_Warehouse_Name
+                                    })
+                                })
+                            }
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                        })
+
+                        //页面初始化
+                        this.f_reloadPage();
+                    },
+                    //根据货物标识编码查询相应信息
+                    f_checkWorkOrderCode: function (event) {
+                        if ($(event.target).val() == "") {
+                            return;
+                        }
+
+                        //重复请求处理
+                        if (ajaxobjFirst != null) {
+                            ajaxobjFirst.abort();
+                            ajaxobjFirst = null;
+                        }
+
+                        //对象名 查询入库操作的所需可选仓库信息
+                        var objectName = "SelWarehousingWorkOrderInfo";
+                        //参数
+                        var param = { s_BillStockInOutDetail_GoodsProductCode: $(event.target).val(), n_Warehouse_Id: $(".Warehouse").find("option:selected").attr("id") };
+
+                        ajaxobjFirst = ajaxhelper.ajax_Get(objectName, param, function (result) {
+
+                            if (result.Data[0].length > 0) {
+
+                                //拼装结果表格数据源
+                                var arr = body.InfoDataList.slice();
+                                body.InfoDataList = [];
+
+                                $.each(result.Data[0], function (index, value) {
+                                    //获取是否已存在的该行记录
+                                    var len = $(".InfoTab table tr[n_BillStockInOutDetail_Id=" + value.n_BillStockInOutDetail_Id + "]").length;
+
+                                    if (len == 0) {
+                                        body.InfoDataList.push({
+                                            n_BillStockInOutDetail_Id: value.n_BillStockInOutDetail_Id,
+                                            s_BillStockInOutDetail_GoodsProductCode: value.s_BillStockInOutDetail_GoodsProductCode,
+                                            s_BillStockInOutDetail_GoodsProductName: value.s_BillStockInOutDetail_GoodsProductName,
+                                            f_BillStockInOutDetail_WorkOrderQuantity: value.f_BillStockInOutDetail_WorkOrderQuantity,
+                                            s_WarehousingReason_Name: ""
+                                        })
+                                        return false;
+                                    }
+                                })
+
+                                body.InfoDataList = body.InfoDataList.concat(arr);
+                                //焦点
+                                $(".WorkOrderAmount").focus().select();
+
+                                $(event.target).val("");
+                                ajaxobjFirst = null;
+
+                            } else {
+                                f_commonShowMsg("入库单中无该货物信息,请重新输入!");
+                                //清空
+                                $(event.target).val("").focus().select();
+                                ajaxobjFirst = null;
+                            }
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            //清空
+                            $(event.target).val("").focus().select();
+                        })
+
+                    },
+                    //修正数量信息
+                    f_checkWorkOrderAmount: function () {
+                        if ($(event.target).val() == "") {
+
+                            //货物标识编码焦点事件
+                            $(".WorkOrderCode").focus().select();
+                            return;
+                        }
+
+                        //遍历所有结果记录行.如果记录表里有该记录，则进行选中标识操作 
+                        body.InfoDataList.forEach(function (value, index) {
+                            if (index == 0) {
+                                value.f_BillStockInOutDetail_WorkOrderQuantity = $(event.target).val();
+                            }
+                        })
+                        //清空
+                        $(event.target).val("");
+                        //焦点
+                        $(".WorkOrderCode").val("").focus().select();
+                    },
+                    //加载页面后执行
+                    f_reloadPage: function () {
+
+                        //给标题
+                        window.parent.$(".top").find("label").text("WMS-入库操作");
+                        //阻止键盘弹出
+                        f_preventKeyBoard();
+                         
+                        //加载返回事件
+                        f_loadEvent("../../../../SiteLogin/Layout?IsExistsSonModules=0&ParentIds=" + "@ParentIds");
+                         
+
+                        $(".WorkOrderCode").focus();
+
+                        //行点击事件
+                        $(".InfoTab table tr").live("click", function () {
+                            $(this).addClass("checked");
+                            $(this).siblings().removeClass("checked");
+                        })
+                    },
+                    //入库
+                    f_saveData: function () {
+
+                        //重复请求处理
+                        if (ajaxobjSecond != null) {
+                            ajaxobjSecond.abort();
+                            ajaxobjSecond = null;
+                        }
+
+                        //参数集合
+                        var arr = new Array();
+
+                        //遍历获取当前行的数据
+                        $(".InfoTab table tr").each(function (index, value) {
+
+                            arr.push({
+                                n_BillStockInOutDetail_Id: $(value).attr("n_BillStockInOutDetail_Id"),
+                                s_BillStockInOutDetail_GoodsProductCode: $(value).find("td:eq(0)").text().trim(),
+                                s_BillStockInOutDetail_GoodsProductName: $(value).find("td:eq(1)").text().trim(),
+                                f_BillStockInOutDetail_WorkOrderQuantity: $(value).find("td:eq(2)").text().trim(),
+                                s_WarehousingReason_Name: $(value).attr("s_WarehousingReason_Name"),
+                                n_Warehouse_Id: $(".Warehouse").find("option:selected").attr("id")
+                            })
+                        })
+
+                        //对象名 新增入库操作记录
+                        var objectName = "InsertWarehousingListStockInOut";
+                        //参数
+                        var param = { Dictionarys: arr };
+
+                        ajaxobjSecond = ajaxhelper.ajax_Post(objectName, param, function (result) {
+                            f_commonShowMsg("入库成功!");
+                            //清空数据
+                            $(".InfoTab table tr").remove();
+                            //焦点
+                            $(".WorkOrderCode").val("").focus().select();
+                            ajaxobjSecond = null;
+
+                        }, function (result) {
+                            f_commonShowMsg(result.Msgs[0]);
+                            ajaxobjSecond = null;
+                        })
+                    },
+                    //删除行记录
+                    f_delData: function () {
+                        var temp = new Array();
+                        //遍历数据行删除对应的记录
+                        body.InfoDataList.forEach(function (value, index) {
+                            if (!value.s_BillStockInOutDetail_GoodsProductCode == $(".InfoTab").find("tr[class=checked]").attr("s_BillStockInOutDetail_GoodsProductCode")) {
+                                temp.push(value);
+                            }
+                        })
+                        body.InfoDataList = [];
+                        body.InfoDataList = temp;
+                        $(".InfoTab table tr[class=checked]").remove();
+                    },
+                    //入库原因记录
+                    f_changeReason: function (event) {
+
+                        //遍历所有结果记录行.如果记录表里有该记录，则进行选中标识操作 
+                        body.InfoDataList.forEach(function (value, index) {
+                            if (index == 0) {
+                                value.s_WarehousingReason_Name = $(event.target).val();
+                            }
+                        })
+                        //清空
+                        $(event.target).val("");
+                        $(".WorkOrderCode").val("").focus().select();
+                    }
+                }
+            })
+
+            body.f_loadWarehouseDataList();
+        })
+
+    </script>
+}

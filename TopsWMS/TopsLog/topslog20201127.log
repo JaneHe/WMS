@@ -1,0 +1,3614 @@
+
+**************************************************************************************************************------>2020/11/27 17:56:47
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:56:48
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:56:48
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:58:15
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:58:17
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:58:17
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:58:21
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:58:22
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:58:23
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:59:10
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:59:10
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:59:11
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 17:59:11
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:10:58
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:10:59
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:10:59
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:10:59
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:11:26
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:11:28
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:11:28
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:11:28
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:12:00
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:12:01
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:12:01
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:12:01
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:12:20
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:12:21
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:12:22
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:12:22
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:13:08
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:13:09
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:13:10
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:13:10
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:14:32
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:14:33
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:14:34
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:14:34
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:17
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"null"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:18
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"null"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:24
+类型：Business 业务对象：UserLogin 
+说明：执行业务检查：1.*.用户不存在
+***************************************************************************************************************
+SQL:
+select 1 from tUser where s_UserNO=@:UserNO
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"127.0.0.1"
+（1）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:"null"
+（4）ParameterName:"@Password" DbType:"AnsiString" Value:"D63901D9A1C3CC97"
+（5）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:24
+类型：Business 业务对象：UserLogin 
+说明：执行业务检查：2.*.用户密码错误
+***************************************************************************************************************
+SQL:
+select 1 from tUser where s_UserNO=@:UserNO and s_Password=@:Password
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"127.0.0.1"
+（1）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:""
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:""
+（4）ParameterName:"@Password" DbType:"AnsiString" Value:"D63901D9A1C3CC97"
+（5）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:24
+类型：Business 业务对象：UserLogin 
+说明：执行业务过程[1]：0.查询用户名
+***************************************************************************************************************
+SQL:
+select UserName = s_UserName from tUser where s_UserNO=@UserNO
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"127.0.0.1"
+（1）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
+（2）ParameterName:"@Operator" DbType:"AnsiString" Value:""
+（3）ParameterName:"@UserName" DbType:"AnsiString" Value:"null"
+（4）ParameterName:"@Password" DbType:"AnsiString" Value:"D63901D9A1C3CC97"
+（5）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:24
+类型：Business 业务对象：UpdateSessionState 
+说明：执行业务过程[1]：0.更新最新的Session状态
+***************************************************************************************************************
+SQL:
+
+if not exists(select 1 from tSessionStateRecord where [s_IPAddress] = @IPAddress and [s_UserAgent] = @UserAgent and s_UserNO = @UserNO)
+begin
+
+INSERT INTO [tSessionStateRecord]
+           ([s_IPAddress]
+           ,[s_UserAgent]
+           ,s_UserNO
+           ,[d_LoginTime]
+           ,n_HoldingTime)
+     VALUES
+           (@IPAddress
+           ,@UserAgent
+           ,@UserNO
+           ,GETDATE()
+           ,30) 
+
+end
+else
+begin
+
+update [tSessionStateRecord] set [d_LoginTime] = GETDATE(),n_HoldingTime = 30
+where [s_IPAddress] = @IPAddress and [s_UserAgent] = @UserAgent
+and s_UserNO = @UserNO
+
+
+
+end
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Password" DbType:"AnsiString" Value:"D63901D9A1C3CC97"
+（2）ParameterName:"@IPAddress" DbType:"AnsiString" Value:"127.0.0.1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"null"
+（4）ParameterName:"@UserAgent" DbType:"AnsiString" Value:"Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:24
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:25
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:25
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:27
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:27
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:15:27
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:16:22
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:16:23
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:16:23
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:16:23
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:18:02
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:18:04
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:18:04
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:18:04
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:19:06
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:19:07
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:19:08
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:19:08
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:21:04
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:21:05
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:21:05
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:21:05
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:21:37
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:21:38
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:21:39
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:21:39
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:24:10
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:24:10
+类型：Query 查询对象：SelPowersByUserNO 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+if exists(
+	select 1 from tUser where s_UserNO=@UserNO
+)
+--如果是登录用户
+begin
+	select RoleID=ur.s_RoleID,PowerID=rp.s_PowerID 
+	into #t1
+	from 
+	tUser u
+	join tUserRole ur on u.s_UserNO=ur.s_UserID
+	join tRolePower rp on rp.s_RoleID=ur.s_RoleID
+	where s_UserNO=@UserNO
+	
+	insert into #t1 (RoleID,PowerID) 
+	select RoleID='defaule',PowerID=s_PowerID  from tPower where n_Type=1
+	
+	select * from #t1
+drop table #t1
+end
+else
+	--如果是非登录用户，只获取公开权限
+	select RoleID='public',PowerID=s_PowerID  from tPower where b_IsPublic=1
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:24:11
+类型：Query 查询对象：SelOperatorRoleID 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+select OperatorRoleID=s_RoleID from tRole where s_RoleID in( select s_RoleID from tUserRole where s_UserID=@UserNO)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@UserNO" DbType:"AnsiString" Value:"admin"
+（1）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************************************************************************************************------>2020/11/27 18:24:11
+类型：Query 查询对象：SelPackingOnShelfSingleReportInventoryCurrent 
+说明：执行查询对象查询(1)
+***************************************************************************************************************
+SQL:
+--仓库库存信息
+declare @table table(
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+	s_ReportInventoryCurrent_Code varchar(max),
+	s_ReportInventoryCurrent_SurplusNumber varchar(max),
+	s_ReportInventoryCurrent_Batch varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	n_ListPutOnOff_Id varchar(max), 
+	n_ReportInventoryCurrent_Id varchar(max), 
+	n_Space_ShipmentSequence int
+)
+--未提交的上架单据货物信息
+declare @UnSubmitTable table(
+	s_ReportInventoryCurrent_Code varchar(max),
+    s_ReportInventoryCurrent_GoodsProductCode varchar(max), 
+	n_Bin_Id varchar(max), 
+	s_Bin_Code varchar(max), 
+	s_ReportInventoryCurrent_Number int
+)
+
+--根据货物编码匹配的仓库中对应产品的库存信息
+insert into @table(
+    s_ReportInventoryCurrent_GoodsProductCode,
+	s_ReportInventoryCurrent_Code,
+	s_ReportInventoryCurrent_SurplusNumber,
+	s_ReportInventoryCurrent_Batch, 
+	n_Bin_Id,
+	s_Bin_Code,
+	n_ListPutOnOff_Id,
+	n_ReportInventoryCurrent_Id,
+	n_Space_ShipmentSequence
+)
+select 
+s_ReportInventoryCurrentDetail_GoodsProductCode, 
+s_ReportInventoryCurrentDetail_Code,
+(case isnull([n_ReportInventoryCurrentDetail_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrentDetail_Number],0)) end),
+s_ReportInventoryCurrentDetail_BatchNumber, 
+tReportInventoryCurrentDetail.n_Bin_Id,
+tBin.s_Bin_Code,
+'',
+tReportInventoryCurrentDetail.n_ReportInventoryCurrent_Id,
+n_Space_ShipmentSequence 
+from tReportInventoryCurrentDetail tReportInventoryCurrentDetail with(nolock)
+inner join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrentDetail.n_Space_Id 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tReportInventoryCurrentDetail.n_Bin_Id
+where s_ReportInventoryCurrentDetail_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and n_ReportInventoryCurrentDetail_state = 1 and n_Space_state = 1 
+and s_ReportInventoryCurrentDetail_QualityStatus = 1 and tBin.n_Bin_State = 1 
+and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+ 
+
+
+--根据货物编码查询未提交的下架单据的指定货位的数量
+insert into @UnSubmitTable(
+	s_ReportInventoryCurrent_Code,
+    s_ReportInventoryCurrent_GoodsProductCode, 
+	n_Bin_Id,
+	s_Bin_Code,
+	s_ReportInventoryCurrent_Number  
+)
+select 
+s_ListPutOnOff_Code,
+s_ListPutOnOff_GoodsProductCode,
+tBin.n_Bin_Id,
+s_Bin_Code,
+sum(n_ListPutOnOff_OffTheShelfNumber) as n_ListPutOnOff_OffTheShelfNumber
+from tListPutOnOff tListPutOnOff with(nolock) 
+inner join tBin tBin with(nolock) on tBin.n_Bin_Id = tListPutOnOff.n_Bin_Id
+where n_ListPutOnOff_state = 1 and s_ListPutOnOff_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+and tListPutOnOff.n_Warehouse_Id = @n_Warehouse_Id
+and n_ListPutOnOff_QualityStatus = 1
+and isnull(s_ListPutOnOff_WhetherToSubmit,0) = 0
+and d_ListPutOnOff_LaunchTime is null and tBin.n_Bin_State = 1 
+group by s_ListPutOnOff_Code,tBin.n_Bin_Id,
+s_Bin_Code,s_ListPutOnOff_GoodsProductCode
+
+ 
+--扣减未提交的上架单据的数量，等于实际已存在的库存数量
+update @table
+set s_ReportInventoryCurrent_SurplusNumber = Convert(int,tab.s_ReportInventoryCurrent_SurplusNumber) - Convert(int,UnSubmitTable.s_ReportInventoryCurrent_Number)
+from @table tab
+inner join @UnSubmitTable UnSubmitTable on UnSubmitTable.s_ReportInventoryCurrent_Code
+ = tab.s_ReportInventoryCurrent_Code and UnSubmitTable.s_ReportInventoryCurrent_GoodsProductCode
+ = tab.s_ReportInventoryCurrent_GoodsProductCode 
+ and UnSubmitTable.n_Bin_Id
+ = tab.n_Bin_Id
+
+select * from @table
+order by isnull(n_Space_ShipmentSequence,0) asc, s_ReportInventoryCurrent_Batch asc,Convert(int,replace(s_ReportInventoryCurrent_SurplusNumber,'---','100000000')) asc
+ 
+
+--declare @table table(
+--s_ReportInventoryCurrent_GoodsProductCode varchar(max),
+--s_ReportInventoryCurrent_Code varchar(max),
+--s_ReportInventoryCurrent_SurplusNumber varchar(max),
+--s_ReportInventoryCurrent_Batch varchar(max), 
+--n_ListPutOnOff_Id varchar(max), 
+--n_ReportInventoryCurrent_Id varchar(max), 
+--n_Space_ShipmentSequence int
+--)
+
+----根据货物编码匹配的已占据产品的库位的信息
+--insert into @table(
+--s_ReportInventoryCurrent_GoodsProductCode,
+--s_ReportInventoryCurrent_Code,
+--s_ReportInventoryCurrent_SurplusNumber,
+--s_ReportInventoryCurrent_Batch, 
+--n_ListPutOnOff_Id,
+--n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence
+--)
+--select 
+--s_ReportInventoryCurrent_GoodsProductCode, 
+--s_ReportInventoryCurrent_Code,
+--(case isnull([n_ReportInventoryCurrent_Number],'0') when '0' then '---' else Convert(varchar(20),isnull([n_ReportInventoryCurrent_Number],0)) end),
+--s_ListPutOnOff_BatchNumber, 
+--'',
+--tReportInventoryCurrent.n_ReportInventoryCurrent_Id,
+--n_Space_ShipmentSequence 
+--from tReportInventoryCurrent tReportInventoryCurrent with(nolock)
+--left join tSpace tSpace with(nolock) on tSpace.n_Space_Id = tReportInventoryCurrent.n_Space_Id 
+--left join tListPutOnOff tListPutOnOff with(nolock) on tListPutOnOff.n_ReportInventoryCurrent_Id
+--= tReportInventoryCurrent.n_ReportInventoryCurrent_Id
+--where s_ReportInventoryCurrent_GoodsProductCode = @s_ReportInventoryCurrent_GoodsProductCode
+--and n_ReportInventoryCurrent_state = 1 and n_Space_state = 1
+--and tListPutOnOff.n_ListPutOnOff_state = 1
+--and s_ReportInventoryCurrent_QualityStatus = @s_ReportInventoryCurrent_QualityStatus 
+--and tSpace.n_Warehouse_Id = @n_Warehouse_Id
+--order by d_ListPutOnOff_LaunchTime asc  
+ 
+--select * from @table
+
+
+
+
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+参数：
+（0）ParameterName:"@s_ReportInventoryCurrent_GoodsProductCode" DbType:"AnsiString" Value:"1203100002"
+（1）ParameterName:"@n_Warehouse_Id" DbType:"AnsiString" Value:"5D5EFEB1-CA50-4677-A94F-605FECD259D0"
+（2）ParameterName:"@s_ReportInventoryCurrent_QualityStatus" DbType:"AnsiString" Value:"1"
+（3）ParameterName:"@Operator" DbType:"AnsiString" Value:"admin"
+（4）ParameterName:"@OperatorRoleID" DbType:"AnsiString" Value:"001"
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
